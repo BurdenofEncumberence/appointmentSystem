@@ -25,6 +25,7 @@
             color: var(--ink);
             font-family: 'VT323', monospace;
             font-size: 20px;
+            overflow-x: hidden;
             background-image:
                 repeating-linear-gradient(0deg, rgba(26,22,17,0.03) 0px, rgba(26,22,17,0.03) 1px, transparent 1px, transparent 4px);
         }
@@ -71,62 +72,40 @@
         }
         .seal div { width: 100%; height: 100%; }
 
-        .event-tab {
+        .event-travel-group {
             position: absolute;
-            top: -1px;
-            right: 40px;
-            padding: 10px 18px;
-            cursor: pointer;
-            transition: transform 0.7s cubic-bezier(0.22, 0.68, 0.32, 1);
+            top: 100%;
+            margin-top: 10px;
+            left: calc(100% - 150px);
+            display: flex;
+            align-items: center;
             z-index: 30;
+            cursor: pointer;
         }
-        .event-tab.open {
-            transform: translate(-78vw, 46px);
+        .event-tab {
+            padding: 10px 18px;
+            white-space: nowrap;
         }
-        @media (max-width: 640px) {
-            .event-tab.open {
-                transform: translate(-55vw, 46px);
-            }
+        .event-banner-strip {
+            padding: 10px 22px;
+            white-space: nowrap;
+            margin-left: 14px;
         }
 
-        .event-ticker-wrap {
-            position: absolute;
-            top: 45px;
-            right: 0;
-            height: 40px;
-            width: 0;
-            overflow: hidden;
-            background: var(--ink);
-            transition: width 0.7s cubic-bezier(0.22, 0.68, 0.32, 1);
-            z-index: 25;
+        @keyframes event-travel {
+            0%   { transform: translateX(0); opacity: 1; }
+            83%  { transform: translateX(-160vw); opacity: 1; }
+            84%  { opacity: 0; }
+            85%  { transform: translateX(0); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
         }
-        .event-ticker-wrap.open {
-            width: 100%;
-        }
-        .event-ticker-track {
-            display: inline-flex;
-            white-space: nowrap;
-            animation: ticker-scroll 14s linear infinite;
-            animation-play-state: paused;
-            padding-top: 9px;
-        }
-        .event-ticker-wrap.open .event-ticker-track {
-            animation-play-state: running;
-        }
-        .event-ticker-track span {
-            color: var(--gold);
-            font-family: 'Press Start 2P', monospace;
-            font-size: 11px;
-            padding-right: 60px;
-        }
-        @keyframes ticker-scroll {
-            from { transform: translateX(0); }
-            to { transform: translateX(-50%); }
+        .event-travel-group.traveling {
+            animation: event-travel 6s linear 1;
         }
         @media (prefers-reduced-motion: reduce) {
-            .event-tab.open { transition: none; }
-            .event-ticker-wrap.open { transition: none; }
-            .event-ticker-track { animation-duration: 40s; }
+            .event-travel-group.traveling {
+                animation-duration: 0.6s;
+            }
         }
 
         .court-frame {
@@ -178,13 +157,12 @@
                 </a>
             </nav>
         </header>
-        <div class="event-tab pixel-border bg-[color:var(--cream)]" id="dragon-toggle" role="button" tabindex="0" aria-label="Show upcoming events">
-            <span class="font-pixel text-[10px]">EVENTS</span>
-        </div>
-        <div class="event-ticker-wrap" id="event-ticker-wrap">
-            <div class="event-ticker-track">
-                <span>GRAND OPENING TOURNAMENT — REGISTRATION OPENS SOON</span>
-                <span>GRAND OPENING TOURNAMENT — REGISTRATION OPENS SOON</span>
+        <div class="event-travel-group" id="dragon-toggle" role="button" tabindex="0" aria-label="Show upcoming events">
+            <div class="event-tab pixel-border bg-[color:var(--cream)]">
+                <span class="font-pixel text-[10px]">EVENTS</span>
+            </div>
+            <div class="event-banner-strip pixel-border" style="background: var(--ink);">
+                <span class="font-pixel text-[11px]" style="color: var(--gold);">GRAND OPENING TOURNAMENT — REGISTRATION OPENS SOON</span>
             </div>
         </div>
     </div>
@@ -340,17 +318,19 @@
             renderPixelGrid(id, sealRows[id], { '.': 'transparent', 'G': '#E3A857' });
         });
 
-        const dragonToggle = document.getElementById('dragon-toggle');
-        const tickerWrap = document.getElementById('event-ticker-wrap');
-        function toggleBanner() {
-            dragonToggle.classList.toggle('open');
-            tickerWrap.classList.toggle('open');
+        const travelGroup = document.getElementById('dragon-toggle');
+        function startTravel() {
+            if (travelGroup.classList.contains('traveling')) return;
+            travelGroup.classList.add('traveling');
         }
-        dragonToggle.addEventListener('click', toggleBanner);
-        dragonToggle.addEventListener('keydown', (e) => {
+        travelGroup.addEventListener('animationend', () => {
+            travelGroup.classList.remove('traveling');
+        });
+        travelGroup.addEventListener('click', startTravel);
+        travelGroup.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                toggleBanner();
+                startTravel();
             }
         });
     </script>
