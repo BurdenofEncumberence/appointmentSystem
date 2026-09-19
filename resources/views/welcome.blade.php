@@ -4,158 +4,336 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>KYMNET - Book Your Court, Rally with Ease</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        :root {
+            --ink: #1A1611;
+            --red: #B3261E;
+            --gold: #E3A857;
+            --parchment: #F3E5C8;
+            --jade: #2F6F4E;
+            --cream: #FDF6E3;
+        }
+
+        * { border-radius: 0 !important; }
+
+        body {
+            background-color: var(--parchment);
+            color: var(--ink);
+            font-family: 'VT323', monospace;
+            font-size: 20px;
+            overflow-x: hidden;
+            background-image:
+                repeating-linear-gradient(0deg, rgba(26,22,17,0.03) 0px, rgba(26,22,17,0.03) 1px, transparent 1px, transparent 4px);
+        }
+
+        .font-pixel {
+            font-family: 'Press Start 2P', monospace;
+            line-height: 1.6;
+        }
+
+        .double-rule {
+            border-bottom: 6px solid var(--red);
+            box-shadow: 0 8px 0 -2px var(--gold);
+            margin-bottom: 8px;
+        }
+
+        .pixel-border {
+            border: 3px solid var(--ink);
+            box-shadow: 6px 6px 0 var(--ink);
+        }
+
+        .pixel-btn {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 12px;
+            border: 3px solid var(--ink);
+            box-shadow: 5px 5px 0 var(--ink);
+            transition: transform 0.08s ease, box-shadow 0.08s ease;
+            display: inline-block;
+            padding: 14px 20px;
+        }
+        .pixel-btn:active {
+            transform: translate(5px, 5px);
+            box-shadow: 0 0 0 var(--ink);
+        }
+
+        .seal {
+            width: 44px;
+            height: 44px;
+            background: var(--red);
+            border: 2px solid var(--ink);
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            flex-shrink: 0;
+        }
+        .seal div { width: 100%; height: 100%; }
+
+        .event-travel-group {
+            position: absolute;
+            top: 100%;
+            margin-top: 10px;
+            left: calc(100% - 150px);
+            display: flex;
+            align-items: center;
+            z-index: 30;
+            cursor: pointer;
+        }
+        .event-tab {
+            padding: 10px 18px;
+            white-space: nowrap;
+        }
+        .event-banner-strip {
+            padding: 10px 22px;
+            white-space: nowrap;
+            margin-left: 14px;
+        }
+
+        @keyframes event-travel {
+            0%   { transform: translateX(0); opacity: 1; }
+            83%  { transform: translateX(-160vw); opacity: 1; }
+            84%  { opacity: 0; }
+            85%  { transform: translateX(0); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+        .event-travel-group.traveling {
+            animation: event-travel 6s linear 1;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .event-travel-group.traveling {
+                animation-duration: 0.6s;
+            }
+        }
+
+        .court-frame {
+            aspect-ratio: 4 / 3;
+            background: var(--jade);
+            position: relative;
+            overflow: hidden;
+        }
+        .court-line {
+            position: absolute;
+            background: var(--cream);
+        }
+        .court-net {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: repeating-linear-gradient(0deg, var(--ink), var(--ink) 4px, transparent 4px, transparent 8px);
+            transform: translateX(-50%);
+        }
+        .court-dot {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+        }
+
+        .ledger-row {
+            border-bottom: 3px dashed var(--ink);
+        }
+        .ledger-row:last-child { border-bottom: none; }
+    </style>
 </head>
-<body class="bg-white text-slate-900 antialiased">
+<body class="antialiased">
 
-    {{-- Navbar --}}
-    <header class="border-b border-slate-100">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    {{-- Header --}}
+    <div class="double-rule relative">
+        <header class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-lg bg-slate-900 flex items-center justify-center">
-                    <span class="text-lime-400 font-bold text-sm">K</span>
-                </div>
-                <div>
-                    <span class="text-xl font-extrabold tracking-tight">KYMNET</span>
-                    <span class="ml-2 inline-block bg-lime-100 text-lime-700 text-[10px] font-semibold px-2 py-0.5 rounded-full align-middle">
-                        #1 PICKLEBALL COURT ARENA
-                    </span>
-                </div>
+                <div class="seal" aria-hidden="true" id="brand-seal"></div>
+                <span class="font-pixel text-lg">KYMNET</span>
             </div>
-
-            <div class="flex items-center gap-3">
-                <a href="{{ route('login') }}"
-                   class="bg-slate-900 text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-slate-800 transition">
+            <nav class="flex items-center gap-4">
+                <a href="{{ route('login') }}" class="pixel-btn bg-[color:var(--parchment)]">
                     Login
                 </a>
-                <a href="{{ route('register') }}"
-                   class="bg-slate-900 text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-slate-800 transition">
+                <a href="{{ route('register') }}" class="pixel-btn text-[color:var(--cream)] bg-[color:var(--red)]">
                     Register
                 </a>
+            </nav>
+        </header>
+        <div class="event-travel-group" id="dragon-toggle" role="button" tabindex="0" aria-label="Show upcoming events">
+            <div class="event-tab pixel-border bg-[color:var(--cream)]">
+                <span class="font-pixel text-[10px]">EVENTS</span>
+            </div>
+            <div class="event-banner-strip pixel-border" style="background: var(--ink);">
+                <span class="font-pixel text-[11px]" style="color: var(--gold);">GRAND OPENING TOURNAMENT — REGISTRATION OPENS SOON</span>
             </div>
         </div>
-    </header>
+    </div>
 
     {{-- Hero --}}
-    <section class="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-12 items-center">
-        <div>
-            <h1 class="text-5xl font-extrabold leading-tight">
-                Book Your Court<br>
-                <span class="text-lime-500">Rally with Ease</span>
-            </h1>
-            <p class="mt-6 text-slate-500 max-w-md leading-relaxed">
-                KYMNET brings everything pickleball under one roof. Reserve court time,
-                join skill-matched games, and gear up—all from one seamless platform.
-            </p>
+    <section class="max-w-6xl mx-auto px-6 pt-20 pb-28 relative">
+        <div class="grid md:grid-cols-2 gap-16 items-center relative">
+            <div class="relative">
+                <h1 class="font-pixel text-3xl md:text-4xl leading-relaxed">
+                    Book Your Court.<br>
+                    <span style="color: var(--red);">Rally With Ease.</span>
+                </h1>
+                <p class="mt-8 max-w-sm text-xl leading-relaxed">
+                    KYMNET brings court reservations, tournaments, and match schedules
+                    into one place. Pick a court, pick a time, and play.
+                </p>
+                <a href="{{ route('register') }}" class="pixel-btn text-[color:var(--cream)] bg-[color:var(--jade)] mt-10">
+                    Reserve a Court
+                </a>
+            </div>
+
+            <div class="pixel-border court-frame">
+                <div class="court-line" style="top:8%; left:8%; right:8%; height:4px;"></div>
+                <div class="court-line" style="bottom:8%; left:8%; right:8%; height:4px;"></div>
+                <div class="court-line" style="top:8%; bottom:8%; left:8%; width:4px;"></div>
+                <div class="court-line" style="top:8%; bottom:8%; right:8%; width:4px;"></div>
+                <div class="court-net"></div>
+                <div class="court-dot" style="background: var(--gold); left: 30%; top: 40%;"></div>
+                <div class="court-dot" style="background: var(--red); left: 65%; top: 60%;"></div>
+            </div>
         </div>
 
-        <div class="rounded-3xl overflow-hidden shadow-xl">
-            <img src="https://images.unsplash.com/photo-1595435742656-5272d0b3fa82?auto=format&fit=crop&w=1200&q=80"
-                 alt="Players on a pickleball court at sunset"
-                 class="w-full h-full object-cover">
-        </div>
+        {{-- court frame is the only thing left on the right column now --}}
     </section>
 
     {{-- Features --}}
-    <section class="bg-slate-50 py-20">
-        <div class="max-w-4xl mx-auto text-center px-6">
-            <h2 class="text-4xl font-extrabold">Built for the modern player</h2>
-            <p class="mt-4 text-slate-500">
-                Say goodbye to endless phone calls and waiting lists. Our platform streamlines
-                every aspect of your game prep.
-            </p>
-        </div>
+    <section class="max-w-4xl mx-auto px-6 pb-24">
+        <h2 class="font-pixel text-2xl mb-10">Built for the modern player</h2>
 
-        <div class="max-w-6xl mx-auto px-6 mt-14 grid md:grid-cols-3 gap-8">
-
-            {{-- Real-Time Availability --}}
-            <div class="bg-white rounded-2xl p-8 shadow-sm border border-slate-100">
-                <div class="w-12 h-12 rounded-xl bg-lime-100 flex items-center justify-center mb-5">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-lime-600" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0V11.25A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6l2.25 2.25L16.5 12" />
-                    </svg>
+        <div class="pixel-border bg-[color:var(--cream)]">
+            <div class="ledger-row flex items-start gap-5 p-6">
+                <div class="seal" id="seal-availability"></div>
+                <div>
+                    <h3 class="font-pixel text-base mb-2">Real-Time Availability</h3>
+                    <p class="text-lg leading-relaxed">
+                        See live court schedules the moment a slot opens or closes, no phone calls needed.
+                    </p>
                 </div>
-                <h3 class="font-bold text-lg mb-2">Real-Time Availability</h3>
-                <p class="text-slate-500 text-sm leading-relaxed">
-                    See live schedule updates directly from premier regional clubs and outdoor centers.
-                </p>
             </div>
-
-            {{-- Instant Booking --}}
-            <div class="bg-white rounded-2xl p-8 shadow-sm border border-slate-100">
-                <div class="w-12 h-12 rounded-xl bg-lime-100 flex items-center justify-center mb-5">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-lime-600" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12.75 10.5h7.5l-10.5 11.25L11.25 13.5h-7.5z" />
-                    </svg>
+            <div class="ledger-row flex items-start gap-5 p-6">
+                <div class="seal" id="seal-booking"></div>
+                <div>
+                    <h3 class="font-pixel text-base mb-2">Instant Booking</h3>
+                    <p class="text-lg leading-relaxed">
+                        Reserve a court in under a minute, with a clear summary before you pay.
+                    </p>
                 </div>
-                <h3 class="font-bold text-lg mb-2">Instant Booking</h3>
-                <p class="text-slate-500 text-sm leading-relaxed">
-                    Secure your time slot in less than 30 seconds with clean, secure checkouts.
-                </p>
             </div>
-
-            {{-- Court Preferences --}}
-            <div class="bg-white rounded-2xl p-8 shadow-sm border border-slate-100">
-                <div class="w-12 h-12 rounded-xl bg-lime-100 flex items-center justify-center mb-5">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-lime-600" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m9 12h3.75M16.5 18a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0H13.5M10.5 12h9.75M10.5 12a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 12H7.5" />
-                    </svg>
+            <div class="flex items-start gap-5 p-6">
+                <div class="seal" id="seal-preferences"></div>
+                <div>
+                    <h3 class="font-pixel text-base mb-2">Court Preferences</h3>
+                    <p class="text-lg leading-relaxed">
+                        Filter by indoor or outdoor, covered courts, or night lighting.
+                    </p>
                 </div>
-                <h3 class="font-bold text-lg mb-2">Court Preferences</h3>
-                <p class="text-slate-500 text-sm leading-relaxed">
-                    Filter by indoor/outdoor, professional cushion surfaces, covered courts, or night lighting.
-                </p>
             </div>
         </div>
     </section>
 
     {{-- Footer --}}
-    <footer class="bg-slate-900 text-white py-16">
-        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-10">
-            <div>
-                <span class="text-2xl font-extrabold">KYMNET</span>
-                <p class="mt-4 text-slate-400 text-sm max-w-xs leading-relaxed">
-                    Premium court booking software designed for modern players. Real-time availability,
-                    hassle-free reservations, and instant match setups.
-                </p>
-            </div>
+    <footer style="background: var(--ink); color: var(--cream);">
+        <div style="border-top: 6px solid var(--red); box-shadow: inset 0 4px 0 -1px var(--gold);">
+            <div class="max-w-6xl mx-auto px-6 py-14 grid md:grid-cols-4 gap-10">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="seal" id="footer-seal"></div>
+                        <span class="font-pixel text-base">KYMNET</span>
+                    </div>
+                    <p class="text-lg opacity-80 max-w-xs leading-relaxed">
+                        Court booking for the Davao pickleball community. Built by players, for players.
+                    </p>
+                </div>
 
-            <div>
-                <h4 class="text-xs font-semibold tracking-wider text-slate-400 mb-4">EXPLORE</h4>
-                <ul class="space-y-2 text-sm text-slate-300">
-                    <li><a href="#" class="hover:text-white">Find Courts</a></li>
-                    <li><a href="#" class="hover:text-white">Host Tournament</a></li>
-                    <li><a href="#" class="hover:text-white">Find Partners</a></li>
-                </ul>
-            </div>
+                <div>
+                    <h4 class="font-pixel text-xs mb-4">Explore</h4>
+                    <ul class="space-y-2 text-lg opacity-80">
+                        <li><a href="#" class="hover:opacity-100" style="color: var(--gold);">Find courts</a></li>
+                        <li><a href="#" class="hover:opacity-100" style="color: var(--gold);">Host a tournament</a></li>
+                        <li><a href="#" class="hover:opacity-100" style="color: var(--gold);">Find partners</a></li>
+                    </ul>
+                </div>
 
-            <div>
-                <h4 class="text-xs font-semibold tracking-wider text-slate-400 mb-4">FOR USERS</h4>
-                <ul class="space-y-2 text-sm text-slate-300">
-                    <li><a href="#" class="hover:text-white">Support</a></li>
-                    <li><a href="#" class="hover:text-white">Software Features</a></li>
-                    <li><a href="#" class="hover:text-white">Pricing</a></li>
-                </ul>
-            </div>
+                <div>
+                    <h4 class="font-pixel text-xs mb-4">For users</h4>
+                    <ul class="space-y-2 text-lg opacity-80">
+                        <li><a href="#" class="hover:opacity-100" style="color: var(--gold);">Support</a></li>
+                        <li><a href="#" class="hover:opacity-100" style="color: var(--gold);">Pricing</a></li>
+                    </ul>
+                </div>
 
-            <div>
-                <h4 class="text-xs font-semibold tracking-wider text-slate-400 mb-4">COMPANY</h4>
-                <ul class="space-y-2 text-sm text-slate-300">
-                    <li><a href="#" class="hover:text-white">About Us</a></li>
-                    <li><a href="#" class="hover:text-white">Contact Support</a></li>
-                    <li><a href="#" class="hover:text-white">Careers</a></li>
-                </ul>
+                <div>
+                    <h4 class="font-pixel text-xs mb-4">Company</h4>
+                    <ul class="space-y-2 text-lg opacity-80">
+                        <li><a href="#" class="hover:opacity-100" style="color: var(--gold);">About us</a></li>
+                        <li><a href="#" class="hover:opacity-100" style="color: var(--gold);">Contact</a></li>
+                    </ul>
+                </div>
             </div>
-        </div>
-
-        <div class="max-w-7xl mx-auto px-6 mt-12 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-400">
-            <span>© {{ date('Y') }} KYMNET Inc. All rights reserved.</span>
-            <div class="flex gap-6">
-                <a href="#" class="hover:text-white">Privacy Policy</a>
-                <a href="#" class="hover:text-white">Terms of Service</a>
+            <div class="max-w-6xl mx-auto px-6 pb-8 text-base opacity-60">
+                © {{ date('Y') }} KYMNET. All rights reserved.
             </div>
         </div>
     </footer>
+
+    <script>
+        function renderPixelGrid(id, rows, colorMap) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.innerHTML = '';
+            rows.forEach(row => {
+                [...row].forEach(ch => {
+                    const cell = document.createElement('div');
+                    cell.style.background = colorMap[ch] || 'transparent';
+                    el.appendChild(cell);
+                });
+            });
+        }
+
+        const sealRows = {
+            'brand-seal': [
+                "........",".G....G.","..GGGG..",".G.GG.G.",
+                ".G.GG.G.","..GGGG..",".G....G.","........"
+            ],
+            'seal-availability': [
+                "........",".G....G.","..GGGG..",".G.GG.G.",
+                ".G.GG.G.","..GGGG..",".G....G.","........"
+            ],
+            'seal-booking': [
+                "...G....","..GG....",".GGG....","GGGGGGG.",
+                "....GGG.","....GG..","....G...","........"
+            ],
+            'seal-preferences': [
+                "........",".GGGG...","...G....",".GGGGGG.",
+                "...G....",".GG.....","...G....","........"
+            ],
+            'footer-seal': [
+                "........",".G....G.","..GGGG..",".G.GG.G.",
+                ".G.GG.G.","..GGGG..",".G....G.","........"
+            ]
+        };
+        Object.keys(sealRows).forEach(id => {
+            renderPixelGrid(id, sealRows[id], { '.': 'transparent', 'G': '#E3A857' });
+        });
+
+        const travelGroup = document.getElementById('dragon-toggle');
+        function startTravel() {
+            if (travelGroup.classList.contains('traveling')) return;
+            travelGroup.classList.add('traveling');
+        }
+        travelGroup.addEventListener('animationend', () => {
+            travelGroup.classList.remove('traveling');
+        });
+        travelGroup.addEventListener('click', startTravel);
+        travelGroup.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                startTravel();
+            }
+        });
+    </script>
 
 </body>
 </html>
