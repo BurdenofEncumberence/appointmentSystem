@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -45,5 +46,28 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function hasRole(string|array $roles): bool
+    {
+        return in_array($this->role, (array) $roles, true);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('admin');
+    }
+
+    public function hasPermission(string $permission): bool
+    {
+        $permissions = [
+            'admin' => ['*'],
+            'manager' => ['view_admin_dashboard', 'manage_courts', 'view_finances'],
+            'staff' => ['view_admin_dashboard', 'manage_courts'],
+            'player' => [],
+        ];
+
+        return in_array('*', $permissions[$this->role] ?? [], true)
+            || in_array($permission, $permissions[$this->role] ?? [], true);
     }
 }
