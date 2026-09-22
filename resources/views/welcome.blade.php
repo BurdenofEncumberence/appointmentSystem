@@ -8,6 +8,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        .dragon-icon {
+            display: inline-block;
+            width: 135px;
+            height: auto;
+            image-rendering: pixelated;
+        }
+        .event-travel-group.traveling .dragon-icon {
+            animation: dragon-fly 5.0s ease-in-out;
+        }
+        @keyframes dragon-fly {
+            0%   { transform: translateX(0) translateY(0); }
+            50%  { transform: translateX(40px) translateY(-10px); }
+            100% { transform: translateX(0) translateY(0); }
+        }
+    </style>
 </head>
 <body class="antialiased">
 
@@ -28,9 +44,14 @@
             </nav>
         </header>
         <div class="event-travel-group" id="dragon-toggle" role="button" tabindex="0" aria-label="Show upcoming events">
-            <div class="event-tab pixel-border bg-[color:var(--cream)]">
-                <span class="font-pixel text-[10px]">EVENTS</span>
-            </div>
+            <img
+                src="{{ asset('images/dragon-static.png') }}"
+                data-static="{{ asset('images/dragon-static.png') }}"
+                data-animated="{{ asset('images/dragon.gif') }}"
+                alt="Dragon"
+                class="event-tab dragon-icon"
+                id="dragon-img"
+            >
             <div class="event-banner-strip pixel-border" style="background: var(--ink);">
                 <span class="font-pixel text-[11px]" style="color: var(--gold);">GRAND OPENING TOURNAMENT — REGISTRATION OPENS SOON</span>
             </div>
@@ -186,14 +207,23 @@
             renderPixelGrid(id, sealRows[id], { '.': 'transparent', 'G': '#E3A857' });
         });
 
+        // Dragon: sits on a static frame until clicked. The GIF is only
+        // swapped in for the duration of the fly animation, then swapped
+        // back out, so it never idles/loops on its own.
         const travelGroup = document.getElementById('dragon-toggle');
+        const dragonImg = document.getElementById('dragon-img');
+
         function startTravel() {
             if (travelGroup.classList.contains('traveling')) return;
+            dragonImg.src = dragonImg.dataset.animated; // reloading the src restarts the GIF at frame 0
             travelGroup.classList.add('traveling');
         }
+
         travelGroup.addEventListener('animationend', () => {
             travelGroup.classList.remove('traveling');
+            dragonImg.src = dragonImg.dataset.static;
         });
+
         travelGroup.addEventListener('click', startTravel);
         travelGroup.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
