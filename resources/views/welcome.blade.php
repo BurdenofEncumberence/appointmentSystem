@@ -16,12 +16,11 @@
             image-rendering: pixelated;
         }
         .event-travel-group.traveling .dragon-icon {
-            animation: dragon-fly 5.0s ease-in-out;
+            animation: dragon-fly 6.6s ease-in-out infinite;
         }
         @keyframes dragon-fly {
-            0%   { transform: translateX(0) translateY(0); }
-            50%  { transform: translateX(40px) translateY(-10px); }
-            100% { transform: translateX(0) translateY(0); }
+            0%, 100% { transform: translateY(0); }
+            50%      { transform: translateY(-8px); }
         }
     </style>
 </head>
