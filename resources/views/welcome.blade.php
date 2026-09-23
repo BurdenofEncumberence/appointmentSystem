@@ -22,6 +22,41 @@
             0%, 100% { transform: translateY(0); }
             50%      { transform: translateY(-8px); }
         }
+
+        /* Speech bubble tooltip: appended to <body>, positioned in JS,
+           so it always sits above the dragon regardless of how .event-tab
+           itself is positioned elsewhere in the stylesheet. */
+        .dragon-speech-tooltip {
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: var(--cream, #F1EAD9);
+            color: var(--ink, #1C1A16);
+            border: 2px solid var(--ink, #1C1A16);
+            box-shadow: 3px 3px 0 0 var(--ink, #1C1A16);
+            padding: 6px 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transform: translate(-50%, 0px);
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            z-index: 9999;
+        }
+        .dragon-speech-tooltip.visible {
+            opacity: 1;
+            transform: translate(-50%, -14px);
+        }
+        .dragon-speech-tail {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background: var(--cream, #F1EAD9);
+            border-right: 2px solid var(--ink, #1C1A16);
+            border-bottom: 2px solid var(--ink, #1C1A16);
+            transform: translateX(-50%) translateY(-6px) rotate(45deg);
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -30,8 +65,8 @@
     <div class="double-rule relative">
         <header class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="seal" aria-hidden="true" id="brand-seal"></div>
-                <span class="font-pixel text-lg">KYMNET</span>
+            <img src="{{ asset('images/paddleball.png') }}" alt="KYMNET" class="w-[60px] h-[60px]" style="image-rendering: pixelated;">     
+            <span class="font-pixel text-lg">KYMNET</span>
             </div>
             <nav class="flex items-center gap-4">
                 <a href="{{ route('login') }}" class="pixel-btn bg-[color:var(--parchment)]">
@@ -180,11 +215,9 @@
             });
         }
 
+        // "brand-seal" removed from this object: that element no longer exists in the
+        // header (it's a real <img> now), so rendering into it would be dead code.
         const sealRows = {
-            'brand-seal': [
-                "........",".G....G.","..GGGG..",".G.GG.G.",
-                ".G.GG.G.","..GGGG..",".G....G.","........"
-            ],
             'seal-availability': [
                 "........",".G....G.","..GGGG..",".G.GG.G.",
                 ".G.GG.G.","..GGGG..",".G....G.","........"
@@ -206,9 +239,7 @@
             renderPixelGrid(id, sealRows[id], { '.': 'transparent', 'G': '#E3A857' });
         });
 
-        // Dragon: sits on a static frame until clicked. The GIF is only
-        // swapped in for the duration of the fly animation, then swapped
-        // back out, so it never idles/loops on its own.
+
         const travelGroup = document.getElementById('dragon-toggle');
         const dragonImg = document.getElementById('dragon-img');
 
@@ -229,6 +260,41 @@
                 e.preventDefault();
                 startTravel();
             }
+        });
+
+        // Speech bubble: positioned in JS from the dragon image's actual
+        // on-screen coordinates, and appended to <body> so it can never be
+        // clipped or mispositioned by whatever CSS positions .event-tab.
+        const dragonSpeech = document.createElement('div');
+        dragonSpeech.className = 'dragon-speech-tooltip';
+        dragonSpeech.innerHTML = '<span class="font-pixel" style="font-size:10px;">EVENT!</span><i class="dragon-speech-tail"></i>';
+        dragonSpeech.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(dragonSpeech);
+
+        function positionDragonSpeech() {
+            const rect = dragonImg.getBoundingClientRect();
+            dragonSpeech.style.left = (rect.left + rect.width / 2) + 'px';
+            dragonSpeech.style.top = rect.top + 'px';
+        }
+
+        function showDragonSpeech() {
+            positionDragonSpeech();
+            dragonSpeech.classList.add('visible');
+        }
+
+        function hideDragonSpeech() {
+            dragonSpeech.classList.remove('visible');
+        }
+
+        travelGroup.addEventListener('mouseenter', showDragonSpeech);
+        travelGroup.addEventListener('mouseleave', hideDragonSpeech);
+        travelGroup.addEventListener('focus', showDragonSpeech);
+        travelGroup.addEventListener('blur', hideDragonSpeech);
+        window.addEventListener('scroll', () => {
+            if (dragonSpeech.classList.contains('visible')) positionDragonSpeech();
+        }, { passive: true });
+        window.addEventListener('resize', () => {
+            if (dragonSpeech.classList.contains('visible')) positionDragonSpeech();
         });
     </script>
 
