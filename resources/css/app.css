@@ -11,6 +11,7 @@
 }
 
 * { border-radius: 0 !important; }
+[x-cloak] { display: none !important; }
 
 body {
     background-color: var(--parchment);
@@ -103,11 +104,8 @@ body {
     padding: 10px 22px;
     white-space: nowrap;
     margin-left: 14px;
-    opacity: 0;
 }
-.event-travel-group.traveling .event-banner-strip {
-    opacity: 1;
-}
+
 
 @keyframes event-move {
     0%     { transform: translateX(0); }

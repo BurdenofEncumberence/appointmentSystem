@@ -10,6 +10,14 @@ it('blocks players from the admin workspace', function () {
         ->assertForbidden();
 });
 
+it('blocks staff from the admin workspace', function () {
+    $staff = User::factory()->create(['role' => 'staff']);
+
+    $this->actingAs($staff)
+        ->get(route('admin.dashboard'))
+        ->assertForbidden();
+});
+
 it('allows admins into the admin workspace', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 

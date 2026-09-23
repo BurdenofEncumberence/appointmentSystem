@@ -1,5 +1,108 @@
 <x-admin-layout>
-    <x-slot name="heading">{{ $court->exists ? 'Edit court' : 'Add court' }}</x-slot>
+    <x-slot name="heading">{{ $court->exists ? 'Edit Court' : 'Add New Court' }}</x-slot>
 
-    <div class="max-w-2xl"><a href="{{ route('admin.courts.index') }}" class="text-sm font-bold text-slate-500 hover:text-slate-900">← Back to courts</a><div class="mt-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"><div class="mb-8"><p class="text-xs font-bold uppercase tracking-[0.2em] text-lime-600">Court setup</p><h2 class="mt-2 text-2xl font-extrabold tracking-tight">{{ $court->exists ? 'Update court details' : 'Add a new court' }}</h2><p class="mt-2 text-sm text-slate-500">Set the details players will see when choosing a court.</p></div><form method="POST" action="{{ $court->exists ? route('admin.courts.update', $court) : route('admin.courts.store') }}" class="space-y-5">@csrf @if($court->exists) @method('PUT') @endif<div><label for="court_name" class="block text-sm font-semibold text-slate-700">Court name</label><input id="court_name" name="court_name" value="{{ old('court_name', $court->court_name) }}" required class="mt-2 block w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:border-lime-400 focus:bg-white focus:ring-lime-100"><x-input-error :messages="$errors->get('court_name')" class="mt-2" /></div><div class="grid gap-5 sm:grid-cols-2"><div><label for="size" class="block text-sm font-semibold text-slate-700">Court size</label><input id="size" name="size" value="{{ old('size', $court->size) }}" placeholder="e.g. Indoor / doubles" class="mt-2 block w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:border-lime-400 focus:bg-white focus:ring-lime-100"><x-input-error :messages="$errors->get('size')" class="mt-2" /></div><div><label for="price_per_hour" class="block text-sm font-semibold text-slate-700">Price per hour</label><input id="price_per_hour" name="price_per_hour" type="number" min="0" step="0.01" value="{{ old('price_per_hour', $court->price_per_hour) }}" required class="mt-2 block w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:border-lime-400 focus:bg-white focus:ring-lime-100"><x-input-error :messages="$errors->get('price_per_hour')" class="mt-2" /></div></div><div><label for="court_status" class="block text-sm font-semibold text-slate-700">Availability status</label><select id="court_status" name="court_status" class="mt-2 block w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:border-lime-400 focus:bg-white focus:ring-lime-100"><option value="available" @selected(old('court_status', $court->court_status ?: 'available') === 'available')>Available</option><option value="maintenance" @selected(old('court_status', $court->court_status) === 'maintenance')>Maintenance</option><option value="closed" @selected(old('court_status', $court->court_status) === 'closed')>Closed</option></select><x-input-error :messages="$errors->get('court_status')" class="mt-2" /></div><div class="flex flex-col-reverse gap-3 pt-4 sm:flex-row sm:justify-end"><a href="{{ route('admin.courts.index') }}" class="inline-flex items-center justify-center rounded-xl px-5 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 hover:bg-slate-50">Cancel</a><button class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-3 text-xs font-bold uppercase tracking-wider text-white hover:bg-lime-400 hover:text-slate-950">{{ $court->exists ? 'Save changes' : 'Add court' }}</button></div></form></div></div>
+    <div class="max-w-2xl mx-auto">
+        <div class="mb-4">
+            <a href="{{ route('admin.courts.index') }}" class="font-pixel text-[9px] text-stone-700 hover:text-black">
+                ← BACK TO COURT INVENTORY
+            </a>
+        </div>
+
+        <div class="pixel-border p-6" style="background: var(--cream);">
+            <div class="border-b-2 pb-4 mb-6" style="border-color: var(--ink);">
+                <span class="font-pixel text-[9px] px-2 py-0.5 inline-block pixel-border mb-2" style="background: var(--jade); color: var(--cream);">
+                    ARENA SETUP
+                </span>
+                <h2 class="font-pixel text-base" style="color: var(--ink);">
+                    {{ $court->exists ? 'UPDATE COURT: ' . strtoupper($court->court_name) : 'REGISTER NEW COURT' }}
+                </h2>
+                <p class="text-base text-stone-600 mt-1">
+                    Set operational details and pricing displayed in the court appointment system.
+                </p>
+            </div>
+
+            <form method="POST" action="{{ $court->exists ? route('admin.courts.update', $court) : route('admin.courts.store') }}" class="space-y-5">
+                @csrf
+                @if($court->exists)
+                    @method('PUT')
+                @endif
+
+                {{-- Court Name --}}
+                <div>
+                    <label for="court_name" class="block font-pixel text-[10px] mb-2" style="color: var(--ink);">
+                        COURT NAME *
+                    </label>
+                    <input id="court_name"
+                           name="court_name"
+                           type="text"
+                           value="{{ old('court_name', $court->court_name) }}"
+                           placeholder="e.g. Center Court, Court 5"
+                           required
+                           class="pixel-input">
+                    <x-input-error :messages="$errors->get('court_name')" class="mt-2 font-pixel text-[9px]" />
+                </div>
+
+                {{-- Court Size and Price Grid --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div>
+                        <label for="size" class="block font-pixel text-[10px] mb-2" style="color: var(--ink);">
+                            COURT DIMENSIONS / TYPE
+                        </label>
+                        <input id="size"
+                               name="size"
+                               type="text"
+                               value="{{ old('size', $court->size) }}"
+                               placeholder="e.g. Standard / Doubles"
+                               class="pixel-input">
+                        <x-input-error :messages="$errors->get('size')" class="mt-2 font-pixel text-[9px]" />
+                    </div>
+
+                    <div>
+                        <label for="price_per_hour" class="block font-pixel text-[10px] mb-2" style="color: var(--ink);">
+                            RATE PER HOUR (PHP) *
+                        </label>
+                        <input id="price_per_hour"
+                               name="price_per_hour"
+                               type="number"
+                               min="0"
+                               step="0.01"
+                               value="{{ old('price_per_hour', $court->price_per_hour) }}"
+                               placeholder="e.g. 350.00"
+                               required
+                               class="pixel-input">
+                        <x-input-error :messages="$errors->get('price_per_hour')" class="mt-2 font-pixel text-[9px]" />
+                    </div>
+                </div>
+
+                {{-- Court Status --}}
+                <div>
+                    <label for="court_status" class="block font-pixel text-[10px] mb-2" style="color: var(--ink);">
+                        OPERATIONAL STATUS *
+                    </label>
+                    <select id="court_status" name="court_status" class="pixel-input cursor-pointer">
+                        <option value="available" @selected(old('court_status', $court->court_status ?: 'available') === 'available')>
+                            AVAILABLE (Open for Public Reservations)
+                        </option>
+                        <option value="maintenance" @selected(old('court_status', $court->court_status) === 'maintenance')>
+                            MAINTENANCE (Temporarily Unavailable)
+                        </option>
+                        <option value="closed" @selected(old('court_status', $court->court_status) === 'closed')>
+                            CLOSED (Offline / Archived)
+                        </option>
+                    </select>
+                    <x-input-error :messages="$errors->get('court_status')" class="mt-2 font-pixel text-[9px]" />
+                </div>
+
+                {{-- Form Actions --}}
+                <div class="pt-6 border-t-2 flex flex-col-reverse sm:flex-row sm:justify-end gap-3" style="border-color: var(--ink);">
+                    <a href="{{ route('admin.courts.index') }}" class="pixel-btn text-center text-[10px] py-2.5 px-4" style="background: var(--parchment); color: var(--ink);">
+                        CANCEL
+                    </a>
+                    <button type="submit" class="pixel-btn text-[10px] py-2.5 px-5" style="background: var(--jade); color: var(--cream);">
+                        {{ $court->exists ? 'SAVE CHANGES' : 'CREATE COURT' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </x-admin-layout>

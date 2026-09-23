@@ -18,9 +18,7 @@
                 "10:00 AM - 11:00 AM","11:00 AM - 12:00 PM","12:00 PM - 1:00 PM","1:00 PM - 2:00 PM",
             ],
 
-            // Replace with real data from the backend once BookingController exists:
-            // bookedSlots: @json($bookedSlots ?? []),
-            bookedSlots: {},
+            bookedSlots: @json($bookedSlots ?? []),
 
             isBooked(time, courtId) {
                 const dayBookings = this.bookedSlots[this.selectedDate] || {};
@@ -36,11 +34,6 @@
                 this.selectedTimeSlot = time;
             },
             pickCourt(courtId) {
-                if (this.selectedCourt === courtId) {
-                    this.selectedCourt = null;
-                    this.selectedTimeSlot = null;
-                    return;
-                }
                 this.selectedCourt = courtId;
                 this.selectedTimeSlot = null;
             },
@@ -119,39 +112,6 @@
             get canConfirm() {
                 return this.canPay && this.paymentMethod !== null;
             },
-
-            // Placeholder GCash QR — a decorative pixel pattern with three real
-            // QR-style finder squares (corners) and random noise in between.
-            // Purely visual: not a working QR code until the real GCash/PayMongo
-            // integration is added later.
-            gcashQrSize: 17,
-            gcashQr: [],
-            buildGcashQr() {
-                const size = this.gcashQrSize;
-                const isFinderCell = (r, c) => {
-                    const zones = [[0, 0], [0, size - 7], [size - 7, 0]];
-                    for (const [zr, zc] of zones) {
-                        if (r >= zr && r < zr + 7 && c >= zc && c < zc + 7) {
-                            const lr = r - zr, lc = c - zc;
-                            const isBorder = lr === 0 || lr === 6 || lc === 0 || lc === 6;
-                            const isInner = lr >= 2 && lr <= 4 && lc >= 2 && lc <= 4;
-                            return (isBorder || isInner) ? 1 : 0;
-                        }
-                    }
-                    return null;
-                };
-                const cells = [];
-                for (let r = 0; r < size; r++) {
-                    for (let c = 0; c < size; c++) {
-                        const finder = isFinderCell(r, c);
-                        cells.push(finder !== null ? finder : (Math.random() > 0.55 ? 1 : 0));
-                    }
-                }
-                this.gcashQr = cells;
-            },
-            init() {
-                this.buildGcashQr();
-            },
         }'
         class="max-w-6xl mx-auto px-6 py-10"
     >
@@ -161,49 +121,19 @@
 
         <div x-show="step === 1">
 
-        {{-- Court selection cards --}}
-        <section class="mb-10">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <template x-for="court in courts" :key="court.id">
-                    <button
-                        type="button"
-                        @click="pickCourt(court.id)"
-                        class="pixel-border text-left overflow-hidden"
-                        style="background: var(--cream);"
-                    >
-                        <div class="h-24 flex items-end p-3" style="background: var(--jade);">
-                            <span class="font-pixel text-[11px]" style="color: var(--cream);" x-text="court.name"></span>
-                        </div>
-                        <div class="p-3 flex items-center justify-between">
-                            <div>
-                                <p class="text-base" style="opacity: 0.6;">Hourly Rate</p>
-                                <p class="text-lg font-bold" x-text="court.rate + ' PHP /hr'"></p>
-                            </div>
-                            <span
-                                class="text-[10px] font-pixel px-3 py-1 pixel-border"
-                                :style="selectedCourt === court.id ? 'background: var(--jade); color: var(--cream);' : 'background: var(--parchment); color: var(--ink);'"
-                                x-text="selectedCourt === court.id ? 'Selected' : 'Select'"
-                            ></span>
-                        </div>
-                    </button>
-                </template>
-            </div>
-        </section>
-
         {{-- Date + time --}}
         <section class="pixel-border p-6 mb-10" style="background: var(--cream);">
             <h2 class="font-pixel text-base mb-1">Set Your Date and Time</h2>
-            <p class="text-lg mb-6" style="opacity: 0.6;" x-show="selectedCourt">
-                Viewing availability for <span class="font-bold" x-text="selectedCourtName"></span>
-            </p>
-            <p class="text-lg mb-6" style="opacity: 0.6;" x-show="!selectedCourt">
-                Select a court above, then choose an open time slot below.
+            <p class="text-lg mb-6" style="opacity: 0.7;">
+                <span x-show="selectedCourt && selectedTimeSlot">
+                    Selected: <span class="font-bold text-[color:var(--jade)]" x-text="selectedCourtName"></span> at <span class="font-bold text-[color:var(--jade)]" x-text="selectedTimeSlot"></span> on <span class="font-bold text-[color:var(--jade)]" x-text="selectedDate"></span>
+                </span>
+                <span x-show="!selectedCourt || !selectedTimeSlot">
+                    Choose a date on the calendar, then select an open court time slot below.
+                </span>
             </p>
 
-            <div
-                class="grid grid-cols-1 lg:grid-cols-12 gap-8"
-                :style="!selectedCourt ? 'opacity: 0.4; pointer-events: none;' : ''"
-            >
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div class="lg:col-span-4">
                     <div class="pixel-border p-4">
                         <div class="flex items-center justify-between mb-3">
@@ -220,7 +150,7 @@
                                     type="button"
                                     x-show="day !== null"
                                     @click="pickDay(day)"
-                                    :disabled="day === null || isPast(day) || !selectedCourt"
+                                    :disabled="day === null || isPast(day)"
                                     class="h-9 flex items-center justify-center pixel-border"
                                     :style="
                                         day !== null && isPast(day)
@@ -236,7 +166,7 @@
                             </template>
                         </div>
                         <p class="text-base mt-4" style="opacity: 0.6;">
-                            Selected: <span class="font-bold" x-text="selectedDate"></span>
+                            Selected Date: <span class="font-bold" x-text="selectedDate"></span>
                         </p>
                     </div>
                 </div>
@@ -248,9 +178,11 @@
                                 <tr style="background: var(--ink); color: var(--cream);">
                                     <th class="p-2 text-left font-pixel text-[9px]">Time</th>
                                     <template x-for="court in courts" :key="'head'+court.id">
-                                        <th class="p-2 font-pixel text-[9px]"
-                                            :style="selectedCourt === court.id ? 'background: var(--jade);' : ''"
-                                            x-text="court.name"></th>
+                                        <th class="p-2 font-pixel text-[9px] text-center transition"
+                                            :style="selectedCourt === court.id ? 'background: var(--jade); color: var(--cream);' : ''">
+                                            <span x-text="court.name"></span>
+                                            <span class="block text-[8px] font-sans font-normal opacity-80" x-text="'₱' + court.rate + '/hr'"></span>
+                                        </th>
                                     </template>
                                 </tr>
                             </thead>
@@ -263,14 +195,14 @@
                                                 <button
                                                     type="button"
                                                     @click="pickSlot(time, court.id)"
-                                                    :disabled="isBooked(time, court.id) || !selectedCourt"
+                                                    :disabled="isBooked(time, court.id)"
                                                     class="w-full h-9 text-[10px] font-pixel pixel-border"
                                                     :style="
                                                         isBooked(time, court.id)
                                                             ? 'background: #ccc; color: #888; box-shadow: none; cursor: not-allowed;'
                                                             : (isSelected(time, court.id)
-                                                                ? 'background: var(--jade); color: var(--cream);'
-                                                                : 'background: var(--parchment);')
+                                                                ? 'background: var(--jade); color: var(--cream); cursor: pointer;'
+                                                                : 'background: var(--parchment); cursor: pointer;')
                                                     "
                                                     x-text="isBooked(time, court.id) ? 'Booked' : (isSelected(time, court.id) ? 'Selected' : 'Open')"
                                                 ></button>
@@ -393,24 +325,10 @@
                             </button>
                         </div>
 
-                        {{-- GCash: QR code or manual number entry --}}
-                        <div x-show="paymentMethod === 'gcash'" x-cloak class="mb-6 text-center">
-                            <div
-                                class="pixel-border mx-auto"
-                                style="width: 204px; height: 204px; display: grid; grid-template-columns: repeat(17, 1fr); grid-template-rows: repeat(17, 1fr); background: var(--cream);"
-                            >
-                                <template x-for="(cell, idx) in gcashQr" :key="idx">
-                                    <div :style="cell ? 'background: var(--ink);' : 'background: var(--cream);'"></div>
-                                </template>
-                            </div>
-                            <p class="font-pixel text-[10px] mt-4">Scan with GCash</p>
-                            <p class="text-base mt-2" style="opacity: 0.5;">or enter your number</p>
-                            <div class="mt-4 text-left max-w-xs mx-auto">
-                                <x-input-label value="GCash Mobile Number" />
-                                <input type="tel" class="pixel-input mt-1" placeholder="09XX XXX XXXX">
-                            </div>
+                        <div x-show="paymentMethod === 'gcash'" x-cloak class="mb-6">
+                            <x-input-label value="GCash Mobile Number" />
+                            <input type="tel" class="pixel-input mt-1" placeholder="09XX XXX XXXX">
                         </div>
-
                         <div x-show="paymentMethod === 'card'" x-cloak class="mb-6 grid grid-cols-2 gap-4">
                             <div class="col-span-2">
                                 <x-input-label value="Card Number" />
@@ -434,7 +352,7 @@
                         {{--
                             This still posts to the exact same endpoint as before. Payment details
                             entered above aren't sent to the backend yet — actually charging a card
-                            or verifying a GCash payment needs a real payment gateway integration,
+                            or verifying a GCash number needs a real payment gateway integration,
                             which is separate backend work, not something this form can do alone.
                         --}}
                         <form method="POST" action="{{ route('bookings.store') }}">

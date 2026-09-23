@@ -1,20 +1,17 @@
 <x-app-layout>
     <x-slot name="header">
-        <h1 class="font-pixel text-lg">Dashboard</h1>
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Dashboard') }}
+        </h2>
     </x-slot>
 
-    <div class="max-w-6xl mx-auto px-6 py-10">
-        <div class="pixel-border p-6" style="background: var(--cream);">
-            <p class="text-lg">
-                You're logged in, {{ Auth::user()->name }}!
-            </p>
-            <p class="text-lg mt-4" style="opacity: 0.7;">
-                Head to
-                <a href="{{ route('booking') }}" class="underline" style="color: var(--jade);">Book Courts</a>
-                to reserve a court, or check
-                <a href="{{ route('bookings.index') }}" class="underline" style="color: var(--jade);">Courts Booked</a>
-                to see your upcoming reservations.
-            </p>
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    {{ __("You're logged in!") }}
+                </div>
+            </div>
         </div>
     </div>
 </x-app-layout>

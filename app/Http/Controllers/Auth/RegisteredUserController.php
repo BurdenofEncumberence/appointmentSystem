@@ -30,14 +30,33 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        if (! $request->has('first_name') && $request->filled('name')) {
+            $parts = explode(' ', trim((string) $request->name), 2);
+            $request->merge([
+                'first_name' => $parts[0] ?? '',
+                'last_name' => $parts[1] ?? '',
+            ]);
+        }
+
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:255'],
+            'middle_name' => ['nullable', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        $parts = array_filter(
+            [$request->first_name, $request->middle_name, $request->last_name],
+            fn ($part) => ! empty(trim((string) $part))
+        );
+        $fullName = implode(' ', $parts);
+
         $user = User::create([
-            'name' => $request->name,
+            'first_name' => $request->first_name,
+            'middle_name' => $request->middle_name,
+            'last_name' => $request->last_name,
+            'name' => $fullName,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);

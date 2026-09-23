@@ -10,34 +10,14 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="antialiased">
-    <div class="min-h-screen flex flex-col items-center justify-center px-6 py-12">
-        <a href="/" class="flex items-center gap-3 mb-8">
-            <div class="seal" aria-hidden="true" id="guest-seal"></div>
-            <span class="font-pixel text-lg">KYMNET</span>
-        </a>
+    <div class="min-h-screen flex flex-col">
+        @include('layouts.navigation')
 
-        <div class="w-full sm:max-w-md pixel-border bg-[color:var(--cream)] px-8 py-8">
-            {{ $slot }}
+        <div class="flex-1 flex flex-col items-center justify-center px-6 py-10">
+            <div class="w-full sm:max-w-md pixel-border bg-[color:var(--cream)] px-8 py-8">
+                {{ $slot }}
+            </div>
         </div>
     </div>
-
-    <script>
-        function renderPixelGrid(id, rows, colorMap) {
-            const el = document.getElementById(id);
-            if (!el) return;
-            el.innerHTML = '';
-            rows.forEach(row => {
-                [...row].forEach(ch => {
-                    const cell = document.createElement('div');
-                    cell.style.background = colorMap[ch] || 'transparent';
-                    el.appendChild(cell);
-                });
-            });
-        }
-        renderPixelGrid('guest-seal', [
-            "........", ".G....G.", "..GGGG..", ".G.GG.G.",
-            ".G.GG.G.", "..GGGG..", ".G....G.", "........"
-        ], { '.': 'transparent', 'G': '#E3A857' });
-    </script>
 </body>
 </html>

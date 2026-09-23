@@ -36,6 +36,10 @@ class AdminDashboardController extends Controller
             ->whereBetween('date', [now()->subMonth()->startOfMonth()->toDateString(), now()->subMonth()->endOfMonth()->toDateString()])
             ->sum('amount');
 
+        $yearRevenue = (clone $paidPayments)
+            ->whereYear('date', now()->year)
+            ->sum('amount');
+
         $revenueChange = $lastMonthRevenue > 0
             ? round((($monthlyRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100)
             : null;
@@ -43,16 +47,18 @@ class AdminDashboardController extends Controller
         $recentPayments = Payment::with('booking.user')
             ->latest('date')
             ->latest('created_at')
-            ->limit(5)
+            ->limit(6)
             ->get();
 
         return view('admin.dashboard', [
             'courts' => $courts,
             'todayBookings' => $todayBookings,
             'monthlyRevenue' => $monthlyRevenue,
+            'yearRevenue' => $yearRevenue,
             'revenueChange' => $revenueChange,
             'pendingPayments' => Payment::where('payment_status', 'pending')->count(),
             'totalBookings' => Booking::count(),
+            'confirmedBookingsCount' => Booking::where('booking_status', 'confirmed')->count(),
             'recentPayments' => $recentPayments,
             'today' => Carbon::today(),
         ]);
