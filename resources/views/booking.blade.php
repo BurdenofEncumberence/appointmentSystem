@@ -119,6 +119,39 @@
             get canConfirm() {
                 return this.canPay && this.paymentMethod !== null;
             },
+
+            // Placeholder GCash QR — a decorative pixel pattern with three real
+            // QR-style finder squares (corners) and random noise in between.
+            // Purely visual: not a working QR code until the real GCash/PayMongo
+            // integration is added later.
+            gcashQrSize: 17,
+            gcashQr: [],
+            buildGcashQr() {
+                const size = this.gcashQrSize;
+                const isFinderCell = (r, c) => {
+                    const zones = [[0, 0], [0, size - 7], [size - 7, 0]];
+                    for (const [zr, zc] of zones) {
+                        if (r >= zr && r < zr + 7 && c >= zc && c < zc + 7) {
+                            const lr = r - zr, lc = c - zc;
+                            const isBorder = lr === 0 || lr === 6 || lc === 0 || lc === 6;
+                            const isInner = lr >= 2 && lr <= 4 && lc >= 2 && lc <= 4;
+                            return (isBorder || isInner) ? 1 : 0;
+                        }
+                    }
+                    return null;
+                };
+                const cells = [];
+                for (let r = 0; r < size; r++) {
+                    for (let c = 0; c < size; c++) {
+                        const finder = isFinderCell(r, c);
+                        cells.push(finder !== null ? finder : (Math.random() > 0.55 ? 1 : 0));
+                    }
+                }
+                this.gcashQr = cells;
+            },
+            init() {
+                this.buildGcashQr();
+            },
         }'
         class="max-w-6xl mx-auto px-6 py-10"
     >
@@ -360,10 +393,24 @@
                             </button>
                         </div>
 
-                        <div x-show="paymentMethod === 'gcash'" x-cloak class="mb-6">
-                            <x-input-label value="GCash Mobile Number" />
-                            <input type="tel" class="pixel-input mt-1" placeholder="09XX XXX XXXX">
+                        {{-- GCash: QR code or manual number entry --}}
+                        <div x-show="paymentMethod === 'gcash'" x-cloak class="mb-6 text-center">
+                            <div
+                                class="pixel-border mx-auto"
+                                style="width: 204px; height: 204px; display: grid; grid-template-columns: repeat(17, 1fr); grid-template-rows: repeat(17, 1fr); background: var(--cream);"
+                            >
+                                <template x-for="(cell, idx) in gcashQr" :key="idx">
+                                    <div :style="cell ? 'background: var(--ink);' : 'background: var(--cream);'"></div>
+                                </template>
+                            </div>
+                            <p class="font-pixel text-[10px] mt-4">Scan with GCash</p>
+                            <p class="text-base mt-2" style="opacity: 0.5;">or enter your number</p>
+                            <div class="mt-4 text-left max-w-xs mx-auto">
+                                <x-input-label value="GCash Mobile Number" />
+                                <input type="tel" class="pixel-input mt-1" placeholder="09XX XXX XXXX">
+                            </div>
                         </div>
+
                         <div x-show="paymentMethod === 'card'" x-cloak class="mb-6 grid grid-cols-2 gap-4">
                             <div class="col-span-2">
                                 <x-input-label value="Card Number" />
@@ -387,7 +434,7 @@
                         {{--
                             This still posts to the exact same endpoint as before. Payment details
                             entered above aren't sent to the backend yet — actually charging a card
-                            or verifying a GCash number needs a real payment gateway integration,
+                            or verifying a GCash payment needs a real payment gateway integration,
                             which is separate backend work, not something this form can do alone.
                         --}}
                         <form method="POST" action="{{ route('bookings.store') }}">
