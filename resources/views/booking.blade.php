@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h1 class="font-pixel text-lg">Reserve a Court</h1>
+        <h1 class="gz-font-display font-bold text-lg">Reserve a Court</h1>
     </x-slot>
 
     <div
@@ -104,29 +104,32 @@
                 return this.selectedCourtRate + this.serviceFee;
             },
             goToReview() {
-                if (this.canPay) this.step = 2;
+                if (this.canPay) {
+                    this.step = 2;
+                    this.$nextTick(() => this.$refs.step2Heading?.focus());
+                }
             },
             goBack() {
                 this.step = 1;
+                this.$nextTick(() => this.$refs.step1Heading?.focus());
             },
             get canConfirm() {
                 return this.canPay && this.paymentMethod !== null;
             },
         }'
-        class="max-w-6xl mx-auto px-6 py-10"
+        class="gz-container"
     >
-        <p class="text-lg mb-8" style="color: var(--ink); opacity: 0.7;">
+        <p class="text-base mb-8" style="color: var(--gz-muted);">
             Pick a court, choose your time, and secure it with online advance payment.
         </p>
 
         <div x-show="step === 1">
 
-        {{-- Date + time --}}
-        <section class="pixel-border p-6 mb-10" style="background: var(--cream);">
-            <h2 class="font-pixel text-base mb-1">Set Your Date and Time</h2>
-            <p class="text-lg mb-6" style="opacity: 0.7;">
+        <section class="gz-panel gz-panel-body mb-8">
+            <h2 class="gz-font-display font-bold text-base mb-1" tabindex="-1" x-ref="step1Heading">Set Your Date and Time</h2>
+            <p class="text-sm mb-6" style="color: var(--gz-muted);" role="status" aria-live="polite">
                 <span x-show="selectedCourt && selectedTimeSlot">
-                    Selected: <span class="font-bold text-[color:var(--jade)]" x-text="selectedCourtName"></span> at <span class="font-bold text-[color:var(--jade)]" x-text="selectedTimeSlot"></span> on <span class="font-bold text-[color:var(--jade)]" x-text="selectedDate"></span>
+                    Selected: <span class="font-semibold" style="color: var(--gz-pop-dark);" x-text="selectedCourtName"></span> at <span class="font-semibold" style="color: var(--gz-pop-dark);" x-text="selectedTimeSlot"></span> on <span class="font-semibold" style="color: var(--gz-pop-dark);" x-text="selectedDate"></span>
                 </span>
                 <span x-show="!selectedCourt || !selectedTimeSlot">
                     Choose a date on the calendar, then select an open court time slot below.
@@ -135,74 +138,80 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div class="lg:col-span-4">
-                    <div class="pixel-border p-4">
+                    <div class="gz-kpi-card">
                         <div class="flex items-center justify-between mb-3">
-                            <button type="button" @click="prevMonth()" class="pixel-btn text-[10px] px-2 py-1" style="background: var(--parchment);">‹</button>
-                            <p class="font-pixel text-[10px]" x-text="monthLabel"></p>
-                            <button type="button" @click="nextMonth()" class="pixel-btn text-[10px] px-2 py-1" style="background: var(--parchment);">›</button>
+                            <button type="button" @click="prevMonth()" class="gz-btn-outline gz-btn-sm" aria-label="Previous month">‹</button>
+                            <p class="gz-font-display font-bold text-sm" x-text="monthLabel" aria-live="polite"></p>
+                            <button type="button" @click="nextMonth()" class="gz-btn-outline gz-btn-sm" aria-label="Next month">›</button>
                         </div>
-                        <div class="grid grid-cols-7 gap-1 text-base text-center mb-2" style="opacity: 0.5;">
+                        <div class="grid grid-cols-7 gap-1 text-xs text-center mb-2" style="color: var(--gz-muted);" aria-hidden="true">
                             <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
                         </div>
-                        <div class="grid grid-cols-7 gap-1 text-base">
+                        <div class="grid grid-cols-7 gap-1 text-sm" role="grid" aria-label="Choose a date">
                             <template x-for="(day, idx) in calendarDays" :key="idx">
                                 <button
                                     type="button"
                                     x-show="day !== null"
                                     @click="pickDay(day)"
                                     :disabled="day === null || isPast(day)"
-                                    class="h-9 flex items-center justify-center pixel-border"
+                                    :aria-current="day !== null && isToday(day) ? 'date' : null"
+                                    :aria-pressed="day !== null && selectedDate === dateStringFor(day) ? 'true' : 'false'"
+                                    :aria-label="day !== null ? (isToday(day) ? day + ', today' : day) : null"
+                                    class="h-9 flex items-center justify-center rounded-xl"
                                     :style="
                                         day !== null && isPast(day)
-                                            ? 'background: #ccc; color: #888; box-shadow: none; cursor: not-allowed;'
+                                            ? 'background: transparent; color: var(--gz-border); cursor: not-allowed;'
                                             : (day !== null && selectedDate === dateStringFor(day)
-                                                ? 'background: var(--jade); color: var(--cream);'
+                                                ? 'background: var(--gz-pop); color: var(--gz-ink); font-weight: 700;'
                                                 : (day !== null && isToday(day)
-                                                    ? 'background: var(--parchment); border-color: var(--red); border-width: 2px;'
-                                                    : 'background: var(--cream);'))
+                                                    ? 'background: var(--gz-bg); border: 1.5px solid var(--gz-pop-dark); font-weight: 700;'
+                                                    : 'background: transparent; border: 1px solid transparent;'))
                                     "
                                     x-text="day"
                                 ></button>
                             </template>
                         </div>
-                        <p class="text-base mt-4" style="opacity: 0.6;">
-                            Selected Date: <span class="font-bold" x-text="selectedDate"></span>
+                        <p class="text-xs mt-4" style="color: var(--gz-muted);">
+                            Selected date: <span class="font-semibold" x-text="selectedDate" style="color: var(--gz-ink);"></span>
                         </p>
                     </div>
                 </div>
 
                 <div class="lg:col-span-8">
-                    <div class="pixel-border overflow-x-auto">
-                        <table class="w-full text-base border-collapse">
+                    <div class="gz-panel overflow-x-auto">
+                        <table class="gz-table">
+                            <caption class="sr-only">Court availability by time slot. Select an open slot to book it.</caption>
                             <thead>
-                                <tr style="background: var(--ink); color: var(--cream);">
-                                    <th class="p-2 text-left font-pixel text-[9px]">Time</th>
+                                <tr>
+                                    <th>Time</th>
                                     <template x-for="court in courts" :key="'head'+court.id">
-                                        <th class="p-2 font-pixel text-[9px] text-center transition"
-                                            :style="selectedCourt === court.id ? 'background: var(--jade); color: var(--cream);' : ''">
+                                        <th class="text-center"
+                                            :style="selectedCourt === court.id ? 'color: var(--gz-pop-dark);' : ''">
                                             <span x-text="court.name"></span>
-                                            <span class="block text-[8px] font-sans font-normal opacity-80" x-text="'₱' + court.rate + '/hr'"></span>
+                                            <span class="block text-[11px] font-normal" style="color: var(--gz-muted);" x-text="'₱' + court.rate + '/hr'"></span>
                                         </th>
                                     </template>
                                 </tr>
                             </thead>
                             <tbody>
                                 <template x-for="time in timeSlots" :key="time">
-                                    <tr style="border-top: 1px solid var(--ink);">
-                                        <td class="p-2 font-bold whitespace-nowrap" x-text="time"></td>
+                                    <tr>
+                                        <th scope="row" class="text-left font-semibold whitespace-nowrap" x-text="time"></th>
                                         <template x-for="court in courts" :key="time + '-' + court.id">
-                                            <td class="p-1">
+                                            <td class="p-1.5">
                                                 <button
                                                     type="button"
                                                     @click="pickSlot(time, court.id)"
                                                     :disabled="isBooked(time, court.id)"
-                                                    class="w-full h-9 text-[10px] font-pixel pixel-border"
+                                                    :aria-pressed="isSelected(time, court.id) ? 'true' : 'false'"
+                                                    :aria-label="court.name + ' at ' + time + ': ' + (isBooked(time, court.id) ? 'booked' : (isSelected(time, court.id) ? 'selected' : 'open'))"
+                                                    class="w-full h-9 text-xs font-semibold rounded-xl transition"
                                                     :style="
                                                         isBooked(time, court.id)
-                                                            ? 'background: #ccc; color: #888; box-shadow: none; cursor: not-allowed;'
+                                                            ? 'background: var(--gz-bg); color: var(--gz-muted); cursor: not-allowed; border: 1px solid var(--gz-border);'
                                                             : (isSelected(time, court.id)
-                                                                ? 'background: var(--jade); color: var(--cream); cursor: pointer;'
-                                                                : 'background: var(--parchment); cursor: pointer;')
+                                                                ? 'background: var(--gz-pop); color: var(--gz-ink); cursor: pointer;'
+                                                                : 'background: var(--gz-surface); border: 1px solid var(--gz-border); cursor: pointer;')
                                                     "
                                                     x-text="isBooked(time, court.id) ? 'Booked' : (isSelected(time, court.id) ? 'Selected' : 'Open')"
                                                 ></button>
@@ -214,15 +223,15 @@
                         </table>
                     </div>
 
-                    <div class="flex items-center gap-6 mt-4 text-base">
+                    <div class="flex items-center gap-6 mt-4 text-xs" style="color: var(--gz-muted);">
                         <span class="flex items-center gap-2">
-                            <span class="w-3 h-3 inline-block pixel-border" style="background: var(--parchment);"></span> Available
+                            <span class="w-3 h-3 inline-block rounded" style="background: var(--gz-surface); border: 1px solid var(--gz-border);" aria-hidden="true"></span> Available
                         </span>
                         <span class="flex items-center gap-2">
-                            <span class="w-3 h-3 inline-block pixel-border" style="background: #ccc;"></span> Booked
+                            <span class="w-3 h-3 inline-block rounded" style="background: var(--gz-bg); border: 1px solid var(--gz-border);" aria-hidden="true"></span> Booked
                         </span>
                         <span class="flex items-center gap-2">
-                            <span class="w-3 h-3 inline-block pixel-border" style="background: var(--jade);"></span> Selected
+                            <span class="w-3 h-3 inline-block rounded" style="background: var(--gz-pop);" aria-hidden="true"></span> Selected
                         </span>
                     </div>
                 </div>
@@ -230,141 +239,130 @@
         </section>
 
         @error('time_slot')
-            <div class="pixel-border p-4 mb-6" style="background: var(--red); color: var(--cream);">
+            <div class="mb-6 p-4 rounded-2xl" style="background: var(--gz-danger-bg); color: var(--gz-danger);" role="alert">
                 {{ $message }}
             </div>
         @enderror
 
-        {{-- Step 1 CTA: just moves to the review step, nothing is saved yet --}}
-        <section class="pixel-border p-6 flex flex-col sm:flex-row items-center justify-between gap-4"
-                  style="background: var(--ink); color: var(--cream);">
+        <section class="gz-panel gz-panel-body flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
-                <p class="font-pixel text-sm mb-2">Review your booking</p>
-                <p class="text-lg" style="opacity: 0.7;" x-show="canPay">
+                <p class="gz-font-display font-bold text-sm mb-1">Review your booking</p>
+                <p class="text-sm" style="color: var(--gz-muted);" x-show="canPay">
                     <span x-text="selectedCourtName"></span> ·
                     <span x-text="selectedDate"></span> ·
                     <span x-text="selectedTimeSlot"></span>
                 </p>
-                <p class="text-lg" style="opacity: 0.5;" x-show="!canPay">
+                <p class="text-sm" style="color: var(--gz-muted);" x-show="!canPay">
                     Choose a court, a date, and an open time slot to continue.
                 </p>
             </div>
 
-            <button type="button" @click="goToReview()" :disabled="!canPay"
-                    class="pixel-btn font-pixel text-[10px] px-6 py-3"
-                    style="background: var(--gold); color: var(--ink);">
+            <button type="button" @click="goToReview()" :disabled="!canPay" class="gz-btn-primary">
                 Next
             </button>
         </section>
 
         </div>
-        {{-- end step 1 --}}
 
-        {{-- ================= STEP 2: SUMMARY + PAYMENT ================= --}}
         <div x-show="step === 2" x-cloak>
-            <button type="button" @click="goBack()" class="pixel-btn text-[10px] font-pixel mb-8" style="background: var(--parchment);">
+            <button type="button" @click="goBack()" class="gz-btn-outline mb-8">
                 ‹ Back
             </button>
 
+            <h2 class="sr-only" tabindex="-1" x-ref="step2Heading">Review and pay for your booking</h2>
+
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-                {{-- Reservation summary --}}
                 <div class="lg:col-span-5">
-                    <div class="pixel-border p-6" style="background: var(--cream);">
-                        <h2 class="font-pixel text-base mb-6">Reservation Summary</h2>
+                    <div class="gz-panel gz-panel-body">
+                        <h3 class="gz-font-display font-bold text-base mb-6">Reservation Summary</h3>
 
-                        <div class="ledger-row pb-3 mb-3">
-                            <p class="text-base" style="opacity: 0.6;">Court</p>
-                            <p class="text-lg font-bold" x-text="selectedCourtName"></p>
+                        <div class="pb-3 mb-3 border-b" style="border-color: var(--gz-border);">
+                            <p class="text-xs" style="color: var(--gz-muted);">Court</p>
+                            <p class="text-base font-semibold" x-text="selectedCourtName"></p>
                         </div>
-                        <div class="ledger-row pb-3 mb-3">
-                            <p class="text-base" style="opacity: 0.6;">Date</p>
-                            <p class="text-lg font-bold" x-text="selectedDate"></p>
+                        <div class="pb-3 mb-3 border-b" style="border-color: var(--gz-border);">
+                            <p class="text-xs" style="color: var(--gz-muted);">Date</p>
+                            <p class="text-base font-semibold" x-text="selectedDate"></p>
                         </div>
-                        <div class="ledger-row pb-3 mb-3">
-                            <p class="text-base" style="opacity: 0.6;">Time</p>
-                            <p class="text-lg font-bold" x-text="selectedTimeSlot"></p>
+                        <div class="pb-3 mb-3 border-b" style="border-color: var(--gz-border);">
+                            <p class="text-xs" style="color: var(--gz-muted);">Time</p>
+                            <p class="text-base font-semibold" x-text="selectedTimeSlot"></p>
                         </div>
 
-                        <div class="flex justify-between text-lg mb-2">
+                        <div class="flex justify-between text-sm mb-2">
                             <span>Court Fee (1 hour)</span>
                             <span x-text="'₱' + selectedCourtRate.toFixed(2)"></span>
                         </div>
-                        <div class="flex justify-between text-lg mb-4">
+                        <div class="flex justify-between text-sm mb-4">
                             <span>Service Fee</span>
                             <span x-text="'₱' + serviceFee.toFixed(2)"></span>
                         </div>
 
-                        <div class="flex justify-between items-center pt-4" style="border-top: 3px solid var(--ink);">
-                            <span class="font-pixel text-[10px]">Total Due</span>
-                            <span class="font-pixel text-base" style="color: var(--red);" x-text="'₱' + totalDue.toFixed(2)"></span>
+                        <div class="flex justify-between items-center pt-4 border-t" style="border-color: var(--gz-border);">
+                            <span class="gz-font-display font-bold text-sm">Total Due</span>
+                            <span class="gz-font-display font-bold text-lg" style="color: var(--gz-pop-dark);" x-text="'₱' + totalDue.toFixed(2)"></span>
                         </div>
                     </div>
                 </div>
 
-                {{-- Payment method --}}
                 <div class="lg:col-span-7">
-                    <div class="pixel-border p-6" style="background: var(--cream);">
-                        <h2 class="font-pixel text-base mb-6">Payment Method</h2>
+                    <div class="gz-panel gz-panel-body">
+                        <h3 class="gz-font-display font-bold text-base mb-6">Payment Method</h3>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8" role="radiogroup" aria-label="Payment method">
                             <button type="button" @click="paymentMethod = 'gcash'"
-                                    class="pixel-border p-4 text-center"
-                                    :style="paymentMethod === 'gcash' ? 'background: var(--jade); color: var(--cream);' : 'background: var(--parchment);'">
-                                <span class="font-pixel text-[10px] block">GCash</span>
+                                    role="radio" :aria-checked="paymentMethod === 'gcash' ? 'true' : 'false'"
+                                    class="gz-kpi-card text-center"
+                                    :style="paymentMethod === 'gcash' ? 'border-color: var(--gz-pop); background: rgba(62,207,126,0.08);' : ''">
+                                <span class="text-sm font-semibold block">GCash</span>
                             </button>
                             <button type="button" @click="paymentMethod = 'card'"
-                                    class="pixel-border p-4 text-center"
-                                    :style="paymentMethod === 'card' ? 'background: var(--jade); color: var(--cream);' : 'background: var(--parchment);'">
-                                <span class="font-pixel text-[10px] block">Card</span>
+                                    role="radio" :aria-checked="paymentMethod === 'card' ? 'true' : 'false'"
+                                    class="gz-kpi-card text-center"
+                                    :style="paymentMethod === 'card' ? 'border-color: var(--gz-pop); background: rgba(62,207,126,0.08);' : ''">
+                                <span class="text-sm font-semibold block">Card</span>
                             </button>
                             <button type="button" @click="paymentMethod = 'cash'"
-                                    class="pixel-border p-4 text-center"
-                                    :style="paymentMethod === 'cash' ? 'background: var(--jade); color: var(--cream);' : 'background: var(--parchment);'">
-                                <span class="font-pixel text-[10px] block">Cash at Counter</span>
+                                    role="radio" :aria-checked="paymentMethod === 'cash' ? 'true' : 'false'"
+                                    class="gz-kpi-card text-center"
+                                    :style="paymentMethod === 'cash' ? 'border-color: var(--gz-pop); background: rgba(62,207,126,0.08);' : ''">
+                                <span class="text-sm font-semibold block">Cash at Counter</span>
                             </button>
                         </div>
 
                         <div x-show="paymentMethod === 'gcash'" x-cloak class="mb-6">
-                            <x-input-label value="GCash Mobile Number" />
-                            <input type="tel" class="pixel-input mt-1" placeholder="09XX XXX XXXX">
+                            <label class="gz-label" for="gcash_number">GCash Mobile Number</label>
+                            <input type="tel" id="gcash_number" class="gz-input" placeholder="09XX XXX XXXX">
                         </div>
                         <div x-show="paymentMethod === 'card'" x-cloak class="mb-6 grid grid-cols-2 gap-4">
                             <div class="col-span-2">
-                                <x-input-label value="Card Number" />
-                                <input type="text" class="pixel-input mt-1" placeholder="0000 0000 0000 0000">
+                                <label class="gz-label" for="card_number">Card Number</label>
+                                <input type="text" id="card_number" class="gz-input" placeholder="0000 0000 0000 0000">
                             </div>
                             <div>
-                                <x-input-label value="Expiry" />
-                                <input type="text" class="pixel-input mt-1" placeholder="MM/YY">
+                                <label class="gz-label" for="card_expiry">Expiry</label>
+                                <input type="text" id="card_expiry" class="gz-input" placeholder="MM/YY">
                             </div>
                             <div>
-                                <x-input-label value="CVC" />
-                                <input type="text" class="pixel-input mt-1" placeholder="123">
+                                <label class="gz-label" for="card_cvc">CVC</label>
+                                <input type="text" id="card_cvc" class="gz-input" placeholder="123">
                             </div>
                         </div>
                         <div x-show="paymentMethod === 'cash'" x-cloak class="mb-6">
-                            <p class="text-lg" style="opacity: 0.7;">
+                            <p class="text-sm" style="color: var(--gz-muted);">
                                 Pay in person at the KYMNET front desk when you arrive for your session.
                             </p>
                         </div>
 
-                        {{--
-                            This still posts to the exact same endpoint as before. Payment details
-                            entered above aren't sent to the backend yet — actually charging a card
-                            or verifying a GCash number needs a real payment gateway integration,
-                            which is separate backend work, not something this form can do alone.
-                        --}}
                         <form method="POST" action="{{ route('bookings.store') }}">
                             @csrf
                             <input type="hidden" name="court_id" :value="selectedCourt">
                             <input type="hidden" name="date" :value="selectedDate">
                             <input type="hidden" name="time_slot" :value="selectedTimeSlot">
                             <input type="hidden" name="payment_method" :value="paymentMethod">
-                            <button type="submit" :disabled="!canConfirm"
-                                    class="pixel-btn font-pixel text-[10px] px-6 py-3 w-full"
-                                    style="background: var(--gold); color: var(--ink);">
-                                Confirm &amp; Pay
+                            <button type="submit" :disabled="!canConfirm" class="gz-btn-primary w-full justify-center">
+                                Confirm & Pay
                             </button>
                         </form>
                     </div>

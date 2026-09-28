@@ -1,53 +1,70 @@
 <x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
+    <div class="gz-page">
+        <div class="gz-card">
+            <h1 class="gz-font-display font-bold text-2xl mb-1">Create your account.</h1>
+            <p class="gz-hint mb-6">Takes about a minute. No cap.</p>
 
-        <!-- First Name -->
-        <div>
-            <x-input-label for="first_name" :value="__('First Name')" />
-            <x-text-input id="first_name" class="mt-1" type="text" name="first_name" :value="old('first_name')" required autofocus autocomplete="given-name" />
-            <x-input-error :messages="$errors->get('first_name')" class="mt-2" />
-        </div>
+            <form method="POST" action="{{ route('register') }}">
+                @csrf
 
-        <!-- Middle Name (Optional) -->
-        <div class="mt-4">
-            <x-input-label for="middle_name" :value="__('Middle Name (Optional)')" />
-            <x-text-input id="middle_name" class="mt-1" type="text" name="middle_name" :value="old('middle_name')" autocomplete="additional-name" />
-            <x-input-error :messages="$errors->get('middle_name')" class="mt-2" />
-        </div>
+                <fieldset class="border-0 p-0 m-0">
+                    <legend class="sr-only">Full name</legend>
 
-        <!-- Last Name -->
-        <div class="mt-4">
-            <x-input-label for="last_name" :value="__('Last Name')" />
-            <x-text-input id="last_name" class="mt-1" type="text" name="last_name" :value="old('last_name')" required autocomplete="family-name" />
-            <x-input-error :messages="$errors->get('last_name')" class="mt-2" />
-        </div>
+                    <div>
+                        <label for="first_name" class="gz-label">First name</label>
+                        <input id="first_name" class="gz-input" type="text" name="first_name" value="{{ old('first_name') }}" required autofocus autocomplete="given-name">
+                        @error('first_name')
+                            <p class="gz-error" role="alert">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="mt-1" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+                    <div class="mt-5">
+                        <label for="middle_name" class="gz-label">Middle name (optional)</label>
+                        <input id="middle_name" class="gz-input" type="text" name="middle_name" value="{{ old('middle_name') }}" autocomplete="additional-name">
+                        @error('middle_name')
+                            <p class="gz-error" role="alert">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input id="password" class="mt-1" type="password" name="password" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+                    <div class="mt-5">
+                        <label for="last_name" class="gz-label">Last name</label>
+                        <input id="last_name" class="gz-input" type="text" name="last_name" value="{{ old('last_name') }}" required autocomplete="family-name">
+                        @error('last_name')
+                            <p class="gz-error" role="alert">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </fieldset>
 
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-            <x-text-input id="password_confirmation" class="mt-1" type="password" name="password_confirmation" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
+                <div class="mt-5">
+                    <label for="email" class="gz-label">Email</label>
+                    <input id="email" class="gz-input" type="email" name="email" value="{{ old('email') }}" required autocomplete="username">
+                    @error('email')
+                        <p class="gz-error" role="alert">{{ $message }}</p>
+                    @enderror
+                </div>
 
-        <div class="flex items-center justify-end mt-6">
-            <a href="{{ route('login') }}" class="text-base underline mr-4" style="color: var(--jade);">
-                {{ __('Already registered?') }}
-            </a>
-            <x-primary-button>
-                {{ __('Register') }}
-            </x-primary-button>
+                <div class="mt-5">
+                    <label for="password" class="gz-label">Password</label>
+                    <input id="password" class="gz-input" type="password" name="password" required autocomplete="new-password" aria-describedby="password-hint">
+                    <p id="password-hint" class="gz-hint">At least 8 characters.</p>
+                    @error('password')
+                        <p class="gz-error" role="alert">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mt-5">
+                    <label for="password_confirmation" class="gz-label">Confirm password</label>
+                    <input id="password_confirmation" class="gz-input" type="password" name="password_confirmation" required autocomplete="new-password">
+                    @error('password_confirmation')
+                        <p class="gz-error" role="alert">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex items-center justify-between mt-7">
+                    <a href="{{ route('login') }}" class="gz-link">Already registered?</a>
+                    <button type="submit" class="gz-btn-primary">Register</button>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </x-guest-layout>
