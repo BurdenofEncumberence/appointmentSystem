@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminCourtController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminFinanceController;
 use App\Http\Controllers\StaffTodayController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -13,9 +14,15 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    /** @var \App\Models\User|null $user */
+    $user = Auth::user();
 
+    return match(true) {
+        $user?->isAdmin() => redirect()->route('admin.dashboard'),
+        $user?->hasRole('staff') => redirect()->route('staff.today'),
+        default => view('dashboard'),
+    };
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');

@@ -31,9 +31,10 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div class="gz-kpi-card">
             <div class="flex items-center justify-between mb-3">
-                <span class="gz-eyebrow">Month revenue</span>
+                <div class="icon-badge" style="width:32px; height:32px; padding:6px;" id="icon-revenue" aria-hidden="true"></div>
                 <span class="gz-badge gz-badge-neutral">PHP</span>
             </div>
+            <div class="gz-eyebrow mb-1">Month revenue</div>
             <div class="gz-kpi-value" style="color: var(--gz-pop-dark); font-size: 22px;">
                 ₱{{ number_format($monthlyRevenue, 2) }}
             </div>
@@ -48,9 +49,10 @@
 
         <div class="gz-kpi-card">
             <div class="flex items-center justify-between mb-3">
-                <span class="gz-eyebrow">Court fleet</span>
+                <div class="icon-badge" style="width:32px; height:32px; padding:6px;" id="icon-fleet" aria-hidden="true"></div>
                 <span class="gz-badge gz-badge-success">Live</span>
             </div>
+            <div class="gz-eyebrow mb-1">Court fleet</div>
             <div class="gz-kpi-value" style="font-size: 22px;">
                 {{ $courts->where('court_status', 'available')->count() }}
                 <span class="text-sm font-normal" style="color: var(--gz-muted);">/ {{ $courts->count() }}</span>
@@ -60,9 +62,10 @@
 
         <div class="gz-kpi-card">
             <div class="flex items-center justify-between mb-3">
-                <span class="gz-eyebrow">Today matches</span>
+                <div class="icon-badge" style="width:32px; height:32px; padding:6px;" id="icon-matches" aria-hidden="true"></div>
                 <span class="gz-badge gz-badge-neutral">{{ $today->format('M j') }}</span>
             </div>
+            <div class="gz-eyebrow mb-1">Today matches</div>
             <div class="gz-kpi-value" style="font-size: 22px;">
                 {{ $todayBookings->count() }}
             </div>
@@ -71,11 +74,12 @@
 
         <div class="gz-kpi-card">
             <div class="flex items-center justify-between mb-3">
-                <span class="gz-eyebrow">Pending audits</span>
+                <div class="icon-badge" style="width:32px; height:32px; padding:6px;" id="icon-audits" aria-hidden="true"></div>
                 <span class="gz-badge {{ $pendingPayments > 0 ? 'gz-badge-danger' : 'gz-badge-success' }}">
                     {{ $pendingPayments > 0 ? 'Action' : 'Clear' }}
                 </span>
             </div>
+            <div class="gz-eyebrow mb-1">Pending audits</div>
             <div class="gz-kpi-value" style="font-size: 22px; color: {{ $pendingPayments > 0 ? 'var(--gz-danger)' : 'var(--gz-pop-dark)' }};">
                 {{ $pendingPayments }}
             </div>
@@ -99,7 +103,7 @@
 
             <div class="gz-panel-body overflow-x-auto">
                 @if($todayBookings->isEmpty())
-                    <div class="p-8 text-center border border-dashed" style="border-color: var(--gz-border);">
+                    <div class="p-8 text-center border border-dashed" style="border-color: var(--gz-border); background: var(--gz-surface);">
                         <p class="font-semibold">No matches slated today</p>
                         <p class="text-sm mt-1" style="color: var(--gz-muted);">All courts are clear or open for reservation.</p>
                     </div>
@@ -211,7 +215,7 @@
 
         <div class="gz-panel-body overflow-x-auto">
             @if($recentPayments->isEmpty())
-                <div class="p-8 text-center border border-dashed" style="border-color: var(--gz-border);">
+                <div class="p-8 text-center border border-dashed" style="border-color: var(--gz-border); background: var(--gz-surface);">
                     <p class="font-semibold">No recent payments logged</p>
                     <p class="text-sm mt-1" style="color: var(--gz-muted);">New completed customer payments will appear here in real time.</p>
                 </div>

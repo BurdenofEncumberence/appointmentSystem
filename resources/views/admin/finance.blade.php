@@ -17,9 +17,10 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div class="gz-kpi-card">
             <div class="flex items-center justify-between mb-3">
-                <span class="gz-eyebrow">This month</span>
+                <div class="icon-badge" style="width:32px; height:32px; padding:6px;" id="icon-this-month" aria-hidden="true"></div>
                 <span class="gz-badge gz-badge-success">Paid</span>
             </div>
+            <div class="gz-eyebrow mb-1">This month</div>
             <div class="gz-kpi-value" style="color: var(--gz-pop-dark);">
                 ₱{{ number_format($monthlyRevenue, 2) }}
             </div>
@@ -28,9 +29,10 @@
 
         <div class="gz-kpi-card">
             <div class="flex items-center justify-between mb-3">
-                <span class="gz-eyebrow">Year to date</span>
+                <div class="icon-badge" style="width:32px; height:32px; padding:6px;" id="icon-ytd" aria-hidden="true"></div>
                 <span class="gz-badge gz-badge-neutral">Cumulative</span>
             </div>
+            <div class="gz-eyebrow mb-1">Year to date</div>
             <div class="gz-kpi-value">
                 ₱{{ number_format($yearRevenue, 2) }}
             </div>
@@ -39,9 +41,10 @@
 
         <div class="gz-kpi-card">
             <div class="flex items-center justify-between mb-3">
-                <span class="gz-eyebrow">Transactions</span>
+                <div class="icon-badge" style="width:32px; height:32px; padding:6px;" id="icon-transactions" aria-hidden="true"></div>
                 <span class="gz-badge gz-badge-neutral">Count</span>
             </div>
+            <div class="gz-eyebrow mb-1">Transactions</div>
             <div class="gz-kpi-value">
                 {{ number_format($transactionCount) }}
             </div>
@@ -150,7 +153,7 @@
 
         <div class="gz-panel-body overflow-x-auto">
             @if($payments->isEmpty())
-                <div class="p-8 text-center border border-dashed" style="border-color: var(--gz-border);">
+                <div class="p-8 text-center border border-dashed" style="border-color: var(--gz-border); background: var(--gz-surface);">
                     <p class="font-semibold">No transactions in ledger</p>
                     <p class="text-sm mt-1" style="color: var(--gz-muted);">Paid bookings will automatically append to this ledger.</p>
                 </div>

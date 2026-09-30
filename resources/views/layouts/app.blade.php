@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -6,16 +7,18 @@
     <title>{{ config('app.name', 'KYMNET') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="antialiased">
+<body class="antialiased gz-app-shell">
     <div class="min-h-screen">
         @include('layouts.navigation')
 
         @isset($header)
-            <header class="pixel-border px-6 py-4 mt-8 mb-2 max-w-6xl mx-auto" style="background: var(--cream);">
-                {{ $header }}
+            <header class="gz-panel px-6 py-4 mt-8 mb-2 max-w-6xl mx-auto">
+                <div class="gz-panel-body" style="padding: 14px 4px;">
+                    {{ $header }}
+                </div>
             </header>
         @endisset
 

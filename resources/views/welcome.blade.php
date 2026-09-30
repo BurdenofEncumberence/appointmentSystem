@@ -206,6 +206,30 @@
 
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
+    <div
+        x-data="{ show: !localStorage.getItem('kymnet_event_banner_dismissed') }"
+        x-show="show"
+        x-cloak
+        class="relative z-40"
+        style="background: var(--ink); color: var(--surface);"
+    >
+        <div class="max-w-6xl mx-auto px-6 py-2.5 flex items-center justify-between gap-4 text-sm">
+            <p class="font-semibold">
+                <span style="color: var(--pop);">●</span>
+                Grand Opening Tournament — registration opens soon.
+                <a href="#" class="underline underline-offset-2 ml-1">Learn more →</a>
+            </p>
+            <button
+                type="button"
+                @click="show = false; localStorage.setItem('kymnet_event_banner_dismissed', '1')"
+                aria-label="Dismiss announcement"
+                class="shrink-0 opacity-70 hover:opacity-100"
+            >
+                ✕
+            </button>
+        </div>
+    </div>
+
     <header
         class="site-header relative"
         x-data="{ mobileNavOpen: false, scrolled: false }"
@@ -217,12 +241,6 @@
                 <div class="pixel-mark" id="brand-mark" aria-hidden="true"></div>
                 <span class="font-display font-bold text-lg">KYMNET</span>
             </div>
-
-            <nav class="hidden sm:flex items-center gap-8 text-sm font-semibold" style="color: var(--muted);" aria-label="Primary">
-                <a href="#" class="nav-link" aria-current="page">Home</a>
-                <a href="#" class="nav-link">Courts</a>
-                <a href="#" class="nav-link">Events</a>
-            </nav>
 
             <div class="flex items-center gap-3">
                 <a href="{{ route('login') }}" class="btn-outline text-sm hidden sm:inline-flex">Login</a>
@@ -249,9 +267,6 @@
             style="border-color: var(--border); color: var(--muted);"
             aria-label="Primary, mobile"
         >
-            <a href="#" class="nav-link" aria-current="page">Home</a>
-            <a href="#" class="nav-link">Courts</a>
-            <a href="#" class="nav-link">Events</a>
             <a href="{{ route('login') }}" class="btn-outline text-sm text-center">Login</a>
             <a href="{{ route('register') }}" class="btn-primary text-sm justify-center">Register</a>
         </nav>
