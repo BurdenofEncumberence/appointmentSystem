@@ -6,12 +6,12 @@
                     $homeUrl = match(true) {
                         Auth::check() && Auth::user()->isAdmin() => route('admin.dashboard'),
                         Auth::check() && Auth::user()->hasRole('staff') => route('staff.today'),
-                        Auth::check() => route('dashboard'),
+                        Auth::check() => route('booking'),
                         default => url('/'),
                     };
                 @endphp
                 <a href="{{ $homeUrl }}" class="flex items-center gap-2">
-                    <div class="pixel-mark" aria-hidden="true" style="width:32px; height:32px; border-radius:10px; background: var(--gz-ink); display:grid; grid-template-columns:repeat(8,1fr); grid-template-rows:repeat(8,1fr); padding:6px;" id="nav-seal"></div>
+                    <div class="pixel-mark" aria-hidden="true" style="width:32px; height:32px; background: var(--gz-ink); display:grid; grid-template-columns:repeat(8,1fr); grid-template-rows:repeat(8,1fr); padding:6px;" id="nav-seal"></div>
                     <span class="gz-font-display font-bold text-base">KYMNET</span>
                 </a>
 
@@ -34,9 +34,6 @@
                         @else
                             <a href="{{ url('/') }}" class="nav-link" @if(request()->is('/')) aria-current="page" @endif>
                                 Home
-                            </a>
-                            <a href="{{ route('dashboard') }}" class="nav-link" @if(request()->routeIs('dashboard')) aria-current="page" @endif>
-                                Dashboard
                             </a>
                             <a href="{{ route('booking') }}" class="nav-link" @if(request()->routeIs('booking')) aria-current="page" @endif>
                                 Book Courts
@@ -72,7 +69,7 @@
                         @elseif(Auth::user()->hasRole('staff'))
                             <a href="{{ route('staff.today') }}" class="block px-4 py-3 text-sm hover:bg-[color:var(--gz-bg)]">Today's Schedule</a>
                         @else
-                            <a href="{{ route('dashboard') }}" class="block px-4 py-3 text-sm hover:bg-[color:var(--gz-bg)]">Dashboard</a>
+                            <a href="{{ route('booking') }}" class="block px-4 py-3 text-sm hover:bg-[color:var(--gz-bg)]">Book Courts</a>
                             <a href="{{ route('bookings.index') }}" class="block px-4 py-3 text-sm hover:bg-[color:var(--gz-bg)]">Courts Booked</a>
                         @endif
                         <a href="{{ route('profile.edit') }}" class="block px-4 py-3 text-sm hover:bg-[color:var(--gz-bg)]" style="border-top: 1px solid var(--gz-border);">
@@ -114,7 +111,6 @@
                 <a href="{{ route('staff.today') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Today's Schedule</a>
             @else
                 <a href="{{ url('/') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Home</a>
-                <a href="{{ route('dashboard') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Dashboard</a>
                 <a href="{{ route('booking') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Book Courts</a>
                 <a href="{{ route('bookings.index') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Courts Booked</a>
             @endif

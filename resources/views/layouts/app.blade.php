@@ -1,30 +1,43 @@
+@props(['title' => null, 'heading' => 'Overview'])
 
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name', 'KYMNET') }}</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{{ $title ?? 'KYMNET' }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="antialiased gz-app-shell">
-    <div class="min-h-screen">
-        @include('layouts.navigation')
+    <div class="grain"></div>
+
+    <div class="min-h-screen flex flex-col">
+        <div style="background: var(--gz-bg); position: sticky; top: 0; z-index: 50;">
+            @include('layouts.navigation')
+        </div>
 
         @isset($header)
-            <header class="gz-panel px-6 py-4 mt-8 mb-2 max-w-6xl mx-auto">
-                <div class="gz-panel-body" style="padding: 14px 4px;">
+            <div class="gz-container relative" style="padding-bottom: 0; z-index: 1;">
+                <div style="padding-top: 24px; padding-bottom: 20px; border-bottom: 1.5px solid var(--gz-border);">
                     {{ $header }}
                 </div>
-            </header>
+            </div>
         @endisset
 
-        <main>
-            {{ $slot }}
-        </main>
+        <div
+            class="gz-container relative flex-1"
+            style="z-index: 1; padding-top: 24px;"
+        >
+            <main>
+                {{ $slot }}
+            </main>
+        </div>
+
+        <x-site-footer />
     </div>
 </body>
 </html>

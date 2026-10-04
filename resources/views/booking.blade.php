@@ -1,8 +1,4 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h1 class="gz-font-display font-bold text-lg">Reserve a Court</h1>
-    </x-slot>
-
+<x-app-layout title="Reserve a Court — KYMNET">
     <div
         x-data='{
             selectedCourt: null,
@@ -117,37 +113,36 @@
                 return this.canPay && this.paymentMethod !== null;
             },
         }'
-        class="gz-container"
     >
-        <p class="text-base mb-8" style="color: var(--gz-muted);">
+        <p class="text-sm mb-4" style="color: var(--gz-muted);">
             Pick a court, choose your time, and secure it with online advance payment.
         </p>
 
         <div x-show="step === 1">
 
-        <section class="gz-panel gz-panel-body mb-8">
-            <h2 class="gz-font-display font-bold text-base mb-1" tabindex="-1" x-ref="step1Heading">Set Your Date and Time</h2>
-            <p class="text-sm mb-6" style="color: var(--gz-muted);" role="status" aria-live="polite">
+        <section class="gz-panel mb-4" style="padding: 16px;">
+            <h2 class="gz-font-display font-bold text-sm mb-1" tabindex="-1" x-ref="step1Heading">Set Your Date and Time</h2>
+            <p class="text-xs mb-3" style="color: var(--gz-muted);" role="status" aria-live="polite">
                 <span x-show="selectedCourt && selectedTimeSlot">
                     Selected: <span class="font-semibold" style="color: var(--gz-pop-dark);" x-text="selectedCourtName"></span> at <span class="font-semibold" style="color: var(--gz-pop-dark);" x-text="selectedTimeSlot"></span> on <span class="font-semibold" style="color: var(--gz-pop-dark);" x-text="selectedDate"></span>
                 </span>
                 <span x-show="!selectedCourt || !selectedTimeSlot">
-                    Choose a date on the calendar, then select an open court time slot below.
+                    Choose a date, then select an open time slot.
                 </span>
             </p>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
                 <div class="lg:col-span-4">
-                    <div class="gz-kpi-card">
-                        <div class="flex items-center justify-between mb-3">
-                            <button type="button" @click="prevMonth()" class="gz-btn-outline gz-btn-sm" aria-label="Previous month">‹</button>
-                            <p class="gz-font-display font-bold text-sm" x-text="monthLabel" aria-live="polite"></p>
-                            <button type="button" @click="nextMonth()" class="gz-btn-outline gz-btn-sm" aria-label="Next month">›</button>
+                    <div class="gz-kpi-card" style="padding: 12px;">
+                        <div class="flex items-center justify-between mb-2">
+                            <button type="button" @click="prevMonth()" class="gz-btn-outline gz-btn-sm" style="padding: 5px 10px;" aria-label="Previous month">‹</button>
+                            <p class="gz-font-display font-bold text-xs" x-text="monthLabel" aria-live="polite"></p>
+                            <button type="button" @click="nextMonth()" class="gz-btn-outline gz-btn-sm" style="padding: 5px 10px;" aria-label="Next month">›</button>
                         </div>
-                        <div class="grid grid-cols-7 gap-1 text-xs text-center mb-2" style="color: var(--gz-muted);" aria-hidden="true">
+                        <div class="grid grid-cols-7 gap-1 text-[10px] text-center mb-1" style="color: var(--gz-muted);" aria-hidden="true">
                             <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
                         </div>
-                        <div class="grid grid-cols-7 gap-1 text-sm" role="grid" aria-label="Choose a date">
+                        <div class="grid grid-cols-7 gap-1 text-xs" role="grid" aria-label="Choose a date">
                             <template x-for="(day, idx) in calendarDays" :key="idx">
                                 <button
                                     type="button"
@@ -157,7 +152,7 @@
                                     :aria-current="day !== null && isToday(day) ? 'date' : null"
                                     :aria-pressed="day !== null && selectedDate === dateStringFor(day) ? 'true' : 'false'"
                                     :aria-label="day !== null ? (isToday(day) ? day + ', today' : day) : null"
-                                    class="h-9 flex items-center justify-center rounded-xl"
+                                    class="h-7 flex items-center justify-center rounded-lg"
                                     :style="
                                         day !== null && isPast(day)
                                             ? 'background: transparent; color: var(--gz-border); cursor: not-allowed;'
@@ -171,67 +166,70 @@
                                 ></button>
                             </template>
                         </div>
-                        <p class="text-xs mt-4" style="color: var(--gz-muted);">
-                            Selected date: <span class="font-semibold" x-text="selectedDate" style="color: var(--gz-ink);"></span>
+                        <p class="text-[11px] mt-2" style="color: var(--gz-muted);">
+                            Selected: <span class="font-semibold" x-text="selectedDate" style="color: var(--gz-ink);"></span>
                         </p>
                     </div>
                 </div>
 
                 <div class="lg:col-span-8">
-                    <div class="gz-panel overflow-x-auto">
-                        <table class="gz-table">
-                            <caption class="sr-only">Court availability by time slot. Select an open slot to book it.</caption>
-                            <thead>
-                                <tr>
-                                    <th>Time</th>
-                                    <template x-for="court in courts" :key="'head'+court.id">
-                                        <th class="text-center"
-                                            :style="selectedCourt === court.id ? 'color: var(--gz-pop-dark);' : ''">
-                                            <span x-text="court.name"></span>
-                                            <span class="block text-[11px] font-normal" style="color: var(--gz-muted);" x-text="'₱' + court.rate + '/hr'"></span>
-                                        </th>
-                                    </template>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <template x-for="time in timeSlots" :key="time">
+                    <div class="gz-panel overflow-hidden">
+                        <div style="max-height: 260px; overflow-y: auto; overflow-x: auto;">
+                            <table class="gz-table" style="font-size: 12px;">
+                                <caption class="sr-only">Court availability by time slot. Select an open slot to book it.</caption>
+                                <thead style="position: sticky; top: 0; z-index: 2; background: var(--gz-surface);">
                                     <tr>
-                                        <th scope="row" class="text-left font-semibold whitespace-nowrap" x-text="time"></th>
-                                        <template x-for="court in courts" :key="time + '-' + court.id">
-                                            <td class="p-1.5">
-                                                <button
-                                                    type="button"
-                                                    @click="pickSlot(time, court.id)"
-                                                    :disabled="isBooked(time, court.id)"
-                                                    :aria-pressed="isSelected(time, court.id) ? 'true' : 'false'"
-                                                    :aria-label="court.name + ' at ' + time + ': ' + (isBooked(time, court.id) ? 'booked' : (isSelected(time, court.id) ? 'selected' : 'open'))"
-                                                    class="w-full h-9 text-xs font-semibold rounded-xl transition"
-                                                    :style="
-                                                        isBooked(time, court.id)
-                                                            ? 'background: var(--gz-bg); color: var(--gz-muted); cursor: not-allowed; border: 1px solid var(--gz-border);'
-                                                            : (isSelected(time, court.id)
-                                                                ? 'background: var(--gz-pop); color: var(--gz-ink); cursor: pointer;'
-                                                                : 'background: var(--gz-surface); border: 1px solid var(--gz-border); cursor: pointer;')
-                                                    "
-                                                    x-text="isBooked(time, court.id) ? 'Booked' : (isSelected(time, court.id) ? 'Selected' : 'Open')"
-                                                ></button>
-                                            </td>
+                                        <th style="padding: 7px 10px;">Time</th>
+                                        <template x-for="court in courts" :key="'head'+court.id">
+                                            <th class="text-center" style="padding: 7px 8px;"
+                                                :style="selectedCourt === court.id ? 'color: var(--gz-pop-dark);' : ''">
+                                                <span x-text="court.name"></span>
+                                                <span class="block text-[10px] font-normal" style="color: var(--gz-muted);" x-text="'₱' + court.rate + '/hr'"></span>
+                                            </th>
                                         </template>
                                     </tr>
-                                </template>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <template x-for="time in timeSlots" :key="time">
+                                        <tr>
+                                            <th scope="row" class="text-left font-semibold whitespace-nowrap" style="padding: 5px 10px;" x-text="time"></th>
+                                            <template x-for="court in courts" :key="time + '-' + court.id">
+                                                <td style="padding: 4px;">
+                                                    <button
+                                                        type="button"
+                                                        @click="pickSlot(time, court.id)"
+                                                        :disabled="isBooked(time, court.id)"
+                                                        :aria-pressed="isSelected(time, court.id) ? 'true' : 'false'"
+                                                        :aria-label="court.name + ' at ' + time + ': ' + (isBooked(time, court.id) ? 'booked' : (isSelected(time, court.id) ? 'selected' : 'open'))"
+                                                        class="w-full text-[11px] font-semibold rounded-lg transition"
+                                                        style="height: 28px;"
+                                                        :style="
+                                                            isBooked(time, court.id)
+                                                                ? 'height: 28px; background: var(--gz-bg); color: var(--gz-muted); cursor: not-allowed; border: 1px solid var(--gz-border);'
+                                                                : (isSelected(time, court.id)
+                                                                    ? 'height: 28px; background: var(--gz-pop); color: var(--gz-ink); cursor: pointer;'
+                                                                    : 'height: 28px; background: var(--gz-surface); border: 1px solid var(--gz-border); cursor: pointer;')
+                                                        "
+                                                        x-text="isBooked(time, court.id) ? 'Booked' : (isSelected(time, court.id) ? 'Selected' : 'Open')"
+                                                    ></button>
+                                                </td>
+                                            </template>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
-                    <div class="flex items-center gap-6 mt-4 text-xs" style="color: var(--gz-muted);">
-                        <span class="flex items-center gap-2">
-                            <span class="w-3 h-3 inline-block rounded" style="background: var(--gz-surface); border: 1px solid var(--gz-border);" aria-hidden="true"></span> Available
+                    <div class="flex items-center gap-4 mt-2 text-[11px]" style="color: var(--gz-muted);">
+                        <span class="flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 inline-block rounded" style="background: var(--gz-surface); border: 1px solid var(--gz-border);" aria-hidden="true"></span> Available
                         </span>
-                        <span class="flex items-center gap-2">
-                            <span class="w-3 h-3 inline-block rounded" style="background: var(--gz-bg); border: 1px solid var(--gz-border);" aria-hidden="true"></span> Booked
+                        <span class="flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 inline-block rounded" style="background: var(--gz-bg); border: 1px solid var(--gz-border);" aria-hidden="true"></span> Booked
                         </span>
-                        <span class="flex items-center gap-2">
-                            <span class="w-3 h-3 inline-block rounded" style="background: var(--gz-pop);" aria-hidden="true"></span> Selected
+                        <span class="flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 inline-block rounded" style="background: var(--gz-pop);" aria-hidden="true"></span> Selected
                         </span>
                     </div>
                 </div>
@@ -239,25 +237,25 @@
         </section>
 
         @error('time_slot')
-            <div class="mb-6 p-4 rounded-2xl" style="background: var(--gz-danger-bg); color: var(--gz-danger);" role="alert">
+            <div class="mb-4 p-3 rounded-xl text-sm" style="background: var(--gz-danger-bg); color: var(--gz-danger);" role="alert">
                 {{ $message }}
             </div>
         @enderror
 
-        <section class="gz-panel gz-panel-body flex flex-col sm:flex-row items-center justify-between gap-4">
+        <section class="gz-panel flex flex-col sm:flex-row items-center justify-between gap-3" style="padding: 14px 16px;">
             <div>
-                <p class="gz-font-display font-bold text-sm mb-1">Review your booking</p>
-                <p class="text-sm" style="color: var(--gz-muted);" x-show="canPay">
+                <p class="gz-font-display font-bold text-sm mb-0.5">Review your booking</p>
+                <p class="text-xs" style="color: var(--gz-muted);" x-show="canPay">
                     <span x-text="selectedCourtName"></span> ·
                     <span x-text="selectedDate"></span> ·
                     <span x-text="selectedTimeSlot"></span>
                 </p>
-                <p class="text-sm" style="color: var(--gz-muted);" x-show="!canPay">
+                <p class="text-xs" style="color: var(--gz-muted);" x-show="!canPay">
                     Choose a court, a date, and an open time slot to continue.
                 </p>
             </div>
 
-            <button type="button" @click="goToReview()" :disabled="!canPay" class="gz-btn-primary">
+            <button type="button" @click="goToReview()" :disabled="!canPay" class="gz-btn-primary gz-btn-sm">
                 Next
             </button>
         </section>
@@ -265,13 +263,13 @@
         </div>
 
         <div x-show="step === 2" x-cloak>
-            <button type="button" @click="goBack()" class="gz-btn-outline mb-8">
+            <button type="button" @click="goBack()" class="gz-btn-outline gz-btn-sm mb-4">
                 ‹ Back
             </button>
 
             <h2 class="sr-only" tabindex="-1" x-ref="step2Heading">Review and pay for your booking</h2>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
                 <div class="lg:col-span-5">
                     <div class="gz-panel gz-panel-body">
@@ -315,18 +313,21 @@
                                     role="radio" :aria-checked="paymentMethod === 'gcash' ? 'true' : 'false'"
                                     class="gz-kpi-card text-center"
                                     :style="paymentMethod === 'gcash' ? 'border-color: var(--gz-pop); background: rgba(62,207,126,0.08);' : ''">
+                                <div class="icon-badge mx-auto mb-2" style="width:32px; height:32px; padding:6px;" id="icon-pay-gcash" aria-hidden="true"></div>
                                 <span class="text-sm font-semibold block">GCash</span>
                             </button>
                             <button type="button" @click="paymentMethod = 'card'"
                                     role="radio" :aria-checked="paymentMethod === 'card' ? 'true' : 'false'"
                                     class="gz-kpi-card text-center"
                                     :style="paymentMethod === 'card' ? 'border-color: var(--gz-pop); background: rgba(62,207,126,0.08);' : ''">
+                                <div class="icon-badge mx-auto mb-2" style="width:32px; height:32px; padding:6px;" id="icon-pay-card" aria-hidden="true"></div>
                                 <span class="text-sm font-semibold block">Card</span>
                             </button>
                             <button type="button" @click="paymentMethod = 'cash'"
                                     role="radio" :aria-checked="paymentMethod === 'cash' ? 'true' : 'false'"
                                     class="gz-kpi-card text-center"
                                     :style="paymentMethod === 'cash' ? 'border-color: var(--gz-pop); background: rgba(62,207,126,0.08);' : ''">
+                                <div class="icon-badge mx-auto mb-2" style="width:32px; height:32px; padding:6px;" id="icon-pay-cash" aria-hidden="true"></div>
                                 <span class="text-sm font-semibold block">Cash at Counter</span>
                             </button>
                         </div>
@@ -370,4 +371,28 @@
             </div>
         </div>
     </div>
+
+    <script>
+        (function () {
+            const glyphs = {
+                'icon-pay-gcash': [
+                    "..GGGG..",".G....G.",".G.GG.G.",".G.GG.G.",
+                    ".G.GG.G.",".G....G.","..GGGG..","........"
+                ],
+                'icon-pay-card': [
+                    "GGGGGGGG","G......G","GGGGGGGG","G......G",
+                    "G.GG...G","G......G","GGGGGGGG","........"
+                ],
+                'icon-pay-cash': [
+                    "........","..GGGG..",".G....G.",".G.GG.G.",
+                    ".G.GG...",".G....G.","..GGGG..","........"
+                ]
+            };
+            Object.keys(glyphs).forEach(id => {
+                if (typeof window.renderPixelGrid === 'function') {
+                    window.renderPixelGrid(id, glyphs[id], { '.': 'transparent', 'G': '#3ECF7E' });
+                }
+            });
+        })();
+    </script>
 </x-app-layout>

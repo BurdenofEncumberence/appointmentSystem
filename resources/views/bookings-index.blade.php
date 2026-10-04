@@ -1,42 +1,48 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-pixel text-lg">Courts Booked</h2>
+        <h1 class="gz-font-display font-bold text-lg">Courts Booked</h1>
     </x-slot>
 
     <div class="max-w-6xl mx-auto px-6 py-10">
         @if (session('status'))
-            <div class="pixel-border p-4 mb-6" style="background: var(--jade); color: var(--cream);">
+            <div class="gz-status mb-6" role="status" aria-live="polite">
                 {{ session('status') }}
             </div>
         @endif
 
         @if ($bookings->isEmpty())
-            <p class="text-lg" style="opacity: 0.7;">You haven't booked a court yet.</p>
+            <p class="text-base" style="color: var(--gz-muted);">You haven't booked a court yet.</p>
         @else
-            <div class="pixel-border overflow-x-auto" style="background: var(--cream);">
-                <table class="w-full text-base border-collapse">
+            <div class="gz-panel overflow-x-auto">
+                <table class="gz-table">
                     <thead>
-                        <tr style="background: var(--ink); color: var(--cream);">
-                            <th class="p-3 text-left font-pixel text-[9px]">Court</th>
-                            <th class="p-3 text-left font-pixel text-[9px]">Date</th>
-                            <th class="p-3 text-left font-pixel text-[9px]">Time</th>
-                            <th class="p-3 text-left font-pixel text-[9px]">Status</th>
+                        <tr>
+                            <th>Court</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($bookings as $booking)
-                            <tr style="border-top: 1px solid var(--ink);">
-                                <td class="p-3">{{ $booking->court->court_name ?? 'Deleted court' }}</td>
-                                <td class="p-3">{{ \Illuminate\Support\Carbon::parse($booking->date)->format('M d, Y') }}</td>
-                                <td class="p-3">
+                            <tr>
+                                <td class="font-semibold">{{ $booking->court->court_name ?? 'Deleted court' }}</td>
+                                <td style="color: var(--gz-muted);">{{ \Illuminate\Support\Carbon::parse($booking->date)->format('M d, Y') }}</td>
+                                <td style="color: var(--gz-muted);">
                                     {{ \Illuminate\Support\Carbon::parse($booking->start_time)->format('g:i A') }}
                                     -
                                     {{ \Illuminate\Support\Carbon::parse($booking->end_time)->format('g:i A') }}
                                 </td>
-                                <td class="p-3">
-                                    <span class="text-[10px] font-pixel px-3 py-1 pixel-border" style="background: var(--parchment);">
-                                        {{ ucfirst($booking->booking_status) }}
-                                    </span>
+                                <td>
+                                    @php
+                                        $badgeClass = match($booking->booking_status) {
+                                            'confirmed' => 'gz-badge-success',
+                                            'pending' => 'gz-badge-warning',
+                                            'cancelled' => 'gz-badge-danger',
+                                            default => 'gz-badge-neutral',
+                                        };
+                                    @endphp
+                                    <span class="gz-badge {{ $badgeClass }}">{{ ucfirst($booking->booking_status) }}</span>
                                 </td>
                             </tr>
                         @endforeach

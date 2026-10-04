@@ -168,6 +168,12 @@ body {
 }
 .ledger-row:last-child { border-bottom: none; }
 
+/* =====================================================================
+   SITE-WIDE ACCESSIBILITY BASE
+   Previously duplicated as an inline <style> block in several individual
+   .blade.php files. Belongs here instead: one definition, applied to
+   every page automatically, instead of copy-pasted per view.
+   ===================================================================== */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible {
@@ -192,6 +198,14 @@ input:focus-visible {
     }
 }
 
+/* =====================================================================
+   GEN Z THEME (used on welcomenew / the redesigned auth pages)
+   Namespaced under a `gz-` prefix and its own CSS variables so it can
+   live in the same stylesheet as the pixel theme above without any
+   class-name collisions or accidental overrides. Any page can opt into
+   this look just by using these classes, without needing its own
+   <style> block.
+   ===================================================================== */
 :root {
     --gz-bg: #F4F1E9;
     --gz-surface: #FCFBF7;
@@ -314,6 +328,15 @@ input:focus-visible {
     font-weight: 600;
 }
 
+/* =====================================================================
+   GEN Z THEME — DASHBOARD / DATA-DENSE PAGE ADDITIONS
+   Panels, tables, badges and meters for admin/finance style pages.
+   Two extra semantic colors (amber for "pending/warning", red for
+   "cancelled/danger") are introduced here out of necessity — status
+   badges need 3+ distinguishable states and green alone can't carry
+   that. They're used only inside badges/alerts, kept far under 10% of
+   overall visual weight, and never used as backgrounds or large fills.
+   ===================================================================== */
 :root {
     --gz-warning: #C9902E;
     --gz-warning-bg: rgba(201, 144, 46, 0.12);
@@ -465,11 +488,140 @@ input:focus-visible {
     outline-offset: 2px;
 }
 
+/* =====================================================================
+   SEMANTIC BUTTON VARIANTS
+   Same push-button shape as .gz-btn-primary (solid fill, drop shadow,
+   press-down on click) — only the color changes. Built entirely from
+   colors already used elsewhere in the theme:
+     - success:  --gz-pop / --gz-pop-dark (same green as primary; this
+                 is an explicit alias so markup intent reads clearly,
+                 e.g. "Confirm" vs a generic primary action)
+     - danger:   --gz-danger (already used in gz-badge-danger)
+     - warning:  --gz-warning (already used in gz-badge-warning)
+     - info:     no blue exists anywhere in this theme, so this is
+                 built from the neutral --gz-ink / --gz-border tones
+                 instead of introducing an unrelated new hue — same
+                 "neutral, non-urgent" role gz-badge-neutral already
+                 serves, just as a button.
+
+   Placed ABOVE .gz-btn-sm deliberately: when combined as e.g.
+   class="gz-btn-success gz-btn-sm", the later rule in the file wins
+   for any property both selectors set (padding, font-size), at equal
+   specificity. Defining these here lets .gz-btn-sm's smaller sizing
+   override them correctly for compact buttons — the same ordering
+   .gz-btn-primary already relies on.
+   ===================================================================== */
+.gz-btn-success {
+    background: var(--gz-pop);
+    color: var(--gz-ink);
+    padding: 14px 28px;
+    font-weight: 700;
+    font-size: 15px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 0 var(--gz-pop-dark);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.gz-btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 var(--gz-pop-dark);
+}
+.gz-btn-success:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 var(--gz-pop-dark);
+}
+.gz-btn-success:focus-visible {
+    outline: 3px solid var(--gz-pop-dark);
+    outline-offset: 3px;
+}
+
+.gz-btn-danger {
+    background: var(--gz-danger);
+    color: var(--gz-surface);
+    padding: 14px 28px;
+    font-weight: 700;
+    font-size: 15px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #8f332b;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.gz-btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #8f332b;
+}
+.gz-btn-danger:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #8f332b;
+}
+.gz-btn-danger:focus-visible {
+    outline: 3px solid var(--gz-danger);
+    outline-offset: 3px;
+}
+
+.gz-btn-warning {
+    background: var(--gz-warning);
+    color: var(--gz-ink);
+    padding: 14px 28px;
+    font-weight: 700;
+    font-size: 15px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #9c711f;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.gz-btn-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #9c711f;
+}
+.gz-btn-warning:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #9c711f;
+}
+.gz-btn-warning:focus-visible {
+    outline: 3px solid var(--gz-warning);
+    outline-offset: 3px;
+}
+
+.gz-btn-info {
+    background: var(--gz-ink);
+    color: var(--gz-surface);
+    padding: 14px 28px;
+    font-weight: 700;
+    font-size: 15px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 0 var(--gz-muted);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.gz-btn-info:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 var(--gz-muted);
+}
+.gz-btn-info:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 var(--gz-muted);
+}
+.gz-btn-info:focus-visible {
+    outline: 3px solid var(--gz-muted);
+    outline-offset: 3px;
+}
+
 .gz-btn-sm {
     padding: 9px 16px;
     font-size: 13px;
 }
 
+.gz-badge-info {
+    background: var(--gz-bg);
+    color: var(--gz-ink);
+    border: 1px solid var(--gz-border);
+}
+
+/* Was only ever defined inside welcomenew's own <style> block, so every
+   other page referencing class="nav-link" (navigation partial, auth
+   pages) had no matching rule at all and fell back to unstyled text.
+   Now global, so it works everywhere the class is used. */
 .nav-link {
     text-decoration: none;
     color: var(--gz-muted);
@@ -483,6 +635,18 @@ input:focus-visible {
     font-weight: 700;
 }
 
+/* =====================================================================
+   SHARED PAGE CHROME (Gen Z theme)
+   Used by every full page that includes <x-site-header /> and
+   <x-site-footer /> — welcome, login, register, etc. Was previously
+   duplicated as an identical <style> block inside each page's own
+   <head>; centralized here so a change only has to happen once. This
+   was the missing piece: without it, .skip-link, .site-header, and
+   .pixel-mark had no matching rules anywhere, so those elements fell
+   back to unstyled defaults (visible skip link, no brand-mark box)
+   and the page as a whole fell through to the pixel theme's global
+   `body` rule above instead of the Gen Z background/font.
+   ===================================================================== */
 .grain {
     position: fixed;
     inset: 0;
@@ -533,13 +697,6 @@ input:focus-visible {
 }
 .pixel-mark div { width: 100%; height: 100%; }
 
-.footer-link {
-    color: rgba(252, 251, 247, 0.65);
-    transition: color 0.15s ease;
-    text-decoration: none;
-}
-.footer-link:hover { color: var(--gz-pop); text-decoration: underline; }
-
 .icon-badge {
     width: 52px;
     height: 52px;
@@ -552,19 +709,15 @@ input:focus-visible {
 }
 .icon-badge div { width: 100%; height: 100%; }
 
+.footer-link {
+    color: rgba(252, 251, 247, 0.65);
+    transition: color 0.15s ease;
+    text-decoration: none;
+}
+.footer-link:hover { color: var(--gz-pop); text-decoration: underline; }
+
 @media (prefers-reduced-motion: reduce) {
     .site-header {
         transition: none !important;
     }
-}
-
-.surface-card {
-}
-.icon-badge {
-}
-.court-frame {
-}
-.court-line {
-}
-.court-dot {
 }
