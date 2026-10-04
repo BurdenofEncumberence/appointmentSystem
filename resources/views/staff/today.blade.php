@@ -2,32 +2,32 @@
     <x-slot name="heading">Today's Customer Attendance</x-slot>
 
     {{-- Header & Operational Banner --}}
-    <div class="pixel-border p-4 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4" style="background: var(--cream);">
+    <div class="gz-panel gz-panel-body mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-2 mb-1">
-                <span class="inline-block w-2.5 h-2.5" style="background: var(--jade);"></span>
-                <span class="font-pixel text-[10px] uppercase" style="color: var(--jade);">FRONT DESK · ATTENDANCE TRACKER</span>
+                <span class="inline-block w-2 h-2" style="background: var(--gz-pop);"></span>
+                <span class="gz-eyebrow" style="color: var(--gz-pop-dark);">Front desk · Attendance tracker</span>
             </div>
-            <p class="font-pixel text-xs" style="color: var(--ink);">
-                CUSTOMERS SCHEDULED FOR TODAY
-            </p>
-            <p class="text-base text-stone-600 mt-1">
+            <h1 class="gz-font-display font-bold text-xl">
+                Customers scheduled for today
+            </h1>
+            <p class="text-sm mt-1" style="color: var(--gz-muted);">
                 Track player arrival and attendance: Show or No-Show for {{ $today->format('l, F j, Y') }}.
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-2 print:hidden">
-            <button onclick="window.print()" class="pixel-btn text-[9px] py-2 px-3" style="background: var(--gold); color: var(--ink);">
-                🖨 PRINT RUNSHEET
+            <button onclick="window.print()" class="gz-btn-outline gz-btn-sm">
+                🖨 Print run-sheet
             </button>
-            <a href="{{ route('staff.today') }}" class="pixel-btn text-[9px] py-2 px-3" style="background: var(--ink); color: var(--cream);">
-                ↺ REFRESH
+            <a href="{{ route('staff.today') }}" class="gz-btn-primary gz-btn-sm">
+                ↺ Refresh
             </a>
         </div>
     </div>
 
     {{-- Feedback Alerts --}}
     @if(session('status'))
-        <div class="pixel-border p-3 mb-6 font-pixel text-xs" style="background: var(--jade); color: var(--cream);">
+        <div class="gz-status mb-6" role="status" aria-live="polite">
             ✓ {{ session('status') }}
         </div>
     @endif
@@ -35,74 +35,62 @@
     {{-- 4 Attendance KPI Counter Ledgers --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 print:hidden">
         {{-- Total Scheduled --}}
-        <div class="pixel-border p-4 flex flex-col justify-between" style="background: var(--cream);">
-            <div class="flex items-center justify-between border-b-2 pb-2" style="border-color: var(--ink);">
-                <span class="font-pixel text-[9px] uppercase tracking-wider" style="color: var(--ink);">SCHEDULED</span>
-                <span class="font-pixel text-[8px] px-1.5 py-0.5" style="background: var(--ink); color: var(--gold);">TODAY</span>
+        <div class="gz-kpi-card">
+            <div class="flex items-center justify-between mb-3">
+                <div class="icon-badge" style="width:32px; height:32px; padding:6px;" id="icon-scheduled" aria-hidden="true"></div>
+                <span class="gz-badge gz-badge-neutral">Today</span>
             </div>
-            <div class="my-3">
-                <div class="font-pixel text-2xl" style="color: var(--ink);">
-                    {{ $totalBookingsToday }}
-                </div>
+            <div class="gz-eyebrow mb-1">Scheduled</div>
+            <div class="gz-kpi-value" style="font-size: 22px;">
+                {{ $totalBookingsToday }}
             </div>
-            <div class="pt-2 border-t text-sm font-bold" style="border-color: rgba(26,22,17,0.15);">
-                <span class="font-pixel text-[8px] text-stone-600">CONFIRMED MATCH SLOTS</span>
-            </div>
+            <p class="text-xs mt-2" style="color: var(--gz-muted);">Confirmed match slots</p>
         </div>
 
         {{-- Show Count --}}
-        <div class="pixel-border p-4 flex flex-col justify-between" style="background: var(--cream);">
-            <div class="flex items-center justify-between border-b-2 pb-2" style="border-color: var(--ink);">
-                <span class="font-pixel text-[9px] uppercase tracking-wider" style="color: var(--ink);">SHOW</span>
-                <span class="font-pixel text-[8px] px-1.5 py-0.5" style="background: var(--jade); color: var(--cream);">PRESENT</span>
+        <div class="gz-kpi-card">
+            <div class="flex items-center justify-between mb-3">
+                <div class="icon-badge" style="width:32px; height:32px; padding:6px;" id="icon-show" aria-hidden="true"></div>
+                <span class="gz-badge gz-badge-success">Present</span>
             </div>
-            <div class="my-3">
-                <div class="font-pixel text-2xl" style="color: var(--jade);">
-                    {{ $showCount }}
-                </div>
+            <div class="gz-eyebrow mb-1">Show</div>
+            <div class="gz-kpi-value" style="font-size: 22px; color: var(--gz-pop-dark);">
+                {{ $showCount }}
             </div>
-            <div class="pt-2 border-t text-sm font-bold" style="border-color: rgba(26,22,17,0.15);">
-                <span class="font-pixel text-[8px] text-emerald-700">ARRIVED & PLAYED</span>
-            </div>
+            <p class="text-xs mt-2 font-semibold" style="color: var(--gz-pop-dark);">Arrived &amp; played</p>
         </div>
 
         {{-- No-Show Count --}}
-        <div class="pixel-border p-4 flex flex-col justify-between" style="background: var(--cream);">
-            <div class="flex items-center justify-between border-b-2 pb-2" style="border-color: var(--ink);">
-                <span class="font-pixel text-[9px] uppercase tracking-wider" style="color: var(--ink);">NO-SHOW</span>
-                <span class="font-pixel text-[8px] px-1.5 py-0.5" style="background: var(--red); color: var(--cream);">ABSENT</span>
+        <div class="gz-kpi-card">
+            <div class="flex items-center justify-between mb-3">
+                <div class="icon-badge" style="width:32px; height:32px; padding:6px;" id="icon-noshow" aria-hidden="true"></div>
+                <span class="gz-badge {{ $noShowCount > 0 ? 'gz-badge-danger' : 'gz-badge-neutral' }}">Absent</span>
             </div>
-            <div class="my-3">
-                <div class="font-pixel text-2xl" style="color: {{ $noShowCount > 0 ? 'var(--red)' : 'var(--ink)' }};">
-                    {{ $noShowCount }}
-                </div>
+            <div class="gz-eyebrow mb-1">No-show</div>
+            <div class="gz-kpi-value" style="font-size: 22px; color: {{ $noShowCount > 0 ? 'var(--gz-danger)' : 'var(--gz-ink)' }};">
+                {{ $noShowCount }}
             </div>
-            <div class="pt-2 border-t text-sm font-bold" style="border-color: rgba(26,22,17,0.15);">
-                <span class="font-pixel text-[8px] {{ $noShowCount > 0 ? 'text-red-700' : 'text-stone-500' }}">
-                    {{ $noShowCount > 0 ? 'MISSED APPOINTMENT' : 'NO MISSED MATCHES' }}
-                </span>
-            </div>
+            <p class="text-xs mt-2" style="color: {{ $noShowCount > 0 ? 'var(--gz-danger)' : 'var(--gz-muted)' }};">
+                {{ $noShowCount > 0 ? 'Missed appointment' : 'No missed matches' }}
+            </p>
         </div>
 
         {{-- Awaiting Arrival --}}
-        <div class="pixel-border p-4 flex flex-col justify-between" style="background: var(--cream);">
-            <div class="flex items-center justify-between border-b-2 pb-2" style="border-color: var(--ink);">
-                <span class="font-pixel text-[9px] uppercase tracking-wider" style="color: var(--ink);">AWAITING</span>
-                <span class="font-pixel text-[8px] px-1.5 py-0.5" style="background: var(--gold); color: var(--ink);">ARRIVAL</span>
+        <div class="gz-kpi-card">
+            <div class="flex items-center justify-between mb-3">
+                <div class="icon-badge" style="width:32px; height:32px; padding:6px;" id="icon-awaiting" aria-hidden="true"></div>
+                <span class="gz-badge gz-badge-warning">Arrival</span>
             </div>
-            <div class="my-3">
-                <div class="font-pixel text-2xl" style="color: var(--ink);">
-                    {{ $awaitingCount }}
-                </div>
+            <div class="gz-eyebrow mb-1">Awaiting</div>
+            <div class="gz-kpi-value" style="font-size: 22px;">
+                {{ $awaitingCount }}
             </div>
-            <div class="pt-2 border-t text-sm font-bold" style="border-color: rgba(26,22,17,0.15);">
-                <span class="font-pixel text-[8px] text-stone-600">SCHEDULED FOR TODAY</span>
-            </div>
+            <p class="text-xs mt-2" style="color: var(--gz-muted);">Scheduled for today</p>
         </div>
     </div>
 
     {{-- Search and Filter Controls --}}
-    <div class="pixel-border p-4 mb-6 print:hidden" style="background: var(--cream);">
+    <div class="gz-panel gz-panel-body mb-6 print:hidden">
         <form method="GET" action="{{ route('staff.today') }}" class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             {{-- Search Input --}}
             <div class="flex-1 flex gap-2">
@@ -110,13 +98,13 @@
                        name="search"
                        value="{{ $searchTerm }}"
                        placeholder="Search customer name, email, or court..."
-                       class="pixel-input text-base">
-                <button type="submit" class="pixel-btn text-[9px] py-2 px-4 whitespace-nowrap" style="background: var(--ink); color: var(--cream);">
-                    SEARCH
+                       class="gz-input">
+                <button type="submit" class="gz-btn-primary gz-btn-sm whitespace-nowrap">
+                    Search
                 </button>
                 @if($searchTerm || $selectedCourt || $selectedStatus)
-                    <a href="{{ route('staff.today') }}" class="pixel-btn text-[9px] py-2 px-3 whitespace-nowrap" style="background: var(--parchment); color: var(--ink);">
-                        CLEAR
+                    <a href="{{ route('staff.today') }}" class="gz-btn-outline gz-btn-sm whitespace-nowrap">
+                        Clear
                     </a>
                 @endif
             </div>
@@ -124,8 +112,8 @@
             {{-- Court & Attendance Quick Filters --}}
             <div class="flex flex-wrap items-center gap-2">
                 {{-- Court Filter --}}
-                <select name="court_id" onchange="this.form.submit()" class="pixel-input py-2 text-sm cursor-pointer w-auto">
-                    <option value="">-- ALL COURTS --</option>
+                <select name="court_id" onchange="this.form.submit()" class="gz-input w-auto">
+                    <option value="">All courts</option>
                     @foreach($courts as $court)
                         <option value="{{ $court->id }}" @selected($selectedCourt == $court->id)>
                             {{ $court->court_name }}
@@ -134,8 +122,8 @@
                 </select>
 
                 {{-- Attendance Status Filter --}}
-                <select name="status" onchange="this.form.submit()" class="pixel-input py-2 text-sm cursor-pointer w-auto">
-                    <option value="">-- ALL ATTENDANCE --</option>
+                <select name="status" onchange="this.form.submit()" class="gz-input w-auto">
+                    <option value="">All attendance</option>
                     <option value="show" @selected($selectedStatus === 'show')>Show (Present)</option>
                     <option value="no_show" @selected($selectedStatus === 'no_show')>No-Show (Absent)</option>
                     <option value="scheduled" @selected($selectedStatus === 'scheduled')>Awaiting Arrival</option>
@@ -145,26 +133,24 @@
     </div>
 
     {{-- Main Customers Table --}}
-    <div class="pixel-border" style="background: var(--cream);">
-        <div class="p-4 border-b-2 flex items-center justify-between flex-wrap gap-2" style="background: var(--ink); color: var(--cream); border-color: var(--ink);">
+    <div class="gz-panel">
+        <div class="gz-panel-header">
             <div>
-                <h2 class="font-pixel text-xs tracking-wider text-[color:var(--gold)]">
-                    TODAY'S CUSTOMER RUN-SHEET
-                </h2>
-                <p class="text-sm text-stone-300 mt-0.5">
+                <h2 class="gz-font-display font-bold text-base">Today's customer run-sheet</h2>
+                <p class="text-xs" style="color: var(--gz-muted);">
                     Showing {{ $bookings->count() }} customer reservation{{ $bookings->count() === 1 ? '' : 's' }} for {{ $today->format('D, M d, Y') }}
                 </p>
             </div>
-            <span class="font-pixel text-[8px] px-2 py-1" style="background: var(--parchment); color: var(--ink);">
-                {{ $bookings->count() }} MATCH{{ $bookings->count() === 1 ? '' : 'ES' }}
+            <span class="gz-badge gz-badge-neutral">
+                {{ $bookings->count() }} match{{ $bookings->count() === 1 ? '' : 'es' }}
             </span>
         </div>
 
-        <div class="p-4 overflow-x-auto">
+        <div class="gz-panel-body overflow-x-auto">
             @if($bookings->isEmpty())
-                <div class="p-12 text-center border-2 border-dashed" style="border-color: var(--ink);">
-                    <p class="font-pixel text-xs" style="color: var(--ink);">NO CUSTOMERS FOUND FOR TODAY</p>
-                    <p class="text-base text-stone-600 mt-2">
+                <div class="p-8 text-center border border-dashed" style="border-color: var(--gz-border); background: var(--gz-surface);">
+                    <p class="font-semibold">No customers found for today</p>
+                    <p class="text-sm mt-1" style="color: var(--gz-muted);">
                         @if($searchTerm || $selectedCourt || $selectedStatus)
                             No scheduled customers match your filter parameters. Try clearing the filter.
                         @else
@@ -173,21 +159,21 @@
                     </p>
                     @if($searchTerm || $selectedCourt || $selectedStatus)
                         <div class="mt-4">
-                            <a href="{{ route('staff.today') }}" class="pixel-btn text-[9px] py-1.5 px-3" style="background: var(--gold); color: var(--ink);">
-                                RESET FILTERS
+                            <a href="{{ route('staff.today') }}" class="gz-btn-outline gz-btn-sm">
+                                Reset filters
                             </a>
                         </div>
                     @endif
                 </div>
             @else
-                <table class="w-full text-base border-collapse">
+                <table class="gz-table">
                     <thead>
-                        <tr class="border-b-2" style="border-color: var(--ink); background: var(--parchment);">
-                            <th class="p-3 text-left font-pixel text-[9px]">TIME / TIMING</th>
-                            <th class="p-3 text-left font-pixel text-[9px]">CUSTOMER / PLAYER</th>
-                            <th class="p-3 text-left font-pixel text-[9px]">COURT ASSIGNED</th>
-                            <th class="p-3 text-left font-pixel text-[9px]">ATTENDANCE</th>
-                            <th class="p-3 text-right font-pixel text-[9px] print:hidden">STAFF ACTION</th>
+                        <tr>
+                            <th>Time / Timing</th>
+                            <th>Customer / Player</th>
+                            <th>Court Assigned</th>
+                            <th>Attendance</th>
+                            <th class="text-right print:hidden">Staff Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -200,45 +186,39 @@
                                 $isNoShow = in_array($booking->booking_status, ['no_show', 'no-show']);
                                 $isShow = $booking->booking_status === 'show';
                             @endphp
-                            <tr class="border-b hover:bg-[color:var(--parchment)] transition-colors" style="border-color: rgba(26,22,17,0.2);">
+                            <tr>
                                 {{-- Time and Live Indicator --}}
-                                <td class="p-3 align-top whitespace-nowrap">
-                                    <div class="font-pixel text-[10px]" style="color: var(--ink);">
+                                <td class="whitespace-nowrap">
+                                    <div class="text-sm font-semibold">
                                         {{ $startTime->format('g:i A') }} - {{ $endTime->format('g:i A') }}
                                     </div>
                                     <div class="mt-1">
                                         @if($isLiveNow)
-                                            <span class="font-pixel text-[7px] px-1.5 py-0.5 inline-block animate-pulse" style="background: var(--jade); color: var(--cream);">
-                                                ● LIVE ON COURT
-                                            </span>
+                                            <span class="gz-badge gz-badge-success">● Live on court</span>
                                         @elseif($isPast)
-                                            <span class="font-pixel text-[7px] px-1.5 py-0.5 inline-block" style="background: var(--parchment); color: var(--ink);">
-                                                ✓ FINISHED
-                                            </span>
+                                            <span class="gz-badge gz-badge-neutral">✓ Finished</span>
                                         @else
-                                            <span class="font-pixel text-[7px] px-1.5 py-0.5 inline-block" style="background: var(--gold); color: var(--ink);">
-                                                ▲ UPCOMING
-                                            </span>
+                                            <span class="gz-badge gz-badge-warning">▲ Upcoming</span>
                                         @endif
                                     </div>
                                 </td>
 
                                 {{-- Customer Details --}}
-                                <td class="p-3 align-top">
+                                <td>
                                     <div class="flex items-start gap-2.5">
-                                        <div class="w-8 h-8 flex items-center justify-center font-pixel text-[10px] pixel-border shrink-0" style="background: var(--gold); color: var(--ink);">
+                                        <div class="w-8 h-8 flex items-center justify-center text-sm font-bold shrink-0" style="background: var(--gz-pop); color: var(--gz-ink);">
                                             {{ strtoupper(substr($booking->user?->first_name ?: $booking->user?->name ?: 'G', 0, 1)) }}
                                         </div>
                                         <div>
-                                            <div class="font-bold text-base leading-tight" style="color: var(--ink);">
+                                            <div class="font-semibold text-sm">
                                                 {{ $booking->user?->name ?? 'Guest Customer' }}
                                             </div>
-                                            <div class="text-xs text-stone-600">
+                                            <div class="text-xs" style="color: var(--gz-muted);">
                                                 {{ $booking->user?->email ?? 'No email on file' }}
                                             </div>
                                             @if($booking->user?->role)
-                                                <span class="inline-block mt-0.5 font-pixel text-[7px] text-stone-500 uppercase">
-                                                    [{{ $booking->user->role }}]
+                                                <span class="gz-eyebrow inline-block mt-0.5">
+                                                    {{ $booking->user->role }}
                                                 </span>
                                             @endif
                                         </div>
@@ -246,34 +226,28 @@
                                 </td>
 
                                 {{-- Court --}}
-                                <td class="p-3 align-top">
-                                    <div class="font-bold font-pixel text-[10px]" style="color: var(--ink);">
+                                <td>
+                                    <div class="font-semibold text-sm">
                                         {{ $booking->court?->court_name ?? 'Court Unassigned' }}
                                     </div>
-                                    <div class="text-xs text-stone-600">
+                                    <div class="text-xs" style="color: var(--gz-muted);">
                                         {{ $booking->court?->size ?: 'Standard Pickleball' }}
                                     </div>
                                 </td>
 
                                 {{-- Attendance Status Badge --}}
-                                <td class="p-3 align-top">
+                                <td>
                                     @if($isShow)
-                                        <span class="font-pixel text-[8px] px-2 py-0.5 inline-block pixel-border" style="background: var(--jade); color: var(--cream);">
-                                            ✓ SHOW (PRESENT)
-                                        </span>
+                                        <span class="gz-badge gz-badge-success">✓ Show (Present)</span>
                                     @elseif($isNoShow)
-                                        <span class="font-pixel text-[8px] px-2 py-0.5 inline-block pixel-border" style="background: var(--red); color: var(--cream);">
-                                            ✕ NO-SHOW (ABSENT)
-                                        </span>
+                                        <span class="gz-badge gz-badge-danger">✕ No-show (Absent)</span>
                                     @else
-                                        <span class="font-pixel text-[8px] px-2 py-0.5 inline-block pixel-border" style="background: var(--gold); color: var(--ink);">
-                                            ⏱ AWAITING ARRIVAL
-                                        </span>
+                                        <span class="gz-badge gz-badge-warning">⏱ Awaiting arrival</span>
                                     @endif
                                 </td>
 
                                 {{-- Staff Attendance Actions (Show / No Show) --}}
-                                <td class="p-3 align-top text-right print:hidden">
+                                <td class="text-right print:hidden">
                                     <div class="flex items-center justify-end gap-2 flex-wrap">
                                         {{-- Mark as SHOW --}}
                                         @if(!$isShow)
@@ -281,8 +255,8 @@
                                                 @csrf
                                                 @method('PATCH')
                                                 <input type="hidden" name="attendance_status" value="show">
-                                                <button type="submit" class="pixel-btn text-[8px] py-1 px-2.5" style="background: var(--jade); color: var(--cream);" title="Mark Customer as Present">
-                                                    ✓ SHOW
+                                                <button type="submit" class="gz-btn-success gz-btn-sm" title="Mark Customer as Present">
+                                                    ✓ Show
                                                 </button>
                                             </form>
                                         @endif
@@ -293,8 +267,8 @@
                                                 @csrf
                                                 @method('PATCH')
                                                 <input type="hidden" name="attendance_status" value="no_show">
-                                                <button type="submit" class="pixel-btn text-[8px] py-1 px-2.5" style="background: var(--red); color: var(--cream);" title="Mark Customer as No-Show">
-                                                    ✕ NO-SHOW
+                                                <button type="submit" class="gz-btn-danger gz-btn-sm" title="Mark Customer as No-Show">
+                                                    ✕ No-show
                                                 </button>
                                             </form>
                                         @endif
@@ -305,8 +279,8 @@
                                                 @csrf
                                                 @method('PATCH')
                                                 <input type="hidden" name="attendance_status" value="scheduled">
-                                                <button type="submit" class="pixel-btn text-[7px] py-1 px-2" style="background: var(--parchment); color: var(--ink);" title="Reset to Awaiting">
-                                                    RESET
+                                                <button type="submit" class="gz-btn-outline gz-btn-sm" title="Reset to Awaiting">
+                                                    Reset
                                                 </button>
                                             </form>
                                         @endif
@@ -320,9 +294,9 @@
         </div>
 
         {{-- Footer Run-sheet summary --}}
-        <div class="p-3 border-t-2 flex flex-col sm:flex-row items-center justify-between text-xs text-stone-600 font-pixel" style="border-color: var(--ink); background: var(--parchment);">
-            <span>KYMNET ARENA FRONT DESK</span>
-            <span>DATE: {{ $today->format('Y-m-d') }} · ATTENDANCE ENGINE</span>
+        <div class="p-4 border-t flex flex-col sm:flex-row items-center justify-between text-xs" style="border-color: var(--gz-border); color: var(--gz-muted);">
+            <span>KYMNET Arena Front Desk</span>
+            <span>Date: {{ $today->format('Y-m-d') }} · Attendance engine</span>
         </div>
     </div>
 </x-staff-layout>

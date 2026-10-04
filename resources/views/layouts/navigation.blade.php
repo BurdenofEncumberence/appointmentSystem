@@ -1,4 +1,4 @@
-<nav x-data="{ mobileOpen: false, profileOpen: false }" class="double-rule relative">
+<nav x-data="{ mobileOpen: false, profileOpen: false }" class="border-b relative" style="border-color: var(--gz-border);">
     <div class="max-w-6xl mx-auto px-6">
         <div class="flex justify-between h-16 items-center">
             <div class="flex items-center gap-8">
@@ -6,16 +6,16 @@
                     $homeUrl = match(true) {
                         Auth::check() && (Auth::user()->isAdmin() || Auth::user()->hasRole('manager')) => route('admin.dashboard'),
                         Auth::check() && Auth::user()->hasRole('staff') => route('staff.today'),
-                        Auth::check() => route('dashboard'),
+                        Auth::check() => route('booking'),
                         default => url('/'),
                     };
                 @endphp
                 <a href="{{ $homeUrl }}" class="flex items-center gap-2">
-                    <div class="seal" aria-hidden="true" id="nav-seal"></div>
-                    <span class="font-pixel text-sm">KYMNET</span>
+                    <div class="pixel-mark" aria-hidden="true" style="width:32px; height:32px; background: var(--gz-ink); display:grid; grid-template-columns:repeat(8,1fr); grid-template-rows:repeat(8,1fr); padding:6px;" id="nav-seal"></div>
+                    <span class="gz-font-display font-bold text-base">KYMNET</span>
                 </a>
 
-                <div class="hidden sm:flex gap-6 font-pixel text-[10px]">
+                <div class="hidden sm:flex gap-6 text-sm font-semibold" style="color: var(--gz-muted);">
                     @auth
                         @if(Auth::user()->isAdmin() || Auth::user()->hasRole('manager'))
                             {{-- Admin/Manager only sees Admin Panel navigation --}}
@@ -23,24 +23,18 @@
                                @if(request()->routeIs('admin.dashboard')) style="color: var(--red); border-bottom: 2px solid var(--red);" @endif>
                                 Overview
                             </a>
-                            <a href="{{ route('admin.courts.index') }}"
-                               @if(request()->routeIs('admin.courts.*')) style="color: var(--red); border-bottom: 2px solid var(--red);" @endif>
+                            <a href="{{ route('admin.courts.index') }}" class="nav-link" @if(request()->routeIs('admin.courts.*')) aria-current="page" @endif>
                                 Courts
                             </a>
-                            <a href="{{ route('admin.finance') }}"
-                               @if(request()->routeIs('admin.finance')) style="color: var(--red); border-bottom: 2px solid var(--red);" @endif>
+                            <a href="{{ route('admin.finance') }}" class="nav-link" @if(request()->routeIs('admin.finance')) aria-current="page" @endif>
                                 Financials
                             </a>
                         @elseif(Auth::user()->hasRole('staff'))
-                            {{-- Staff only sees Today's Schedule --}}
-                            <a href="{{ route('staff.today') }}"
-                               @if(request()->routeIs('staff.*')) style="color: var(--red); border-bottom: 2px solid var(--red);" @endif>
+                            <a href="{{ route('staff.today') }}" class="nav-link" @if(request()->routeIs('staff.*')) aria-current="page" @endif>
                                 Today's Schedule
                             </a>
                         @else
-                            {{-- Regular Player navigation --}}
-                            <a href="{{ url('/') }}"
-                               @if(request()->is('/')) style="color: var(--red); border-bottom: 2px solid var(--red);" @endif>
+                            <a href="{{ url('/') }}" class="nav-link" @if(request()->is('/')) aria-current="page" @endif>
                                 Home
                             </a>
                             {{-- <a href="{{ route('dashboard') }}"
@@ -51,19 +45,15 @@
                                @if(request()->routeIs('booking')) style="color: var(--red); border-bottom: 2px solid var(--red);" @endif>
                                 Book Courts
                             </a>
-                            <a href="{{ route('bookings.index') }}"
-                               @if(request()->routeIs('bookings.index')) style="color: var(--red); border-bottom: 2px solid var(--red);" @endif>
+                            <a href="{{ route('bookings.index') }}" class="nav-link" @if(request()->routeIs('bookings.index')) aria-current="page" @endif>
                                 Courts Booked
                             </a>
                         @endif
                     @else
-                        {{-- Guest navigation --}}
-                        <a href="{{ url('/') }}"
-                           @if(request()->is('/')) style="color: var(--red); border-bottom: 2px solid var(--red);" @endif>
+                        <a href="{{ url('/') }}" class="nav-link" @if(request()->is('/')) aria-current="page" @endif>
                             Home
                         </a>
-                        <a href="{{ route('booking') }}"
-                           @if(request()->routeIs('booking')) style="color: var(--red); border-bottom: 2px solid var(--red);" @endif>
+                        <a href="{{ route('booking') }}" class="nav-link" @if(request()->routeIs('booking')) aria-current="page" @endif>
                             Book Courts
                         </a>
                     @endauth
@@ -73,7 +63,8 @@
             <div class="hidden sm:flex items-center gap-4 relative">
                 @auth
                     <button @click="profileOpen = !profileOpen" @click.outside="profileOpen = false"
-                            class="pixel-btn text-[10px] py-2 px-3" style="background: var(--parchment);">
+                            :aria-expanded="profileOpen.toString()"
+                            class="gz-btn-outline gz-btn-sm">
                         {{ Auth::user()->name ?? 'Account' }}
                     </button>
                     <div x-show="profileOpen" x-cloak
@@ -89,72 +80,63 @@
                                 Financial Reports
                             </a>
                         @elseif(Auth::user()->hasRole('staff'))
-                            <a href="{{ route('staff.today') }}" class="block px-4 py-3 text-lg hover:opacity-70">
-                                Today's Schedule
-                            </a>
+                            <a href="{{ route('staff.today') }}" class="block px-4 py-3 text-sm hover:bg-[color:var(--gz-bg)]">Today's Schedule</a>
                         @else
-                            <a href="{{ route('dashboard') }}" class="block px-4 py-3 text-lg hover:opacity-70">
-                                Dashboard
-                            </a>
-                            <a href="{{ route('bookings.index') }}" class="block px-4 py-3 text-lg hover:opacity-70">
-                                Courts Booked
-                            </a>
+                            <a href="{{ route('booking') }}" class="block px-4 py-3 text-sm hover:bg-[color:var(--gz-bg)]">Book Courts</a>
+                            <a href="{{ route('bookings.index') }}" class="block px-4 py-3 text-sm hover:bg-[color:var(--gz-bg)]">Courts Booked</a>
                         @endif
-                        <a href="{{ route('profile.edit') }}" class="block px-4 py-3 text-lg hover:opacity-70" style="border-top: 1px solid var(--ink);">
+                        <a href="{{ route('profile.edit') }}" class="block px-4 py-3 text-sm hover:bg-[color:var(--gz-bg)]" style="border-top: 1px solid var(--gz-border);">
                             Profile
                         </a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="w-full text-left px-4 py-3 text-lg hover:opacity-70" style="color: var(--red); border-top: 1px solid var(--ink);">
+                            <button type="submit" class="w-full text-left px-4 py-3 text-sm hover:bg-[color:var(--gz-bg)]" style="color: var(--gz-danger); border-top: 1px solid var(--gz-border);">
                                 Log Out
                             </button>
                         </form>
                     </div>
                 @else
-                    <a href="{{ route('login') }}" class="pixel-btn text-[10px] py-2 px-3 bg-[color:var(--parchment)]"
-                       @if(request()->routeIs('login')) style="border-color: var(--red); box-shadow: 0 0 0 2px var(--gold);" @endif>
+                    <a href="{{ route('login') }}" class="gz-btn-outline gz-btn-sm" @if(request()->routeIs('login')) aria-current="page" @endif>
                         Login
                     </a>
-                    <a href="{{ route('register') }}" class="pixel-btn text-[10px] py-2 px-3 text-[color:var(--cream)] bg-[color:var(--red)]"
-                       @if(request()->routeIs('register')) style="box-shadow: 0 0 0 2px var(--gold);" @endif>
+                    <a href="{{ route('register') }}" class="gz-btn-primary gz-btn-sm" @if(request()->routeIs('register')) aria-current="page" @endif>
                         Register
                     </a>
                 @endauth
             </div>
 
             <div class="sm:hidden flex items-center gap-2">
-                <button @click="mobileOpen = !mobileOpen" class="pixel-btn px-3 py-2" style="background: var(--parchment);">
-                    <span class="font-pixel text-[10px]">MENU</span>
+                <button @click="mobileOpen = !mobileOpen" :aria-expanded="mobileOpen.toString()" aria-controls="mobile-nav-genz" class="gz-btn-outline gz-btn-sm">
+                    <span x-show="!mobileOpen">Menu</span>
+                    <span x-show="mobileOpen" x-cloak>Close</span>
                 </button>
             </div>
         </div>
     </div>
 
-    {{-- Mobile Dropdown Menu --}}
-    <div x-show="mobileOpen" x-cloak class="sm:hidden pixel-border mx-6 mb-4" style="background: var(--cream);">
+    <div id="mobile-nav-genz" x-show="mobileOpen" x-cloak class="sm:hidden gz-panel mx-6 mb-4">
         @auth
             @if(Auth::user()->isAdmin() || Auth::user()->hasRole('manager'))
                 <a href="{{ route('admin.dashboard') }}" class="block px-4 py-3 text-lg" style="border-bottom: 1px solid var(--ink);">Admin Overview</a>
                 <a href="{{ route('admin.courts.index') }}" class="block px-4 py-3 text-lg" style="border-bottom: 1px solid var(--ink);">Courts</a>
                 <a href="{{ route('admin.finance') }}" class="block px-4 py-3 text-lg" style="border-bottom: 1px solid var(--ink);">Financials</a>
             @elseif(Auth::user()->hasRole('staff'))
-                <a href="{{ route('staff.today') }}" class="block px-4 py-3 text-lg" style="border-bottom: 1px solid var(--ink);">Today's Schedule</a>
+                <a href="{{ route('staff.today') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Today's Schedule</a>
             @else
-                <a href="{{ url('/') }}" class="block px-4 py-3 text-lg" style="border-bottom: 1px solid var(--ink);">Home</a>
-                <a href="{{ route('dashboard') }}" class="block px-4 py-3 text-lg" style="border-bottom: 1px solid var(--ink);">Dashboard</a>
-                <a href="{{ route('booking') }}" class="block px-4 py-3 text-lg" style="border-bottom: 1px solid var(--ink);">Book Courts</a>
-                <a href="{{ route('bookings.index') }}" class="block px-4 py-3 text-lg" style="border-bottom: 1px solid var(--ink);">Courts Booked</a>
+                <a href="{{ url('/') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Home</a>
+                <a href="{{ route('booking') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Book Courts</a>
+                <a href="{{ route('bookings.index') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Courts Booked</a>
             @endif
-            <a href="{{ route('profile.edit') }}" class="block px-4 py-3 text-lg" style="border-bottom: 1px solid var(--ink);">Profile</a>
+            <a href="{{ route('profile.edit') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Profile</a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="w-full text-left px-4 py-3 text-lg" style="color: var(--red);">Log Out</button>
+                <button type="submit" class="w-full text-left px-4 py-3 text-sm" style="color: var(--gz-danger);">Log Out</button>
             </form>
         @else
-            <a href="{{ url('/') }}" class="block px-4 py-3 text-lg" style="border-bottom: 1px solid var(--ink);">Home</a>
-            <a href="{{ route('booking') }}" class="block px-4 py-3 text-lg" style="border-bottom: 1px solid var(--ink);">Book Courts</a>
-            <a href="{{ route('login') }}" class="block px-4 py-3 text-lg" style="border-bottom: 1px solid var(--ink);">Login</a>
-            <a href="{{ route('register') }}" class="block px-4 py-3 text-lg" style="border-bottom: 1px solid var(--ink);">Register</a>
+            <a href="{{ url('/') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Home</a>
+            <a href="{{ route('booking') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Book Courts</a>
+            <a href="{{ route('login') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Login</a>
+            <a href="{{ route('register') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Register</a>
         @endauth
     </div>
 </nav>
@@ -169,13 +151,15 @@
                 [...row].forEach(ch => {
                     const cell = document.createElement('div');
                     cell.style.background = colorMap[ch] || 'transparent';
+                    cell.style.width = '100%';
+                    cell.style.height = '100%';
                     el.appendChild(cell);
                 });
             });
         };
     }
     window.renderPixelGrid('nav-seal', [
-        "........", ".G....G.", "..GGGG..", ".G.GG.G.",
-        ".G.GG.G.", "..GGGG..", ".G....G.", "........"
-    ], { '.': 'transparent', 'G': '#E3A857' });
+        "........", ".W....W.", "..WWWW..", ".W.WW.W.",
+        ".W.WW.W.", "..WWWW..", ".W....W.", "........"
+    ], { '.': 'transparent', 'W': '#FCFBF7' });
 </script>

@@ -206,52 +206,23 @@
 
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <div
-        x-data="{ show: !localStorage.getItem('kymnet_event_banner_dismissed') }"
-        x-show="show"
-        x-cloak
-        class="relative z-40"
-        style="background: var(--ink); color: var(--surface);"
+    <header
+        class="site-header relative"
+        x-data="{ mobileNavOpen: false, scrolled: false }"
+        @scroll.window="scrolled = window.scrollY > 8"
+        :class="{ 'is-scrolled': scrolled }"
     >
-        <div class="max-w-6xl mx-auto px-6 py-2.5 flex items-center justify-between gap-4 text-sm">
-            <p class="font-semibold">
-                <span style="color: var(--pop);">●</span>
-                Grand Opening Tournament — registration opens soon.
-                <a href="#" class="underline underline-offset-2 ml-1">Learn more →</a>
-            </p>
-            <button
-                type="button"
-                @click="show = false; localStorage.setItem('kymnet_event_banner_dismissed', '1')"
-                aria-label="Dismiss announcement"
-                class="shrink-0 opacity-70 hover:opacity-100"
-            >
-                ✕
-            </button>
-        </div>
-    </div>
-
-    {{-- Hero --}}
-    <section class="max-w-6xl mx-auto px-6 pt-20 pb-28 relative">
-        <div class="grid md:grid-cols-2 gap-16 items-center relative">
-            <div class="relative">
-                <h1 class="font-pixel text-3xl md:text-4xl leading-relaxed">
-                    Book Your Court.<br>
-                    <span style="color: var(--red);">Rally With Ease.</span>
-                </h1>
-                <p class="mt-8 max-w-sm text-xl leading-relaxed">
-                    KYMNET brings court reservations, tournaments, and match schedules
-                    into one place. Pick a court, pick a time, and play.
-                @php
-                    $reserveUrl = match(true) {
-                        Auth::check() && (Auth::user()->isAdmin() || Auth::user()->hasRole('manager')) => route('admin.dashboard'),
-                        Auth::check() && Auth::user()->hasRole('staff') => route('staff.today'),
-                        default => route('booking'),
-                    };
-                @endphp
-                <a href="{{ $reserveUrl }}" class="pixel-btn text-[color:var(--cream)] bg-[color:var(--jade)] mt-10">
-                    Reserve a Court
-                </a>
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="pixel-mark" id="brand-mark" aria-hidden="true"></div>
+                <span class="font-display font-bold text-lg">KYMNET</span>
             </div>
+
+            <nav class="hidden sm:flex items-center gap-8 text-sm font-semibold" style="color: var(--muted);" aria-label="Primary">
+                <a href="#" class="nav-link" aria-current="page">Home</a>
+                <a href="#" class="nav-link">Courts</a>
+                <a href="#" class="nav-link">Events</a>
+            </nav>
 
             <div class="flex items-center gap-3">
                 <a href="{{ route('login') }}" class="btn-outline text-sm hidden sm:inline-flex">Login</a>
@@ -278,6 +249,9 @@
             style="border-color: var(--border); color: var(--muted);"
             aria-label="Primary, mobile"
         >
+            <a href="#" class="nav-link" aria-current="page">Home</a>
+            <a href="#" class="nav-link">Courts</a>
+            <a href="#" class="nav-link">Events</a>
             <a href="{{ route('login') }}" class="btn-outline text-sm text-center">Login</a>
             <a href="{{ route('register') }}" class="btn-primary text-sm justify-center">Register</a>
         </nav>

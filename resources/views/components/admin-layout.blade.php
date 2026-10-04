@@ -9,10 +9,12 @@
     <title>{{ $title ?? 'Admin Operations · KYMNET' }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="antialiased">
+<body class="antialiased gz-app-shell">
+    <div class="grain"></div>
+
     <div class="min-h-screen">
         {{-- Consistent top navbar --}}
         @include('layouts.navigation')
@@ -35,9 +37,11 @@
             </div>
         </div>
 
-        <main class="max-w-6xl mx-auto px-6 py-6">
-            {{ $slot }}
-        </main>
+        <div class="gz-container relative" style="z-index: 1;">
+            <main>
+                {{ $slot }}
+            </main>
+        </div>
     </div>
 </body>
 </html>
