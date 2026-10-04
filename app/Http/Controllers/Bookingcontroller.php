@@ -13,6 +13,18 @@ class BookingController extends Controller
 {
     public function create()
     {
+        $user = Auth::user();
+
+        if ($user) {
+            if ($user->isAdmin() || $user->hasRole('manager')) {
+                return redirect()->route('admin.dashboard');
+            }
+
+            if ($user->hasRole('staff')) {
+                return redirect()->route('staff.today');
+            }
+        }
+
         if (Court::count() === 0) {
             (new \Database\Seeders\CourtSeeder())->run();
         }
@@ -46,6 +58,16 @@ class BookingController extends Controller
 
     public function store(StoreBookingRequest $request)
     {
+        $user = Auth::user();
+
+        if ($user && ($user->isAdmin() || $user->hasRole('manager'))) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        if ($user && $user->hasRole('staff')) {
+            return redirect()->route('staff.today');
+        }
+
         [$startTime, $endTime] = $request->parsedTimes();
 
         $court = Court::findOrFail($request->input('court_id'));

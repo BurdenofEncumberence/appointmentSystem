@@ -17,7 +17,7 @@
         </div>
         <div>
             <span class="font-pixel text-[9px] px-3 py-1.5 pixel-border" style="background: var(--parchment); color: var(--ink);">
-                FISCAL YEAR {{ now()->format('Y') }}
+                YEAR {{ now()->format('Y') }}
             </span>
         </div>
     </div>

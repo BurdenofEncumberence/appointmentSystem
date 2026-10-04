@@ -28,13 +28,19 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        $destination = match (true) {
-            $request->user()->isAdmin() => route('admin.dashboard', absolute: false),
-            $request->user()->hasRole('staff') => route('staff.today', absolute: false),
-            default => route('dashboard', absolute: false),
-        };
+        $user = $request->user();
 
-        return redirect()->intended($destination);
+        if ($user->isAdmin() || $user->hasRole('manager')) {
+            $request->session()->forget('url.intended');
+            return redirect()->route('admin.dashboard');
+        }
+
+        if ($user->hasRole('staff')) {
+            $request->session()->forget('url.intended');
+            return redirect()->route('staff.today');
+        }
+
+        return redirect()->intended(route('booking', absolute: false));
     }
 
     /**

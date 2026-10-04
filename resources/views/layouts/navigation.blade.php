@@ -4,7 +4,7 @@
             <div class="flex items-center gap-8">
                 @php
                     $homeUrl = match(true) {
-                        Auth::check() && Auth::user()->isAdmin() => route('admin.dashboard'),
+                        Auth::check() && (Auth::user()->isAdmin() || Auth::user()->hasRole('manager')) => route('admin.dashboard'),
                         Auth::check() && Auth::user()->hasRole('staff') => route('staff.today'),
                         Auth::check() => route('dashboard'),
                         default => url('/'),
@@ -17,8 +17,8 @@
 
                 <div class="hidden sm:flex gap-6 font-pixel text-[10px]">
                     @auth
-                        @if(Auth::user()->isAdmin())
-                            {{-- Admin only sees Admin Panel navigation --}}
+                        @if(Auth::user()->isAdmin() || Auth::user()->hasRole('manager'))
+                            {{-- Admin/Manager only sees Admin Panel navigation --}}
                             <a href="{{ route('admin.dashboard') }}"
                                @if(request()->routeIs('admin.dashboard')) style="color: var(--red); border-bottom: 2px solid var(--red);" @endif>
                                 Overview
@@ -43,10 +43,10 @@
                                @if(request()->is('/')) style="color: var(--red); border-bottom: 2px solid var(--red);" @endif>
                                 Home
                             </a>
-                            <a href="{{ route('dashboard') }}"
+                            {{-- <a href="{{ route('dashboard') }}"
                                @if(request()->routeIs('dashboard')) style="color: var(--red); border-bottom: 2px solid var(--red);" @endif>
                                 Dashboard
-                            </a>
+                            </a> --}}
                             <a href="{{ route('booking') }}"
                                @if(request()->routeIs('booking')) style="color: var(--red); border-bottom: 2px solid var(--red);" @endif>
                                 Book Courts
@@ -78,7 +78,7 @@
                     </button>
                     <div x-show="profileOpen" x-cloak
                          class="absolute right-0 top-full mt-2 w-48 pixel-border z-40" style="background: var(--cream);">
-                        @if(Auth::user()->isAdmin())
+                        @if(Auth::user()->isAdmin() || Auth::user()->hasRole('manager'))
                             <a href="{{ route('admin.dashboard') }}" class="block px-4 py-3 text-lg hover:opacity-70">
                                 Admin Overview
                             </a>
@@ -133,7 +133,7 @@
     {{-- Mobile Dropdown Menu --}}
     <div x-show="mobileOpen" x-cloak class="sm:hidden pixel-border mx-6 mb-4" style="background: var(--cream);">
         @auth
-            @if(Auth::user()->isAdmin())
+            @if(Auth::user()->isAdmin() || Auth::user()->hasRole('manager'))
                 <a href="{{ route('admin.dashboard') }}" class="block px-4 py-3 text-lg" style="border-bottom: 1px solid var(--ink);">Admin Overview</a>
                 <a href="{{ route('admin.courts.index') }}" class="block px-4 py-3 text-lg" style="border-bottom: 1px solid var(--ink);">Courts</a>
                 <a href="{{ route('admin.finance') }}" class="block px-4 py-3 text-lg" style="border-bottom: 1px solid var(--ink);">Financials</a>

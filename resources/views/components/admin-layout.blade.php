@@ -28,19 +28,10 @@
                 </span>
             </div>
 
-            <div class="flex flex-wrap items-center gap-2">
-                <a href="{{ route('admin.dashboard') }}"
-                   class="pixel-btn text-[10px] py-1.5 px-3 {{ request()->routeIs('admin.dashboard') ? 'bg-[color:var(--ink)] text-[color:var(--cream)]' : 'bg-[color:var(--parchment)]' }}">
-                    Overview
-                </a>
-                <a href="{{ route('admin.courts.index') }}"
-                   class="pixel-btn text-[10px] py-1.5 px-3 {{ request()->routeIs('admin.courts.*') ? 'bg-[color:var(--ink)] text-[color:var(--cream)]' : 'bg-[color:var(--parchment)]' }}">
-                    Courts
-                </a>
-                <a href="{{ route('admin.finance') }}"
-                   class="pixel-btn text-[10px] py-1.5 px-3 {{ request()->routeIs('admin.finance') ? 'bg-[color:var(--ink)] text-[color:var(--cream)]' : 'bg-[color:var(--parchment)]' }}">
-                    Financials
-                </a>
+            <div class="flex items-center gap-3">
+                <span class="font-pixel text-[9px] px-2.5 py-1 pixel-border" style="background: var(--parchment); color: var(--ink);">
+                    ● SYSTEM ACTIVE
+                </span>
             </div>
         </div>
 

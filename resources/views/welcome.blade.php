@@ -56,8 +56,14 @@
                 <p class="mt-8 max-w-sm text-xl leading-relaxed">
                     KYMNET brings court reservations, tournaments, and match schedules
                     into one place. Pick a court, pick a time, and play.
-                </p>
-                <a href="{{ route('booking') }}" class="pixel-btn text-[color:var(--cream)] bg-[color:var(--jade)] mt-10">
+                @php
+                    $reserveUrl = match(true) {
+                        Auth::check() && (Auth::user()->isAdmin() || Auth::user()->hasRole('manager')) => route('admin.dashboard'),
+                        Auth::check() && Auth::user()->hasRole('staff') => route('staff.today'),
+                        default => route('booking'),
+                    };
+                @endphp
+                <a href="{{ $reserveUrl }}" class="pixel-btn text-[color:var(--cream)] bg-[color:var(--jade)] mt-10">
                     Reserve a Court
                 </a>
             </div>

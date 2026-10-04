@@ -16,7 +16,7 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'verified', 'role:admin,manager'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/finance', [AdminFinanceController::class, 'index'])->name('finance');
     Route::resource('courts', AdminCourtController::class)->except(['show']);
@@ -32,9 +32,11 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/booking', [BookingController::class, 'create'])->name('booking');
-    Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
-    Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
+    Route::middleware('prevent.staff_admin_booking')->group(function () {
+        Route::get('/booking', [BookingController::class, 'create'])->name('booking');
+        Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
+        Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
+    });
 });
 
 require __DIR__.'/auth.php';

@@ -30,7 +30,7 @@
     </div>
 
     {{-- 4 KPI Metric Ledgers --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {{-- Metric 1: Month Revenue --}}
         <div class="pixel-border p-4 flex flex-col justify-between" style="background: var(--cream);">
             <div class="flex items-center justify-between border-b-2 pb-2" style="border-color: var(--ink);">
@@ -87,7 +87,7 @@
         </div>
 
         {{-- Metric 4: Pending Audits --}}
-        <div class="pixel-border p-4 flex flex-col justify-between" style="background: var(--cream);">
+        {{-- <div class="pixel-border p-4 flex flex-col justify-between" style="background: var(--cream);">
             <div class="flex items-center justify-between border-b-2 pb-2" style="border-color: var(--ink);">
                 <span class="font-pixel text-[9px] uppercase tracking-wider" style="color: var(--ink);">PENDING AUDITS</span>
                 <span class="font-pixel text-[8px] px-1.5 py-0.5" style="background: var(--red); color: var(--cream);">ACTION</span>
@@ -102,7 +102,7 @@
                     {{ $pendingPayments > 0 ? 'PAYMENTS NEED REVIEW' : 'ALL RECONCILED' }}
                 </span>
             </div>
-        </div>
+        </div> --}}
     </div>
 
     {{-- Main Operations Split View --}}
