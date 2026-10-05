@@ -1,50 +1,112 @@
 <?php
 
-use App\Http\Controllers\BookingController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminCourtController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminFinanceController;
+use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StaffTodayController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('welcome');
 
+/*
+|--------------------------------------------------------------------------
+| Central Authenticated Dashboard Router
+|--------------------------------------------------------------------------
+| Routes authenticated users strictly according to their assigned role.
+*/
 Route::get('/dashboard', function () {
     /** @var \App\Models\User|null $user */
     $user = Auth::user();
 
-    return match(true) {
+    return match (true) {
         $user?->isAdmin() || $user?->hasRole('manager') => redirect()->route('admin.dashboard'),
         $user?->hasRole('staff') => redirect()->route('staff.today'),
         default => redirect()->route('booking'),
     };
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware(['auth', 'verified', 'role:admin,manager'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/finance', [AdminFinanceController::class, 'index'])->name('finance');
-    Route::resource('courts', AdminCourtController::class)->except(['show']);
-});
+/*
+|--------------------------------------------------------------------------
+| Admin & Manager Workspace
+|--------------------------------------------------------------------------
+| Restricted to admin and manager roles with verified accounts.
+*/
+Route::middleware(['auth', 'verified', 'role:admin,manager'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/finance', [AdminFinanceController::class, 'index'])->name('finance');
+        Route::resource('courts', AdminCourtController::class)
+            ->except(['show'])
+            ->whereNumber('court');
+    });
 
-Route::middleware(['auth', 'verified', 'role:staff'])->prefix('staff')->name('staff.')->group(function () {
-    Route::get('/today', [StaffTodayController::class, 'index'])->name('today');
-    Route::patch('/bookings/{booking}/status', [StaffTodayController::class, 'updateStatus'])->name('bookings.status');
-});
+/*
+|--------------------------------------------------------------------------
+| Staff Operations Workspace
+|--------------------------------------------------------------------------
+| Restricted to staff roles; includes parameter validation and rate limiting.
+*/
+Route::middleware(['auth', 'verified', 'role:staff'])
+    ->prefix('staff')
+    ->name('staff.')
+    ->group(function () {
+        Route::get('/today', [StaffTodayController::class, 'index'])->name('today');
+        Route::patch('/bookings/{booking}/status', [StaffTodayController::class, 'updateStatus'])
+            ->whereNumber('booking')
+            ->middleware('throttle:60,1')
+            ->name('bookings.status');
+    });
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    Route::middleware('prevent.staff_admin_booking')->group(function () {
+/*
+|--------------------------------------------------------------------------
+| Player Booking Portal
+|--------------------------------------------------------------------------
+| Restricted to players; prevents staff and admin from booking slots.
+| Throttled to prevent reservation flood attacks.
+*/
+Route::middleware(['auth', 'verified', 'prevent.staff_admin_booking'])
+    ->group(function () {
         Route::get('/booking', [BookingController::class, 'create'])->name('booking');
         Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
-        Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
+        Route::post('/bookings', [BookingController::class, 'store'])
+            ->middleware('throttle:20,1')
+            ->name('bookings.store');
     });
-});
 
+/*
+|--------------------------------------------------------------------------
+| User Account & Profile Management
+|--------------------------------------------------------------------------
+| Requires authenticated session; rate limited against brute force/tampering.
+*/
+Route::middleware('auth')
+    ->prefix('profile')
+    ->name('profile.')
+    ->group(function () {
+        Route::get('/', [ProfileController::class, 'edit'])->name('edit');
+        Route::patch('/', [ProfileController::class, 'update'])
+            ->middleware('throttle:15,1')
+            ->name('update');
+        Route::delete('/', [ProfileController::class, 'destroy'])
+            ->middleware('throttle:5,1')
+            ->name('destroy');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| Authentication Routes (Breeze / OTP / Password Management)
+|--------------------------------------------------------------------------
+*/
 require __DIR__.'/auth.php';

@@ -85,6 +85,14 @@ class StaffTodayController extends Controller
             'attendance_status' => ['required', 'in:show,no_show,scheduled'],
         ]);
 
+        if ($booking->booking_status === 'cancelled') {
+            return back()->with('error', 'Cannot update attendance on a cancelled booking.');
+        }
+
+        if (! Carbon::parse($booking->date)->isSameDay(Carbon::today())) {
+            return back()->with('error', 'Attendance status can only be updated for today\'s scheduled bookings.');
+        }
+
         $statusValue = match ($validated['attendance_status']) {
             'show' => 'show',
             'no_show' => 'no_show',
