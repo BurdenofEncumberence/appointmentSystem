@@ -16,7 +16,9 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
-    return view('welcome');
+    $courts = \App\Models\Court::where('court_status', 'available')->get();
+
+    return view('welcome', compact('courts'));
 })->name('welcome');
 
 /*

@@ -260,8 +260,8 @@
                     <a href="{{ $reserveUrl }}" class="btn-primary">
                         Reserve a Court
                     </a>
-                    <a href="#features" class="text-sm font-semibold underline underline-offset-4" style="color: var(--ink);">
-                        See how it works
+                    <a href="#courts" class="text-sm font-semibold underline underline-offset-4" style="color: var(--ink);">
+                        Explore Courts & Rates ↓
                     </a>
                 </div>
             </div>
@@ -278,30 +278,480 @@
         </div>
     </section>
 
-    <section id="features" class="relative z-10 max-w-5xl mx-auto px-6 pb-24" aria-labelledby="features-heading">
-        <h2 id="features-heading" class="font-display text-3xl md:text-4xl font-bold mb-2">Built different.</h2>
-        <p class="text-base mb-10" style="color: var(--muted);">Everything you need, none of the hassle.</p>
+    <!-- Quick Credibility / Arena Highlights Bar -->
+    <section class="relative z-10 max-w-6xl mx-auto px-6 -mt-8 mb-24" aria-label="Facility Highlights">
+        <div class="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-2xl p-6 shadow-sm grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                </div>
+                <div>
+                    <div class="font-display font-bold text-lg md:text-xl leading-none">4 Courts</div>
+                    <p class="text-xs mt-1" style="color: var(--muted);">Championship Fleet</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                </div>
+                <div>
+                    <div class="font-display font-bold text-lg md:text-xl leading-none">1,000 Lux</div>
+                    <p class="text-xs mt-1" style="color: var(--muted);">Anti-Glare Night LEDs</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                </div>
+                <div>
+                    <div class="font-display font-bold text-lg md:text-xl leading-none">Cushion-Flex™</div>
+                    <p class="text-xs mt-1" style="color: var(--muted);">Low-Impact Joint Safety</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <div>
+                    <div class="font-display font-bold text-lg md:text-xl leading-none">Under 60s</div>
+                    <p class="text-xs mt-1" style="color: var(--muted);">Instant Online Booking</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        <div class="grid md:grid-cols-3 gap-6">
-            <div class="surface-card p-7">
-                <div class="icon-badge mb-6" id="icon-availability" aria-hidden="true"></div>
-                <h3 class="font-display font-bold text-lg mb-2">See what's open, live</h3>
-                <p class="text-base leading-relaxed" style="color: var(--muted);">
-                    Real-time court schedules. No calling, no guessing, no "is it free right now?" texts.
+    <!-- Championship Court Fleet Showcase -->
+    <section id="courts" class="relative z-10 max-w-6xl mx-auto px-6 pb-24" aria-labelledby="courts-heading">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--pop-dark)]">
+                    Arena Fleet Showcase
+                </span>
+                <h2 id="courts-heading" class="font-display text-3xl md:text-4xl font-bold mt-3">
+                    Tournament-Grade Courts Built for Rallies.
+                </h2>
+                <p class="text-base mt-2 max-w-xl" style="color: var(--muted);">
+                    Every court is engineered with competition-grade dimensions, true-bounce surfaces, and optimal lighting so your games stay sharp from first serve to match point.
                 </p>
             </div>
+            <div>
+                <a href="{{ $reserveUrl }}" class="btn-primary shrink-0 text-sm py-3 px-6">
+                    Check Today's Schedule →
+                </a>
+            </div>
+        </div>
+
+        @php
+            $displayCourts = isset($courts) && $courts->isNotEmpty() ? $courts : \App\Models\Court::where('court_status', 'available')->get();
+        @endphp
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            @forelse($displayCourts as $court)
+                <div class="surface-card p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-bold uppercase px-2 py-0.5 rounded-full" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                                {{ $court->size ?: 'Standard' }} Court
+                            </span>
+                            <span class="text-xs font-semibold flex items-center gap-1.5" style="color: var(--pop-dark);">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                Available Daily
+                            </span>
+                        </div>
+
+                        <div class="h-28 rounded-2xl relative overflow-hidden mb-5 flex items-center justify-center" style="background: var(--ink);">
+                            <!-- Mini Court Visual Accent -->
+                            <div class="absolute inset-2 border border-dashed border-stone-600 rounded-lg flex items-center justify-center">
+                                <div class="w-full h-[2px] bg-emerald-400/80"></div>
+                                <div class="absolute w-[2px] h-full bg-stone-500"></div>
+                            </div>
+                            <span class="relative z-10 font-display font-extrabold text-white text-lg tracking-wide uppercase">
+                                {{ $court->court_name }}
+                            </span>
+                        </div>
+
+                        <h3 class="font-display font-bold text-xl mb-1">{{ $court->court_name }}</h3>
+                        <p class="text-xs mb-4" style="color: var(--muted);">
+                            USA Pickleball regulation 20' × 44' perimeter layout with high-durability acrylic cushioning.
+                        </p>
+
+                        <ul class="space-y-2 text-xs mb-6" style="color: var(--ink);">
+                            <li class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                <span>Anti-slip acrylic cushion surface</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                <span>1,000-Lux stadium night lighting</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                <span>Heavy-duty tournament mesh net</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                <span>Covered roof & shaded player zone</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="pt-4 border-t border-[color:var(--border)]">
+                        <div class="flex items-baseline justify-between mb-3">
+                            <span class="text-xs" style="color: var(--muted);">Hourly Rate</span>
+                            <div>
+                                <span class="font-display font-bold text-xl text-[color:var(--ink)]">₱{{ number_format($court->price_per_hour, 2) }}</span>
+                                <span class="text-[11px]" style="color: var(--muted);">/ hr</span>
+                            </div>
+                        </div>
+                        <a href="{{ $reserveUrl }}" class="btn-outline w-full text-center text-xs py-2.5 block">
+                            Book {{ $court->court_name }}
+                        </a>
+                    </div>
+                </div>
+            @empty
+                <div class="col-span-full p-8 text-center surface-card">
+                    <p class="font-bold">Courts are being prepared for play.</p>
+                    <a href="{{ $reserveUrl }}" class="btn-primary mt-4 inline-block">View Booking Schedule</a>
+                </div>
+            @endforelse
+        </div>
+
+        <div class="mt-8 p-5 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-lg shrink-0">
+                    ⚡
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm">Organizing a mini tournament or squad friendly?</h4>
+                    <p class="text-xs" style="color: var(--muted);">Our booking engine supports selecting multiple courts & multiple consecutive hours in one unified checkout!</p>
+                </div>
+            </div>
+            <a href="{{ $reserveUrl }}" class="font-semibold text-xs underline underline-offset-4 shrink-0" style="color: var(--ink);">
+                Reserve multiple courts →
+            </a>
+        </div>
+    </section>
+
+    <!-- Why Play at KYMNET / Amenities -->
+    <section id="perks" class="relative z-10 max-w-6xl mx-auto px-6 pb-24" aria-labelledby="perks-heading">
+        <div class="text-center max-w-2xl mx-auto mb-14">
+            <span class="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--pop-dark)]">
+                The KYMNET Experience
+            </span>
+            <h2 id="perks-heading" class="font-display text-3xl md:text-4xl font-bold mt-3">
+                Why Davao Picklers Choose Our Courts
+            </h2>
+            <p class="text-base mt-2" style="color: var(--muted);">
+                From the moment you step foot on the acrylic surface to the final match point, every detail is tailored for maximum performance, comfort, and fun.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Perk 1 -->
             <div class="surface-card p-7">
-                <div class="icon-badge mb-6" id="icon-booking" aria-hidden="true"></div>
-                <h3 class="font-display font-bold text-lg mb-2">Book in one tap</h3>
-                <p class="text-base leading-relaxed" style="color: var(--muted);">
-                    Pick a slot, see the total, pay. Under a minute, start to finish.
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                </div>
+                <h3 class="font-display font-bold text-lg mb-2">Joint-Cushion Surface</h3>
+                <p class="text-sm leading-relaxed" style="color: var(--muted);">
+                    Multi-layer shock absorbing acrylic cushion protects your knees and ankles during quick dinking lateral movements, reducing fatigue and injury risk.
                 </p>
             </div>
+
+            <!-- Perk 2 -->
             <div class="surface-card p-7">
-                <div class="icon-badge mb-6" id="icon-preferences" aria-hidden="true"></div>
-                <h3 class="font-display font-bold text-lg mb-2">Pick your vibe</h3>
-                <p class="text-base leading-relaxed" style="color: var(--muted);">
-                    Indoor, outdoor, covered, or under the lights — filter to what you actually want.
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                </div>
+                <h3 class="font-display font-bold text-lg mb-2">Anti-Glare Night Lighting</h3>
+                <p class="text-sm leading-relaxed" style="color: var(--muted);">
+                    Stadium-grade 1,000-Lux overhead lighting angled perfectly above the court so you can track high lobs and overhead smashes without blinding glare.
+                </p>
+            </div>
+
+            <!-- Perk 3 -->
+            <div class="surface-card p-7">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z" /></svg>
+                </div>
+                <h3 class="font-display font-bold text-lg mb-2">Covered & Weather-Resistant</h3>
+                <p class="text-sm leading-relaxed" style="color: var(--muted);">
+                    Rain or intense tropical sun will never cancel your match. Our covered arena canopy keeps courts 100% dry and breezy with natural cross-ventilation.
+                </p>
+            </div>
+
+            <!-- Perk 4 -->
+            <div class="surface-card p-7">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                </div>
+                <h3 class="font-display font-bold text-lg mb-2">Pro Shop & Gear Rentals</h3>
+                <p class="text-sm leading-relaxed" style="color: var(--muted);">
+                    No paddle? No problem! Rent tournament-grade carbon fiber paddles and official outdoor balls at the front counter, or test out new overgrips.
+                </p>
+            </div>
+
+            <!-- Perk 5 -->
+            <div class="surface-card p-7">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                </div>
+                <h3 class="font-display font-bold text-lg mb-2">Showers & Locker Rooms</h3>
+                <p class="text-sm leading-relaxed" style="color: var(--muted);">
+                    Clean shower stalls, changing rooms, and secured lockers ensure you can rally before work or head straight out with friends feeling completely refreshed.
+                </p>
+            </div>
+
+            <!-- Perk 6 -->
+            <div class="surface-card p-7">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                </div>
+                <h3 class="font-display font-bold text-lg mb-2">Lounge & Refreshment Bar</h3>
+                <p class="text-sm leading-relaxed" style="color: var(--muted);">
+                    Refuel between games with complimentary filtered water refills, chilled electrolyte beverages, shaded spectator benches, and free high-speed Wi-Fi.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3-Step Seamless Booking Process -->
+    <section id="how-it-works" class="relative z-10 max-w-6xl mx-auto px-6 pb-24" aria-labelledby="steps-heading">
+        <div class="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-3xl p-8 md:p-12">
+            <div class="max-w-2xl mb-12">
+                <span class="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border border-[color:var(--border)] bg-[color:var(--bg)] text-[color:var(--pop-dark)]">
+                    Frictionless Experience
+                </span>
+                <h2 id="steps-heading" class="font-display text-3xl md:text-4xl font-bold mt-3">
+                    Book Your Court in Under 60 Seconds
+                </h2>
+                <p class="text-base mt-2" style="color: var(--muted);">
+                    No more waiting for message replies or showing up to full courts. Instant confirmation is guaranteed.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+                <div class="flex flex-col">
+                    <div class="w-12 h-12 rounded-2xl bg-[color:var(--ink)] text-white font-display font-bold text-xl flex items-center justify-center mb-4">
+                        01
+                    </div>
+                    <h3 class="font-display font-bold text-lg mb-2">Pick Your Date & Time</h3>
+                    <p class="text-sm leading-relaxed" style="color: var(--muted);">
+                        Select which court you prefer and see real-time color-coded slot availability. What you see is guaranteed open.
+                    </p>
+                </div>
+
+                <div class="flex flex-col">
+                    <div class="w-12 h-12 rounded-2xl bg-[color:var(--ink)] text-white font-display font-bold text-xl flex items-center justify-center mb-4">
+                        02
+                    </div>
+                    <h3 class="font-display font-bold text-lg mb-2">Single or Multi-Slot Cart</h3>
+                    <p class="text-sm leading-relaxed" style="color: var(--muted);">
+                        Book a 1-hour fast match or add multiple consecutive hours and multiple courts for group play in a single checkout.
+                    </p>
+                </div>
+
+                <div class="flex flex-col">
+                    <div class="w-12 h-12 rounded-2xl bg-[color:var(--pop)] text-[color:var(--ink)] font-display font-bold text-xl flex items-center justify-center mb-4 shadow-sm">
+                        03
+                    </div>
+                    <h3 class="font-display font-bold text-lg mb-2">Instant Confirmation & Play</h3>
+                    <p class="text-sm leading-relaxed" style="color: var(--muted);">
+                        Pay via GCash online or on-site Cash at the front desk with instant OTP verification. Show up and claim your court!
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-10 pt-8 border-t border-[color:var(--border)] flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3 text-xs" style="color: var(--muted);">
+                    <span class="flex items-center gap-1.5 font-semibold text-[color:var(--ink)]">
+                        <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                        Zero Booking Surcharge
+                    </span>
+                    <span>·</span>
+                    <span class="flex items-center gap-1.5 font-semibold text-[color:var(--ink)]">
+                        <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                        Instant Verified Digital Receipt
+                    </span>
+                </div>
+                <a href="{{ $reserveUrl }}" class="btn-primary py-3 px-8 text-sm">
+                    Start Reservation →
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Player Testimonials -->
+    <section class="relative z-10 max-w-6xl mx-auto px-6 pb-24" aria-labelledby="testimonials-heading">
+        <div class="text-center max-w-2xl mx-auto mb-14">
+            <span class="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--pop-dark)]">
+                Player Community
+            </span>
+            <h2 id="testimonials-heading" class="font-display text-3xl md:text-4xl font-bold mt-3">
+                Loved by Passionate Davao Picklers
+            </h2>
+            <p class="text-base mt-2" style="color: var(--muted);">
+                Read why local players, tournament contenders, and weekend squads make KYMNET their home court.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="surface-card p-7 flex flex-col justify-between">
+                <div>
+                    <div class="flex text-amber-500 mb-3 text-sm tracking-widest" aria-label="5 stars">
+                        ★★★★★
+                    </div>
+                    <p class="text-sm leading-relaxed mb-6" style="color: var(--ink);">
+                        "The court grip and cushion are the best in Davao. My knees don't hurt even after 3 straight hours of tournament drills. And being able to reserve in under 30 seconds without calling anyone is amazing."
+                    </p>
+                </div>
+                <div class="flex items-center gap-3 pt-4 border-t border-[color:var(--border)]">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-emerald-100 text-emerald-800">
+                        CM
+                    </div>
+                    <div>
+                        <div class="font-bold text-sm">Carlo Mendoza</div>
+                        <div class="text-xs" style="color: var(--muted);">DUPR 4.0 Club Player</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="surface-card p-7 flex flex-col justify-between">
+                <div>
+                    <div class="flex text-amber-500 mb-3 text-sm tracking-widest" aria-label="5 stars">
+                        ★★★★★
+                    </div>
+                    <p class="text-sm leading-relaxed mb-6" style="color: var(--ink);">
+                        "We used to waste 40 minutes in Messenger groups trying to coordinate court slots. KYMNET's live schedule makes booking effortless. The stadium lights at night are super crisp and anti-glare!"
+                    </p>
+                </div>
+                <div class="flex items-center gap-3 pt-4 border-t border-[color:var(--border)]">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-purple-100 text-purple-800">
+                        RG
+                    </div>
+                    <div>
+                        <div class="font-bold text-sm">Rachel Garcia</div>
+                        <div class="text-xs" style="color: var(--muted);">Weekend Warrior Squad</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="surface-card p-7 flex flex-col justify-between">
+                <div>
+                    <div class="flex text-amber-500 mb-3 text-sm tracking-widest" aria-label="5 stars">
+                        ★★★★★
+                    </div>
+                    <p class="text-sm leading-relaxed mb-6" style="color: var(--ink);">
+                        "Top-notch facilities, clean showers, cold hydration water, and very welcoming staff. We booked 2 courts for our company round-robin and everything was ready right on the dot."
+                    </p>
+                </div>
+                <div class="flex items-center gap-3 pt-4 border-t border-[color:var(--border)]">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-amber-100 text-amber-800">
+                        PR
+                    </div>
+                    <div>
+                        <div class="font-bold text-sm">Paolo Rodriguez</div>
+                        <div class="text-xs" style="color: var(--muted);">Company League Captain</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Frequently Asked Questions -->
+    <section id="faq" class="relative z-10 max-w-4xl mx-auto px-6 pb-24" aria-labelledby="faq-heading" x-data="{ activeFaq: null }">
+        <div class="text-center mb-12">
+            <span class="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--pop-dark)]">
+                Got Questions?
+            </span>
+            <h2 id="faq-heading" class="font-display text-3xl md:text-4xl font-bold mt-3">
+                Frequently Asked Questions
+            </h2>
+            <p class="text-base mt-2" style="color: var(--muted);">
+                Everything you need to know before booking your court appointment.
+            </p>
+        </div>
+
+        <div class="space-y-3">
+            <div class="surface-card overflow-hidden">
+                <button type="button" @click="activeFaq = activeFaq === 1 ? null : 1" class="w-full p-5 text-left flex items-center justify-between font-bold text-base">
+                    <span>Do I need to bring my own paddles and balls?</span>
+                    <span class="text-xl transition-transform" :class="{'rotate-45': activeFaq === 1}">+</span>
+                </button>
+                <div x-show="activeFaq === 1" x-cloak x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="px-5 pb-5 text-sm leading-relaxed" style="color: var(--muted);">
+                    You are welcome to bring your own gear! If you don't have paddles yet, we offer tournament-grade carbon fiber paddle rentals and USAPA approved balls at our reception counter for a nominal fee.
+                </div>
+            </div>
+
+            <div class="surface-card overflow-hidden">
+                <button type="button" @click="activeFaq = activeFaq === 2 ? null : 2" class="w-full p-5 text-left flex items-center justify-between font-bold text-base">
+                    <span>How many players can play on one reserved court?</span>
+                    <span class="text-xl transition-transform" :class="{'rotate-45': activeFaq === 2}">+</span>
+                </button>
+                <div x-show="activeFaq === 2" x-cloak x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="px-5 pb-5 text-sm leading-relaxed" style="color: var(--muted);">
+                    Each reservation covers the entire court! You can play singles (2 players), standard doubles (4 players), or bring up to 6 players to rotate and play king-of-the-court rallies at no extra charge.
+                </div>
+            </div>
+
+            <div class="surface-card overflow-hidden">
+                <button type="button" @click="activeFaq = activeFaq === 3 ? null : 3" class="w-full p-5 text-left flex items-center justify-between font-bold text-base">
+                    <span>Can I book multiple courts or multiple hours at once?</span>
+                    <span class="text-xl transition-transform" :class="{'rotate-45': activeFaq === 3}">+</span>
+                </button>
+                <div x-show="activeFaq === 3" x-cloak x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="px-5 pb-5 text-sm leading-relaxed" style="color: var(--muted);">
+                    Yes! Our interactive booking system allows you to select consecutive time slots across the day or reserve multiple courts simultaneously for clubs and mini-tournaments in one single checkout.
+                </div>
+            </div>
+
+            <div class="surface-card overflow-hidden">
+                <button type="button" @click="activeFaq = activeFaq === 4 ? null : 4" class="w-full p-5 text-left flex items-center justify-between font-bold text-base">
+                    <span>What payment methods are supported?</span>
+                    <span class="text-xl transition-transform" :class="{'rotate-45': activeFaq === 4}">+</span>
+                </button>
+                <div x-show="activeFaq === 4" x-cloak x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="px-5 pb-5 text-sm leading-relaxed" style="color: var(--muted);">
+                    We support instant digital payments via GCash when reserving online, as well as on-site cash settlements handled directly by our front desk staff.
+                </div>
+            </div>
+
+            <div class="surface-card overflow-hidden">
+                <button type="button" @click="activeFaq = activeFaq === 5 ? null : 5" class="w-full p-5 text-left flex items-center justify-between font-bold text-base">
+                    <span>What are your operating hours?</span>
+                    <span class="text-xl transition-transform" :class="{'rotate-45': activeFaq === 5}">+</span>
+                </button>
+                <div x-show="activeFaq === 5" x-cloak x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="px-5 pb-5 text-sm leading-relaxed" style="color: var(--muted);">
+                    KYMNET is open 7 days a week from 8:00 AM to 10:00 PM, including holidays. Night play is fully lit by our 1,000-Lux stadium lighting system.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Big Final Call To Action Banner -->
+    <section class="relative z-10 max-w-6xl mx-auto px-6 pb-24" aria-label="Reserve Call To Action">
+        <div class="rounded-3xl p-10 md:p-16 text-center relative overflow-hidden" style="background: var(--ink); color: var(--surface);">
+            <!-- Background accent glow -->
+            <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full blur-3xl opacity-20 pointer-events-none" style="background: var(--pop);"></div>
+            <div class="absolute -left-20 -bottom-20 w-80 h-80 rounded-full blur-3xl opacity-20 pointer-events-none" style="background: var(--pop);"></div>
+
+            <div class="relative z-10 max-w-2xl mx-auto">
+                <span class="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full" style="background: rgba(62, 207, 126, 0.2); color: var(--pop);">
+                    ● Live Availability Ready
+                </span>
+                <h2 class="font-display text-4xl md:text-5xl font-extrabold mt-5 leading-tight">
+                    Your next great rally starts on our courts.
+                </h2>
+                <p class="mt-4 text-base md:text-lg leading-relaxed text-stone-300">
+                    Peak evening and weekend slots fill up fast. Reserve your preferred court today and experience the highest standard of pickleball in Davao.
+                </p>
+                <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
+                    <a href="{{ $reserveUrl }}" class="btn-primary text-base py-4 px-8">
+                        Reserve a Court Now →
+                    </a>
+                    <a href="#courts" class="btn-outline text-white border-white hover:bg-white hover:text-black text-base py-3.5 px-6">
+                        Explore Courts & Rates
+                    </a>
+                </div>
+                <p class="text-xs mt-6 text-stone-400">
+                    Instant confirmation · Flexible cancellation · Multi-court options
                 </p>
             </div>
         </div>
@@ -320,24 +770,27 @@
             <div>
                 <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: var(--surface);">Explore</h4>
                 <ul class="space-y-2 text-sm">
-                    <li><a href="{{ route('booking') }}" class="footer-link">Find courts</a></li>
-                    <li><a href="#" class="footer-link">Host a tournament</a></li>
-                    <li><a href="#" class="footer-link">Find partners</a></li>
+                    <li><a href="{{ $reserveUrl }}" class="footer-link">Reserve a Court</a></li>
+                    <li><a href="#courts" class="footer-link">Court Fleet & Rates</a></li>
+                    <li><a href="#perks" class="footer-link">Facility Amenities</a></li>
+                    <li><a href="#how-it-works" class="footer-link">How It Works</a></li>
                 </ul>
             </div>
             <div>
-                <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: var(--surface);">For users</h4>
+                <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: var(--surface);">Support</h4>
                 <ul class="space-y-2 text-sm">
-                    <li><a href="#" class="footer-link">Support</a></li>
-                    <li><a href="#" class="footer-link">Pricing</a></li>
+                    <li><a href="#faq" class="footer-link">Frequently Asked Questions</a></li>
+                    <li><a href="{{ route('booking') }}" class="footer-link">Live Slot Availability</a></li>
+                    <li><a href="mailto:support@kymnet.ph" class="footer-link">Contact Desk</a></li>
                 </ul>
             </div>
             <div>
-                <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: var(--surface);">Company</h4>
-                <ul class="space-y-2 text-sm">
-                    <li><a href="#" class="footer-link">About us</a></li>
-                    <li><a href="#" class="footer-link">Contact</a></li>
-                </ul>
+                <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: var(--surface);">Location & Hours</h4>
+                <p class="text-sm leading-relaxed" style="color: rgba(255,255,255,0.65);">
+                    Davao City, Philippines<br>
+                    Open Daily: 8:00 AM – 10:00 PM<br>
+                    Covered & Stadium-Lit Courts
+                </p>
             </div>
         </div>
         <div class="max-w-6xl mx-auto px-6 pb-8 text-sm" style="color: rgba(255,255,255,0.4);">
