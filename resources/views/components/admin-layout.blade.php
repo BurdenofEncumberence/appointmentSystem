@@ -22,25 +22,7 @@
             @include('layouts.navigation')
         </div>
 
-        {{-- Admin sub-navigation banner --}}
-        <div class="gz-panel mx-6 mt-6 max-w-6xl md:mx-auto p-4 flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <span class="gz-badge-primary text-[11px] font-bold tracking-wider">
-                    HQ OPERATIONS
-                </span>
-                <span class="font-bold text-sm tracking-wide text-[color:var(--gz-ink)] font-mono">
-                    {{ $heading }}
-                </span>
-            </div>
-
-            <div class="flex items-center gap-3">
-                <span class="gz-badge-outline text-[10px] font-mono tracking-wider">
-                    ● SYSTEM ACTIVE
-                </span>
-            </div>
-        </div>
-
-        <div class="gz-container relative" style="z-index: 1;">
+        <div class="gz-container relative" style="z-index: 1; padding-top: 24px;">
             <main>
                 {{ $slot }}
             </main>

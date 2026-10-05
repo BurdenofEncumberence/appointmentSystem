@@ -10,7 +10,7 @@
             </p>
         </div>
         <div>
-            <span class="font-pixel text-[9px] px-3 py-1.5 pixel-border" style="background: var(--parchment); color: var(--ink);">
+            <span class="gz-badge-outline font-mono text-xs">
                 YEAR {{ now()->format('Y') }}
             </span>
         </div>
@@ -19,11 +19,15 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div class="gz-kpi-card">
             <div class="flex items-center justify-between mb-3">
-                <div class="icon-badge" style="width:32px; height:32px; padding:6px;" id="icon-this-month" aria-hidden="true"></div>
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: rgba(62, 207, 126, 0.15); color: var(--gz-pop-dark);">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 12v-2m0 0c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
                 <span class="gz-badge gz-badge-success">Paid</span>
             </div>
             <div class="gz-eyebrow mb-1">This month</div>
-            <div class="gz-kpi-value" style="color: var(--gz-pop-dark);">
+            <div class="gz-kpi-value" style="color: var(--gz-pop-dark); font-size: 24px;">
                 ₱{{ number_format($monthlyRevenue, 2) }}
             </div>
             <p class="text-xs mt-2" style="color: var(--gz-muted);">{{ now()->format('F Y') }} audited</p>
@@ -31,11 +35,15 @@
 
         <div class="gz-kpi-card">
             <div class="flex items-center justify-between mb-3">
-                <div class="icon-badge" style="width:32px; height:32px; padding:6px;" id="icon-ytd" aria-hidden="true"></div>
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: rgba(18, 21, 15, 0.06); color: var(--gz-ink);">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                </div>
                 <span class="gz-badge gz-badge-neutral">Cumulative</span>
             </div>
             <div class="gz-eyebrow mb-1">Year to date</div>
-            <div class="gz-kpi-value">
+            <div class="gz-kpi-value" style="font-size: 24px;">
                 ₱{{ number_format($yearRevenue, 2) }}
             </div>
             <p class="text-xs mt-2" style="color: var(--gz-muted);">All settled {{ now()->format('Y') }}</p>
@@ -43,11 +51,15 @@
 
         <div class="gz-kpi-card">
             <div class="flex items-center justify-between mb-3">
-                <div class="icon-badge" style="width:32px; height:32px; padding:6px;" id="icon-transactions" aria-hidden="true"></div>
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: rgba(18, 21, 15, 0.06); color: var(--gz-ink);">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                </div>
                 <span class="gz-badge gz-badge-neutral">Count</span>
             </div>
             <div class="gz-eyebrow mb-1">Transactions</div>
-            <div class="gz-kpi-value">
+            <div class="gz-kpi-value" style="font-size: 24px;">
                 {{ number_format($transactionCount) }}
             </div>
             <p class="text-xs mt-2" style="color: var(--gz-muted);">Confirmed paid receipts</p>

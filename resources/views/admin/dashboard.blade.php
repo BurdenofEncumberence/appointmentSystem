@@ -28,69 +28,66 @@
         </div>
     </div>
 
-    {{-- 4 KPI Metric Ledgers --}}
+    {{-- 3 KPI Metric Cards --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {{-- Metric 1: Month Revenue --}}
-        <div class="pixel-border p-4 flex flex-col justify-between" style="background: var(--cream);">
-            <div class="flex items-center justify-between border-b-2 pb-2" style="border-color: var(--ink);">
-                <span class="font-pixel text-[9px] uppercase tracking-wider" style="color: var(--ink);">MONTH REVENUE</span>
-                <span class="font-pixel text-[8px] px-1.5 py-0.5" style="background: var(--ink); color: var(--gold);">PHP</span>
+        <div class="gz-kpi-card">
+            <div class="flex items-center justify-between mb-3">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: rgba(62, 207, 126, 0.15); color: var(--gz-pop-dark);">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 12v-2m0 0c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <span class="gz-badge gz-badge-success">AUDITED</span>
             </div>
             <div class="gz-eyebrow mb-1">Month revenue</div>
-            <div class="gz-kpi-value" style="color: var(--gz-pop-dark); font-size: 22px;">
+            <div class="gz-kpi-value" style="color: var(--gz-pop-dark); font-size: 24px;">
                 ₱{{ number_format($monthlyRevenue, 2) }}
             </div>
-            <p class="text-xs mt-2 font-semibold" style="color: {{ $revenueChange !== null ? ($revenueChange >= 0 ? 'var(--gz-pop-dark)' : 'var(--gz-danger)') : 'var(--gz-muted)' }};">
+            <p class="text-xs mt-2 font-semibold flex items-center gap-1" style="color: {{ $revenueChange !== null ? ($revenueChange >= 0 ? 'var(--gz-pop-dark)' : 'var(--gz-danger)') : 'var(--gz-muted)' }};">
                 @if($revenueChange !== null)
-                    {{ $revenueChange >= 0 ? '▲ +' : '▼ ' }}{{ $revenueChange }}% vs last mo
+                    <span>{{ $revenueChange >= 0 ? '▲ +' : '▼ ' }}{{ $revenueChange }}%</span>
+                    <span style="color: var(--gz-muted); font-weight: normal;">vs last mo</span>
                 @else
                     Base month benchmark
                 @endif
             </p>
         </div>
 
+        {{-- Metric 2: Court Fleet --}}
         <div class="gz-kpi-card">
             <div class="flex items-center justify-between mb-3">
-                <div class="icon-badge" style="width:32px; height:32px; padding:6px;" id="icon-fleet" aria-hidden="true"></div>
-                <span class="gz-badge gz-badge-success">Live</span>
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: rgba(18, 21, 15, 0.06); color: var(--gz-ink);">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM4 12h16M12 4v16" />
+                    </svg>
+                </div>
+                <span class="gz-badge gz-badge-success">Live Fleet</span>
             </div>
             <div class="gz-eyebrow mb-1">Court fleet</div>
-            <div class="gz-kpi-value" style="font-size: 22px;">
+            <div class="gz-kpi-value" style="font-size: 24px;">
                 {{ $courts->where('court_status', 'available')->count() }}
                 <span class="text-sm font-normal" style="color: var(--gz-muted);">/ {{ $courts->count() }}</span>
             </div>
             <p class="text-xs mt-2 font-semibold" style="color: var(--gz-pop-dark);">Ready for reservation</p>
         </div>
 
+        {{-- Metric 3: Today Matches --}}
         <div class="gz-kpi-card">
             <div class="flex items-center justify-between mb-3">
-                <div class="icon-badge" style="width:32px; height:32px; padding:6px;" id="icon-matches" aria-hidden="true"></div>
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: rgba(18, 21, 15, 0.06); color: var(--gz-ink);">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
                 <span class="gz-badge gz-badge-neutral">{{ $today->format('M j') }}</span>
             </div>
             <div class="gz-eyebrow mb-1">Today matches</div>
-            <div class="gz-kpi-value" style="font-size: 22px;">
+            <div class="gz-kpi-value" style="font-size: 24px;">
                 {{ $todayBookings->count() }}
             </div>
             <p class="text-xs mt-2" style="color: var(--gz-muted);">{{ $totalBookings }} total ({{ $confirmedBookingsCount }} confirmed)</p>
         </div>
-
-        {{-- Metric 4: Pending Audits --}}
-        {{-- <div class="pixel-border p-4 flex flex-col justify-between" style="background: var(--cream);">
-            <div class="flex items-center justify-between border-b-2 pb-2" style="border-color: var(--ink);">
-                <span class="font-pixel text-[9px] uppercase tracking-wider" style="color: var(--ink);">PENDING AUDITS</span>
-                <span class="font-pixel text-[8px] px-1.5 py-0.5" style="background: var(--red); color: var(--cream);">ACTION</span>
-            </div>
-            <div class="my-4">
-                <div class="font-pixel text-xl sm:text-2xl" style="color: {{ $pendingPayments > 0 ? 'var(--red)' : 'var(--jade)' }};">
-                    {{ $pendingPayments }}
-                </div>
-            </div>
-            <div class="text-sm font-bold pt-2 border-t" style="border-color: rgba(26,22,17,0.15);">
-                <span class="font-pixel text-[8px] {{ $pendingPayments > 0 ? 'text-red-700' : 'text-stone-500' }}">
-                    {{ $pendingPayments > 0 ? 'PAYMENTS NEED REVIEW' : 'ALL RECONCILED' }}
-                </span>
-            </div>
-        </div> --}}
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
