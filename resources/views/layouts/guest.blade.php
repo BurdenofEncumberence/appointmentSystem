@@ -16,6 +16,7 @@
 </head>
 <body class="antialiased relative gz-app-shell">
     <div class="grain"></div>
+    <x-loading-screen />
 
     <a href="#main-content" class="skip-link">Skip to main content</a>
 

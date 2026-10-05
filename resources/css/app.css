@@ -721,3 +721,135 @@ input:focus-visible {
         transition: none !important;
     }
 }
+
+/* =====================================================================
+   DROPDOWN MENU STYLES (GEN Z THEME)
+   ===================================================================== */
+.gz-dropdown {
+    background: var(--gz-surface);
+    border: 1.5px solid var(--gz-border);
+    box-shadow: 0 12px 28px -6px rgba(18, 21, 15, 0.15), 0 8px 10px -6px rgba(18, 21, 15, 0.08);
+}
+
+.gz-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--gz-ink);
+    text-decoration: none;
+    transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.gz-dropdown-item:hover {
+    background-color: var(--gz-bg);
+    color: var(--gz-ink);
+}
+
+/* =====================================================================
+   LOADING SCREEN (GEN Z THEME)
+   A smooth, responsive, branded loading overlay that matches KYMNET.
+   ===================================================================== */
+.kymnet-loader-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: var(--gz-bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+    opacity: 1;
+    visibility: visible;
+}
+
+.kymnet-loader-overlay.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.kymnet-loader-box {
+    background: var(--gz-surface);
+    border: 1.5px solid var(--gz-border);
+    box-shadow: 0 20px 35px -10px rgba(18, 21, 15, 0.12);
+    padding: 28px 36px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 250px;
+}
+
+.kymnet-loader-icon {
+    width: 44px;
+    height: 44px;
+    background: var(--gz-ink);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    animation: kymnet-pulse 1.6s ease-in-out infinite;
+}
+
+.kymnet-loader-ball {
+    width: 14px;
+    height: 14px;
+    background: var(--gz-pop);
+    border-radius: 50%;
+    animation: kymnet-bounce 0.8s cubic-bezier(0.28, 0.84, 0.42, 1) infinite alternate;
+}
+
+.kymnet-loader-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+    color: var(--gz-ink);
+    margin-bottom: 4px;
+}
+
+.kymnet-loader-subtitle {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gz-muted);
+    margin-bottom: 14px;
+}
+
+.kymnet-loader-bar {
+    width: 130px;
+    height: 4px;
+    background: var(--gz-bg);
+    border: 1px solid var(--gz-border);
+    overflow: hidden;
+    position: relative;
+}
+
+.kymnet-loader-bar-fill {
+    width: 40%;
+    height: 100%;
+    background: var(--gz-pop);
+    position: absolute;
+    top: 0;
+    left: 0;
+    animation: kymnet-bar 1.2s ease-in-out infinite;
+}
+
+@keyframes kymnet-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes kymnet-bounce {
+    0% { transform: translateY(6px); }
+    100% { transform: translateY(-6px); }
+}
+
+@keyframes kymnet-bar {
+    0% { left: -40%; }
+    100% { left: 100%; }
+}

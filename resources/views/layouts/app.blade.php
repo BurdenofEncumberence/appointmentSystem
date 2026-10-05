@@ -14,6 +14,7 @@
 </head>
 <body class="antialiased gz-app-shell">
     <div class="grain"></div>
+    <x-loading-screen />
 
     <div class="min-h-screen flex flex-col">
         <div style="background: var(--gz-bg); position: sticky; top: 0; z-index: 50;">

@@ -14,24 +14,27 @@
 </head>
 <body class="antialiased gz-app-shell">
     <div class="grain"></div>
+    <x-loading-screen />
 
     <div class="min-h-screen">
         {{-- Consistent top navbar --}}
-        @include('layouts.navigation')
+        <div style="background: var(--gz-bg); position: sticky; top: 0; z-index: 50;">
+            @include('layouts.navigation')
+        </div>
 
         {{-- Admin sub-navigation banner --}}
-        <div class="pixel-border mx-6 mt-6 max-w-6xl md:mx-auto p-4 flex flex-wrap items-center justify-between gap-4" style="background: var(--cream);">
+        <div class="gz-panel mx-6 mt-6 max-w-6xl md:mx-auto p-4 flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-3">
-                <span class="font-pixel text-[10px] px-2.5 py-1 pixel-border" style="background: var(--red); color: var(--cream);">
+                <span class="gz-badge-primary text-[11px] font-bold tracking-wider">
                     HQ OPERATIONS
                 </span>
-                <span class="font-pixel text-sm tracking-wide" style="color: var(--ink);">
+                <span class="font-bold text-sm tracking-wide text-[color:var(--gz-ink)] font-mono">
                     {{ $heading }}
                 </span>
             </div>
 
             <div class="flex items-center gap-3">
-                <span class="font-pixel text-[9px] px-2.5 py-1 pixel-border" style="background: var(--parchment); color: var(--ink);">
+                <span class="gz-badge-outline text-[10px] font-mono tracking-wider">
                     ● SYSTEM ACTIVE
                 </span>
             </div>

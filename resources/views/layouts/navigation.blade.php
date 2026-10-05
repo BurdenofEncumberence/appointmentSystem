@@ -64,36 +64,54 @@
                 @auth
                     <button @click="profileOpen = !profileOpen" @click.outside="profileOpen = false"
                             :aria-expanded="profileOpen.toString()"
-                            class="gz-btn-outline gz-btn-sm">
-                        {{ Auth::user()->name ?? 'Account' }}
+                            class="gz-btn-outline gz-btn-sm flex items-center gap-2">
+                        <span>{{ Auth::user()->name ?? 'Account' }}</span>
+                        <svg class="w-4 h-4 transition-transform duration-150" :class="{'rotate-180': profileOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
                     <div x-show="profileOpen" x-cloak
-                         class="absolute right-0 top-full mt-2 w-48 pixel-border z-40" style="background: var(--cream);">
-                        @if(Auth::user()->isAdmin() || Auth::user()->hasRole('manager'))
-                            <a href="{{ route('admin.dashboard') }}" class="block px-4 py-3 text-lg hover:opacity-70">
-                                Admin Overview
+                         class="absolute right-0 top-full mt-2 w-56 gz-dropdown z-50 overflow-hidden"
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 translate-y-1"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 translate-y-1">
+                        
+                        <div class="px-4 py-3 border-b border-[color:var(--gz-border)] bg-[color:var(--gz-bg)]/40">
+                            <p class="text-[10px] uppercase font-bold tracking-wider text-[color:var(--gz-muted)]">Signed in as</p>
+                            <p class="text-sm font-bold truncate text-[color:var(--gz-ink)]">{{ Auth::user()->name }}</p>
+                            <p class="text-xs text-[color:var(--gz-muted)] truncate">{{ Auth::user()->email }}</p>
+                            <div class="mt-1.5">
+                                <span class="gz-badge-outline text-[10px] px-2 py-0.5 uppercase tracking-wider font-mono font-bold">
+                                    {{ Auth::user()->isAdmin() ? 'ADMIN' : (Auth::user()->hasRole('manager') ? 'MANAGER' : (Auth::user()->hasRole('staff') ? 'STAFF' : 'PLAYER')) }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="py-1">
+                            @if(Auth::user()->isAdmin() || Auth::user()->hasRole('manager'))
+                                <a href="{{ route('admin.dashboard') }}" class="gz-dropdown-item">Admin Overview</a>
+                                <a href="{{ route('admin.courts.index') }}" class="gz-dropdown-item">Courts Inventory</a>
+                                <a href="{{ route('admin.finance') }}" class="gz-dropdown-item">Financial Reports</a>
+                            @elseif(Auth::user()->hasRole('staff'))
+                                <a href="{{ route('staff.today') }}" class="gz-dropdown-item">Today's Schedule</a>
+                            @else
+                                <a href="{{ route('booking') }}" class="gz-dropdown-item">Book Courts</a>
+                                <a href="{{ route('bookings.index') }}" class="gz-dropdown-item">Courts Booked</a>
+                            @endif
+
+                            <div class="my-1 border-t border-[color:var(--gz-border)]"></div>
+
+                            <a href="{{ route('profile.edit') }}" class="gz-dropdown-item">
+                                Profile Settings
                             </a>
-                            <a href="{{ route('admin.courts.index') }}" class="block px-4 py-3 text-lg hover:opacity-70">
-                                Courts Inventory
-                            </a>
-                            <a href="{{ route('admin.finance') }}" class="block px-4 py-3 text-lg hover:opacity-70">
-                                Financial Reports
-                            </a>
-                        @elseif(Auth::user()->hasRole('staff'))
-                            <a href="{{ route('staff.today') }}" class="block px-4 py-3 text-sm hover:bg-[color:var(--gz-bg)]">Today's Schedule</a>
-                        @else
-                            <a href="{{ route('booking') }}" class="block px-4 py-3 text-sm hover:bg-[color:var(--gz-bg)]">Book Courts</a>
-                            <a href="{{ route('bookings.index') }}" class="block px-4 py-3 text-sm hover:bg-[color:var(--gz-bg)]">Courts Booked</a>
-                        @endif
-                        <a href="{{ route('profile.edit') }}" class="block px-4 py-3 text-sm hover:bg-[color:var(--gz-bg)]" style="border-top: 1px solid var(--gz-border);">
-                            Profile
-                        </a>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="w-full text-left px-4 py-3 text-sm hover:bg-[color:var(--gz-bg)]" style="color: var(--gz-danger); border-top: 1px solid var(--gz-border);">
-                                Log Out
-                            </button>
-                        </form>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="w-full text-left gz-dropdown-item font-semibold" style="color: var(--gz-danger);">
+                                    Log Out
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 @else
                     <a href="{{ route('login') }}" class="gz-btn-outline gz-btn-sm" @if(request()->routeIs('login')) aria-current="page" @endif>
@@ -114,29 +132,38 @@
         </div>
     </div>
 
-    <div id="mobile-nav-genz" x-show="mobileOpen" x-cloak class="sm:hidden gz-panel mx-6 mb-4">
+    <div id="mobile-nav-genz" x-show="mobileOpen" x-cloak class="sm:hidden gz-panel mx-6 mb-4 overflow-hidden">
         @auth
+            <div class="px-4 py-3 border-b border-[color:var(--gz-border)] bg-[color:var(--gz-bg)]/40">
+                <p class="text-[10px] uppercase font-bold tracking-wider text-[color:var(--gz-muted)]">Signed in as</p>
+                <p class="text-sm font-bold truncate text-[color:var(--gz-ink)]">{{ Auth::user()->name }}</p>
+                <span class="gz-badge-outline text-[10px] px-2 py-0.5 uppercase tracking-wider font-mono font-bold mt-1 inline-block">
+                    {{ Auth::user()->isAdmin() ? 'ADMIN' : (Auth::user()->hasRole('manager') ? 'MANAGER' : (Auth::user()->hasRole('staff') ? 'STAFF' : 'PLAYER')) }}
+                </span>
+            </div>
             @if(Auth::user()->isAdmin() || Auth::user()->hasRole('manager'))
-                <a href="{{ route('admin.dashboard') }}" class="block px-4 py-3 text-lg" style="border-bottom: 1px solid var(--ink);">Admin Overview</a>
-                <a href="{{ route('admin.courts.index') }}" class="block px-4 py-3 text-lg" style="border-bottom: 1px solid var(--ink);">Courts</a>
-                <a href="{{ route('admin.finance') }}" class="block px-4 py-3 text-lg" style="border-bottom: 1px solid var(--ink);">Financials</a>
+                <a href="{{ route('admin.dashboard') }}" class="gz-dropdown-item">Admin Overview</a>
+                <a href="{{ route('admin.courts.index') }}" class="gz-dropdown-item">Courts</a>
+                <a href="{{ route('admin.finance') }}" class="gz-dropdown-item">Financials</a>
             @elseif(Auth::user()->hasRole('staff'))
-                <a href="{{ route('staff.today') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Today's Schedule</a>
+                <a href="{{ route('staff.today') }}" class="gz-dropdown-item">Today's Schedule</a>
             @else
-                <a href="{{ url('/') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Home</a>
-                <a href="{{ route('booking') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Book Courts</a>
-                <a href="{{ route('bookings.index') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Courts Booked</a>
+                <a href="{{ url('/') }}" class="gz-dropdown-item">Home</a>
+                <a href="{{ route('booking') }}" class="gz-dropdown-item">Book Courts</a>
+                <a href="{{ route('bookings.index') }}" class="gz-dropdown-item">Courts Booked</a>
             @endif
-            <a href="{{ route('profile.edit') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Profile</a>
+            <div class="my-1 border-t border-[color:var(--gz-border)]"></div>
+            <a href="{{ route('profile.edit') }}" class="gz-dropdown-item">Profile Settings</a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="w-full text-left px-4 py-3 text-sm" style="color: var(--gz-danger);">Log Out</button>
+                <button type="submit" class="w-full text-left gz-dropdown-item font-semibold" style="color: var(--gz-danger);">Log Out</button>
             </form>
         @else
-            <a href="{{ url('/') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Home</a>
-            <a href="{{ route('booking') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Book Courts</a>
-            <a href="{{ route('login') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Login</a>
-            <a href="{{ route('register') }}" class="block px-4 py-3 text-sm" style="border-bottom: 1px solid var(--gz-border);">Register</a>
+            <a href="{{ url('/') }}" class="gz-dropdown-item">Home</a>
+            <a href="{{ route('booking') }}" class="gz-dropdown-item">Book Courts</a>
+            <div class="my-1 border-t border-[color:var(--gz-border)]"></div>
+            <a href="{{ route('login') }}" class="gz-dropdown-item">Login</a>
+            <a href="{{ route('register') }}" class="gz-dropdown-item">Register</a>
         @endauth
     </div>
 </nav>
