@@ -218,9 +218,9 @@ class User extends Authenticatable implements MustVerifyEmail
     public function hasPermission(string $permission): bool
     {
         $permissions = [
-            'admin' => ['view_admin_dashboard', 'manage_courts', 'view_finances'],
-            'manager' => ['view_admin_dashboard', 'manage_courts', 'view_finances'],
-            'staff' => ['view_today_bookings', 'manage_booking_status'],
+            'admin' => ['view_admin_dashboard', 'manage_courts', 'view_finances', 'manage_walk_in'],
+            'manager' => ['view_admin_dashboard', 'manage_courts', 'view_finances', 'manage_walk_in'],
+            'staff' => ['view_today_bookings', 'manage_booking_status', 'manage_walk_in'],
             'player' => [],
         ];
 

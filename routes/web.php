@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminFinanceController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StaffTodayController;
+use App\Http\Controllers\StaffWalkInController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -67,6 +68,10 @@ Route::middleware(['auth', 'verified', 'role:staff'])
             ->whereNumber('booking')
             ->middleware('throttle:60,1')
             ->name('bookings.status');
+        Route::get('/walk-in', [StaffWalkInController::class, 'create'])->name('walkin.create');
+        Route::post('/walk-in', [StaffWalkInController::class, 'store'])
+            ->middleware('throttle:30,1')
+            ->name('walkin.store');
     });
 
 /*

@@ -30,8 +30,11 @@
                                 Financials
                             </a>
                         @elseif(Auth::user()->hasRole('staff'))
-                            <a href="{{ route('staff.today') }}" class="nav-link" @if(request()->routeIs('staff.*')) aria-current="page" @endif>
+                            <a href="{{ route('staff.today') }}" class="nav-link" @if(request()->routeIs('staff.today')) aria-current="page" @endif>
                                 Today's Schedule
+                            </a>
+                            <a href="{{ route('staff.walkin.create') }}" class="nav-link" @if(request()->routeIs('staff.walkin.*')) aria-current="page" @endif>
+                                Walk-In Booking
                             </a>
                         @else
                             <a href="{{ url('/') }}" class="nav-link" @if(request()->is('/')) aria-current="page" @endif>
@@ -96,6 +99,7 @@
                                 <a href="{{ route('admin.finance') }}" class="gz-dropdown-item">Financial Reports</a>
                             @elseif(Auth::user()->hasRole('staff'))
                                 <a href="{{ route('staff.today') }}" class="gz-dropdown-item">Today's Schedule</a>
+                                <a href="{{ route('staff.walkin.create') }}" class="gz-dropdown-item">Walk-In Booking</a>
                             @else
                                 <a href="{{ route('booking') }}" class="gz-dropdown-item">Book Courts</a>
                                 <a href="{{ route('bookings.index') }}" class="gz-dropdown-item">Courts Booked</a>
@@ -150,6 +154,7 @@
                 <a href="{{ route('admin.finance') }}" class="gz-dropdown-item">Financials</a>
             @elseif(Auth::user()->hasRole('staff'))
                 <a href="{{ route('staff.today') }}" class="gz-dropdown-item">Today's Schedule</a>
+                <a href="{{ route('staff.walkin.create') }}" class="gz-dropdown-item">Walk-In Booking</a>
             @else
                 <a href="{{ url('/') }}" class="gz-dropdown-item">Home</a>
                 <a href="{{ route('booking') }}" class="gz-dropdown-item">Book Courts</a>

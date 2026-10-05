@@ -16,10 +16,13 @@
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-2 print:hidden">
+            <a href="{{ route('staff.walkin.create') }}" class="gz-btn-primary gz-btn-sm" style="background: var(--red); color: white;">
+                + New Walk-In
+            </a>
             <button onclick="window.print()" class="gz-btn-outline gz-btn-sm">
                 🖨 Print run-sheet
             </button>
-            <a href="{{ route('staff.today') }}" class="gz-btn-primary gz-btn-sm">
+            <a href="{{ route('staff.today') }}" class="gz-btn-outline gz-btn-sm">
                 ↺ Refresh
             </a>
         </div>
