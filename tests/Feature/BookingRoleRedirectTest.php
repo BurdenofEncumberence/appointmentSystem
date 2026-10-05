@@ -177,3 +177,11 @@ test('welcome page reserve court link adapts to role', function () {
         ->assertOk()
         ->assertSee(route('staff.today'));
 });
+
+test('player accessing dashboard route is redirected to booking', function () {
+    $player = User::factory()->create(['role' => 'player']);
+
+    $this->actingAs($player)
+        ->get('/dashboard')
+        ->assertRedirect(route('booking'));
+});

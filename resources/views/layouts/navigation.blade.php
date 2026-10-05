@@ -37,10 +37,6 @@
                             <a href="{{ url('/') }}" class="nav-link" @if(request()->is('/')) aria-current="page" @endif>
                                 Home
                             </a>
-                            {{-- <a href="{{ route('dashboard') }}"
-                               @if(request()->routeIs('dashboard')) style="color: var(--red); border-bottom: 2px solid var(--red);" @endif>
-                                Dashboard
-                            </a> --}}
                             <a href="{{ route('booking') }}"
                                @if(request()->routeIs('booking')) style="color: var(--red); border-bottom: 2px solid var(--red);" @endif>
                                 Book Courts

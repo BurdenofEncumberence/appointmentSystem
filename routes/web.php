@@ -18,9 +18,9 @@ Route::get('/dashboard', function () {
     $user = Auth::user();
 
     return match(true) {
-        $user?->isAdmin() => redirect()->route('admin.dashboard'),
+        $user?->isAdmin() || $user?->hasRole('manager') => redirect()->route('admin.dashboard'),
         $user?->hasRole('staff') => redirect()->route('staff.today'),
-        default => view('dashboard'),
+        default => redirect()->route('booking'),
     };
 })->middleware(['auth', 'verified'])->name('dashboard');
 
