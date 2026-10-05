@@ -6,7 +6,9 @@ use App\Http\Requests\StoreBookingRequest;
 use App\Models\Booking;
 use App\Models\Court;
 use App\Models\Payment;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class BookingController extends Controller
@@ -45,8 +47,8 @@ class BookingController extends Controller
 
         $bookedSlots = [];
         foreach ($bookings as $booking) {
-            $formattedSlot = \Carbon\Carbon::parse($booking->start_time)->format('g:i A') . ' - ' . \Carbon\Carbon::parse($booking->end_time)->format('g:i A');
-            $dateStr = \Carbon\Carbon::parse($booking->date)->toDateString();
+            $formattedSlot = Carbon::parse($booking->start_time)->format('g:i A') . ' - ' . Carbon::parse($booking->end_time)->format('g:i A');
+            $dateStr = Carbon::parse($booking->date)->toDateString();
             $bookedSlots[$dateStr][$booking->court_id][] = $formattedSlot;
         }
 
@@ -68,43 +70,57 @@ class BookingController extends Controller
             return redirect()->route('staff.today');
         }
 
-        [$startTime, $endTime] = $request->parsedTimes();
+        $slots = $request->parsedSlots();
+        $refNum = 'PAY-' . strtoupper(Str::random(8));
+        $paymentMethod = $request->input('payment_method', 'online') ?: 'online';
+        $createdBookings = [];
 
-        $court = Court::findOrFail($request->input('court_id'));
+        DB::transaction(function () use ($slots, $refNum, $paymentMethod, &$createdBookings) {
+            foreach ($slots as $item) {
+                $court = Court::findOrFail($item['court_id']);
 
-        $booking = Booking::create([
-            'user_id' => Auth::id(),
-            'court_id' => $court->id,
-            'event_id' => null,
-            'date' => $request->input('date'),
-            'start_time' => $startTime,
-            'end_time' => $endTime,
-            'booking_status' => 'confirmed',
-        ]);
+                $booking = Booking::create([
+                    'user_id' => Auth::id(),
+                    'court_id' => $court->id,
+                    'event_id' => null,
+                    'date' => $item['date'],
+                    'start_time' => $item['start_time'],
+                    'end_time' => $item['end_time'],
+                    'booking_status' => 'confirmed',
+                ]);
 
-        $start = \Illuminate\Support\Carbon::parse($startTime);
-        $end = \Illuminate\Support\Carbon::parse($endTime);
-        $hours = max(1, $start->diffInMinutes($end) / 60);
-        $amount = round($court->price_per_hour * $hours, 2);
+                $start = Carbon::parse($item['start_time']);
+                $end = Carbon::parse($item['end_time']);
+                $hours = max(1, $start->diffInMinutes($end) / 60);
+                $amount = round($court->price_per_hour * $hours, 2);
 
-        Payment::create([
-            'booking_id' => $booking->id,
-            'payment_method' => 'online',
-            'payment_status' => 'paid',
-            'amount' => $amount,
-            'ref_num' => 'PAY-' . strtoupper(Str::random(8)),
-            'date' => now()->toDateString(),
-            'time' => now()->format('H:i:s'),
-        ]);
+                Payment::create([
+                    'booking_id' => $booking->id,
+                    'payment_method' => $paymentMethod,
+                    'payment_status' => 'paid',
+                    'amount' => $amount,
+                    'ref_num' => $refNum,
+                    'date' => now()->toDateString(),
+                    'time' => now()->format('H:i:s'),
+                ]);
+
+                $createdBookings[] = $booking;
+            }
+        });
+
+        $count = count($createdBookings);
+        $message = $count > 1
+            ? "{$count} court reservations fully paid and confirmed under transaction {$refNum}."
+            : 'Booking fully paid and confirmed for ' . ($slots[0]['date'] ?? today()->toDateString()) . '.';
 
         return redirect()
             ->route('bookings.index')
-            ->with('status', 'Booking fully paid and confirmed for ' . $request->input('date') . '.');
+            ->with('status', $message);
     }
 
     public function index()
     {
-        $bookings = Booking::with('court')
+        $bookings = Booking::with(['court', 'payments'])
             ->where('user_id', Auth::id())
             ->orderByDesc('date')
             ->orderByDesc('start_time')
