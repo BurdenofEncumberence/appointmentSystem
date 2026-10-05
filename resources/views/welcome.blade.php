@@ -231,32 +231,40 @@
         </div>
     </div>
 
-    {{-- Hero --}}
-    <section class="max-w-6xl mx-auto px-6 pt-20 pb-28 relative">
-        <div class="grid md:grid-cols-2 gap-16 items-center relative">
-            <div class="relative">
-                <h1 class="font-pixel text-3xl md:text-4xl leading-relaxed">
-                    Book Your Court.<br>
-                    <span style="color: var(--red);">Rally With Ease.</span>
-                </h1>
-                <p class="mt-8 max-w-sm text-xl leading-relaxed">
-                    KYMNET brings court reservations, tournaments, and match schedules
-                    into one place. Pick a court, pick a time, and play.
-                @php
-                    $reserveUrl = match(true) {
-                        Auth::check() && (Auth::user()->isAdmin() || Auth::user()->hasRole('manager')) => route('admin.dashboard'),
-                        Auth::check() && Auth::user()->hasRole('staff') => route('staff.today'),
-                        default => route('booking'),
-                    };
-                @endphp
-                <a href="{{ $reserveUrl }}" class="pixel-btn text-[color:var(--cream)] bg-[color:var(--jade)] mt-10">
-                    Reserve a Court
-                </a>
-            </div>
+    <header
+        class="site-header relative"
+        x-data="{ mobileNavOpen: false, scrolled: false }"
+        @scroll.window="scrolled = window.scrollY > 8"
+        :class="{ 'is-scrolled': scrolled }"
+    >
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="{{ url('/') }}" class="flex items-center gap-3">
+                <div class="pixel-mark" id="brand-mark" aria-hidden="true"></div>
+                <span class="font-display font-bold text-lg">KYMNET</span>
+            </a>
+
+            <nav class="hidden sm:flex items-center gap-8 text-sm font-semibold" style="color: var(--muted);" aria-label="Primary">
+                <a href="{{ url('/') }}" class="nav-link" aria-current="page">Home</a>
+                <a href="{{ route('booking') }}" class="nav-link">Courts</a>
+                <a href="#features" class="nav-link">Features</a>
+            </nav>
 
             <div class="flex items-center gap-3">
-                <a href="{{ route('login') }}" class="btn-outline text-sm hidden sm:inline-flex">Login</a>
-                <a href="{{ route('register') }}" class="btn-primary text-sm hidden sm:inline-flex">Register</a>
+                @auth
+                    @php
+                        $userDashboard = match(true) {
+                            Auth::user()->isAdmin() || Auth::user()->hasRole('manager') => route('admin.dashboard'),
+                            Auth::user()->hasRole('staff') => route('staff.today'),
+                            default => route('booking'),
+                        };
+                    @endphp
+                    <a href="{{ $userDashboard }}" class="btn-primary text-sm">
+                        Dashboard
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="btn-outline text-sm hidden sm:inline-flex">Login</a>
+                    <a href="{{ route('register') }}" class="btn-primary text-sm hidden sm:inline-flex">Register</a>
+                @endauth
 
                 <button
                     type="button"
@@ -279,8 +287,22 @@
             style="border-color: var(--border); color: var(--muted);"
             aria-label="Primary, mobile"
         >
-            <a href="{{ route('login') }}" class="btn-outline text-sm text-center">Login</a>
-            <a href="{{ route('register') }}" class="btn-primary text-sm justify-center">Register</a>
+            <a href="{{ url('/') }}" class="nav-link">Home</a>
+            <a href="{{ route('booking') }}" class="nav-link">Courts</a>
+            <a href="#features" class="nav-link">Features</a>
+            @auth
+                @php
+                    $userDashboard = match(true) {
+                        Auth::user()->isAdmin() || Auth::user()->hasRole('manager') => route('admin.dashboard'),
+                        Auth::user()->hasRole('staff') => route('staff.today'),
+                        default => route('booking'),
+                    };
+                @endphp
+                <a href="{{ $userDashboard }}" class="btn-primary text-sm justify-center">Dashboard</a>
+            @else
+                <a href="{{ route('login') }}" class="btn-outline text-sm text-center">Login</a>
+                <a href="{{ route('register') }}" class="btn-primary text-sm justify-center">Register</a>
+            @endauth
         </nav>
     </header>
 
@@ -299,8 +321,15 @@
                     See what's open, lock in a time, and go play. That's it.
                 </p>
                 <div class="mt-9 flex flex-wrap items-center gap-4">
-                    <a href="{{ route('register') }}" class="btn-primary">
-                        Lock In a Court
+                    @php
+                        $reserveUrl = match(true) {
+                            Auth::check() && (Auth::user()->isAdmin() || Auth::user()->hasRole('manager')) => route('admin.dashboard'),
+                            Auth::check() && Auth::user()->hasRole('staff') => route('staff.today'),
+                            default => route('booking'),
+                        };
+                    @endphp
+                    <a href="{{ $reserveUrl }}" class="btn-primary">
+                        Reserve a Court
                     </a>
                     <a href="#features" class="text-sm font-semibold underline underline-offset-4" style="color: var(--ink);">
                         See how it works
