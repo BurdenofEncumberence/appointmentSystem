@@ -87,6 +87,7 @@ class BookingController extends Controller
                     'start_time' => $item['start_time'],
                     'end_time' => $item['end_time'],
                     'booking_status' => 'confirmed',
+                    'booking_type' => 'online',
                 ]);
 
                 $start = Carbon::parse($item['start_time']);

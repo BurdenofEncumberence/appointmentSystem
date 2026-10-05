@@ -66,6 +66,61 @@
         </div>
     </div>
 
+    <!-- Channel Breakdown: Online vs Walk-In -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div class="gz-kpi-card" style="border-left: 4px solid var(--gz-pop-dark);">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-base" style="background: rgba(62, 207, 126, 0.15); color: var(--gz-pop-dark);">
+                        🌐
+                    </div>
+                    <div>
+                        <div class="gz-eyebrow">Online Channel</div>
+                        <div class="text-sm font-bold">Online Reservations</div>
+                    </div>
+                </div>
+                <span class="gz-badge gz-badge-neutral">{{ $monthOnlineCount }} this month</span>
+            </div>
+            <div class="grid grid-cols-2 gap-4 pt-2 border-t" style="border-color: var(--gz-border);">
+                <div>
+                    <div class="text-xs" style="color: var(--gz-muted);">Total Bookings</div>
+                    <div class="text-xl font-bold mt-0.5">{{ number_format($totalOnlineCount) }}</div>
+                </div>
+                <div>
+                    <div class="text-xs" style="color: var(--gz-muted);">Audited Collections</div>
+                    <div class="text-xl font-bold mt-0.5" style="color: var(--gz-pop-dark);">₱{{ number_format($onlineRevenue, 2) }}</div>
+                    <div class="text-[10px]" style="color: var(--gz-muted);">{{ number_format($onlinePaidTransactions) }} receipts</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="gz-kpi-card" style="border-left: 4px solid var(--red);">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-base" style="background: rgba(179,38,30,0.12); color: var(--red);">
+                        🚶
+                    </div>
+                    <div>
+                        <div class="gz-eyebrow" style="color: var(--red);">On-Site Desk</div>
+                        <div class="text-sm font-bold">Walk-In Reservations</div>
+                    </div>
+                </div>
+                <span class="gz-badge" style="background: rgba(179,38,30,0.12); color: var(--red); border: 1px solid var(--red);">{{ $monthWalkInCount }} this month</span>
+            </div>
+            <div class="grid grid-cols-2 gap-4 pt-2 border-t" style="border-color: var(--gz-border);">
+                <div>
+                    <div class="text-xs" style="color: var(--gz-muted);">Total Bookings</div>
+                    <div class="text-xl font-bold mt-0.5">{{ number_format($totalWalkInCount) }}</div>
+                </div>
+                <div>
+                    <div class="text-xs" style="color: var(--gz-muted);">Audited Collections</div>
+                    <div class="text-xl font-bold mt-0.5" style="color: var(--red);">₱{{ number_format($walkInRevenue, 2) }}</div>
+                    <div class="text-[10px]" style="color: var(--gz-muted);">{{ number_format($walkInPaidTransactions) }} receipts</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <div class="lg:col-span-2 gz-panel">
             <div class="gz-panel-header">
@@ -177,6 +232,7 @@
                         <tr>
                             <th>Ref No.</th>
                             <th>Player</th>
+                            <th>Channel</th>
                             <th>Method</th>
                             <th>Date</th>
                             <th>Status</th>
@@ -190,6 +246,13 @@
                                 <td>
                                     <div class="font-semibold text-sm">{{ $payment->booking?->user?->name ?? 'Guest User' }}</div>
                                     <div class="text-xs" style="color: var(--gz-muted);">{{ $payment->booking?->user?->email }}</div>
+                                </td>
+                                <td>
+                                    @if($payment->booking?->isWalkIn())
+                                        <span class="gz-badge text-[10px]" style="background: rgba(179,38,30,0.12); color: var(--red); border: 1px solid var(--red);">🚶 Walk-In</span>
+                                    @else
+                                        <span class="gz-badge gz-badge-neutral text-[10px]">🌐 Online</span>
+                                    @endif
                                 </td>
                                 <td class="text-sm font-medium capitalize">{{ $payment->payment_method ?: 'Standard' }}</td>
                                 <td class="text-sm" style="color: var(--gz-muted);">

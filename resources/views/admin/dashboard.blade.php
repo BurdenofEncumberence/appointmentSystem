@@ -86,7 +86,79 @@
             <div class="gz-kpi-value" style="font-size: 24px;">
                 {{ $todayBookings->count() }}
             </div>
-            <p class="text-xs mt-2" style="color: var(--gz-muted);">{{ $totalBookings }} total ({{ $confirmedBookingsCount }} confirmed)</p>
+            <p class="text-xs mt-2" style="color: var(--gz-muted);">
+                <span class="font-bold text-[color:var(--gz-ink)]">{{ $todayOnlineCount }} Online</span> · 
+                <span class="font-bold text-[color:var(--red)]">{{ $todayWalkInCount }} Walk-in</span>
+            </p>
+        </div>
+    </div>
+
+    {{-- Channel Breakdown Summary: Online vs Walk-In --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+        {{-- Online Channel --}}
+        <div class="gz-panel gz-panel-body" style="border-left: 4px solid var(--gz-border);">
+            <div class="flex items-start justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="gz-badge gz-badge-neutral text-xs">🌐 Web Portal</span>
+                        <span class="text-xs" style="color: var(--gz-muted);">Self-Service</span>
+                    </div>
+                    <h3 class="gz-font-display font-bold text-base">Online Reservations</h3>
+                </div>
+                <div class="text-right">
+                    <div class="font-mono font-bold text-2xl text-[color:var(--gz-ink)]">
+                        {{ number_format($totalOnlineCount) }}
+                    </div>
+                    <div class="text-[11px]" style="color: var(--gz-muted);">Total reservations</div>
+                </div>
+            </div>
+            <div class="mt-4 pt-3 border-t flex items-center justify-between text-xs" style="border-color: var(--gz-border);">
+                <div>
+                    <span style="color: var(--gz-muted);">Today:</span>
+                    <span class="font-bold font-mono ml-1">{{ $todayOnlineCount }} sessions</span>
+                </div>
+                <div>
+                    <span style="color: var(--gz-muted);">This Month:</span>
+                    <span class="font-bold font-mono ml-1">{{ $monthOnlineCount }}</span>
+                </div>
+                <div>
+                    <span style="color: var(--gz-muted);">Collections:</span>
+                    <span class="font-bold font-mono ml-1" style="color: var(--gz-pop-dark);">₱{{ number_format($onlineRevenue, 2) }}</span>
+                </div>
+            </div>
+        </div>
+
+        {{-- Walk-In Channel --}}
+        <div class="gz-panel gz-panel-body" style="border-left: 4px solid var(--red);">
+            <div class="flex items-start justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="gz-badge text-xs" style="background: rgba(179,38,30,0.12); color: var(--red); border: 1px solid var(--red);">🚶 Front Desk</span>
+                        <span class="text-xs" style="color: var(--gz-muted);">On-the-spot</span>
+                    </div>
+                    <h3 class="gz-font-display font-bold text-base">Walk-In Reservations</h3>
+                </div>
+                <div class="text-right">
+                    <div class="font-mono font-bold text-2xl" style="color: var(--red);">
+                        {{ number_format($totalWalkInCount) }}
+                    </div>
+                    <div class="text-[11px]" style="color: var(--gz-muted);">Total reservations</div>
+                </div>
+            </div>
+            <div class="mt-4 pt-3 border-t flex items-center justify-between text-xs" style="border-color: var(--gz-border);">
+                <div>
+                    <span style="color: var(--gz-muted);">Today:</span>
+                    <span class="font-bold font-mono ml-1">{{ $todayWalkInCount }} sessions</span>
+                </div>
+                <div>
+                    <span style="color: var(--gz-muted);">This Month:</span>
+                    <span class="font-bold font-mono ml-1">{{ $monthWalkInCount }}</span>
+                </div>
+                <div>
+                    <span style="color: var(--gz-muted);">Collections:</span>
+                    <span class="font-bold font-mono ml-1" style="color: var(--red);">₱{{ number_format($walkInRevenue, 2) }}</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -113,6 +185,7 @@
                         <thead>
                             <tr>
                                 <th>Time</th>
+                                <th>Channel</th>
                                 <th>Court</th>
                                 <th>Player</th>
                                 <th>Status</th>
@@ -127,6 +200,13 @@
                                         –
                                         {{ \Carbon\Carbon::parse($booking->end_time)->format('g:i A') }}
                                     </td>
+                                    <td>
+                                        @if($booking->isWalkIn())
+                                            <span class="gz-badge text-[10px]" style="background: rgba(179,38,30,0.12); color: var(--red); border: 1px solid var(--red);">🚶 Walk-In</span>
+                                        @else
+                                            <span class="gz-badge gz-badge-neutral text-[10px]">🌐 Online</span>
+                                        @endif
+                                    </td>
                                     <td class="font-semibold text-sm">
                                         {{ $booking->court?->court_name ?? 'Court Removed' }}
                                     </td>
@@ -138,6 +218,7 @@
                                         @php
                                             $badgeClass = match($booking->booking_status) {
                                                 'confirmed' => 'gz-badge-success',
+                                                'show' => 'gz-badge-success',
                                                 'pending' => 'gz-badge-warning',
                                                 'cancelled' => 'gz-badge-danger',
                                                 default => 'gz-badge-neutral',
@@ -226,6 +307,7 @@
                         <tr>
                             <th>Ref No.</th>
                             <th>Player</th>
+                            <th>Channel</th>
                             <th>Date</th>
                             <th>Status</th>
                             <th class="text-right">Amount</th>
@@ -236,6 +318,13 @@
                             <tr>
                                 <td class="text-sm">{{ $payment->ref_num ?: 'PAY-#' . $payment->id }}</td>
                                 <td class="text-sm font-semibold">{{ $payment->booking?->user?->name ?? 'Guest User' }}</td>
+                                <td>
+                                    @if($payment->booking?->isWalkIn())
+                                        <span class="gz-badge text-[10px]" style="background: rgba(179,38,30,0.12); color: var(--red); border: 1px solid var(--red);">🚶 Walk-In</span>
+                                    @else
+                                        <span class="gz-badge gz-badge-neutral text-[10px]">🌐 Online</span>
+                                    @endif
+                                </td>
                                 <td class="text-sm" style="color: var(--gz-muted);">
                                     {{ \Carbon\Carbon::parse($payment->date)->format('M d, Y') }}
                                 </td>

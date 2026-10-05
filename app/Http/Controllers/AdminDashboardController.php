@@ -50,9 +50,30 @@ class AdminDashboardController extends Controller
             ->limit(6)
             ->get();
 
+        $todayOnlineCount = $todayBookings->filter(fn ($b) => $b->booking_type === 'online')->count();
+        $todayWalkInCount = $todayBookings->filter(fn ($b) => $b->booking_type === 'walk_in')->count();
+
+        $totalOnlineCount = Booking::where('booking_type', 'online')->count();
+        $totalWalkInCount = Booking::where('booking_type', 'walk_in')->count();
+
+        $monthBookings = Booking::whereBetween('date', [$monthStart->toDateString(), $monthEnd->toDateString()]);
+        $monthOnlineCount = (clone $monthBookings)->where('booking_type', 'online')->count();
+        $monthWalkInCount = (clone $monthBookings)->where('booking_type', 'walk_in')->count();
+
+        $onlineRevenue = (clone $paidPayments)->whereHas('booking', fn ($q) => $q->where('booking_type', 'online'))->sum('amount');
+        $walkInRevenue = (clone $paidPayments)->whereHas('booking', fn ($q) => $q->where('booking_type', 'walk_in'))->sum('amount');
+
         return view('admin.dashboard', [
             'courts' => $courts,
             'todayBookings' => $todayBookings,
+            'todayOnlineCount' => $todayOnlineCount,
+            'todayWalkInCount' => $todayWalkInCount,
+            'totalOnlineCount' => $totalOnlineCount,
+            'totalWalkInCount' => $totalWalkInCount,
+            'monthOnlineCount' => $monthOnlineCount,
+            'monthWalkInCount' => $monthWalkInCount,
+            'onlineRevenue' => $onlineRevenue,
+            'walkInRevenue' => $walkInRevenue,
             'monthlyRevenue' => $monthlyRevenue,
             'yearRevenue' => $yearRevenue,
             'revenueChange' => $revenueChange,

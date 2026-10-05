@@ -17,7 +17,33 @@ class Booking extends Model
         'start_time',
         'end_time',
         'booking_status',
+        'booking_type',
     ];
+
+    public function isWalkIn(): bool
+    {
+        return $this->booking_type === 'walk_in';
+    }
+
+    public function isOnline(): bool
+    {
+        return $this->booking_type === 'online';
+    }
+
+    public function getBookingTypeLabelAttribute(): string
+    {
+        return $this->isWalkIn() ? 'Walk-In' : 'Online';
+    }
+
+    public function scopeWalkIn($query)
+    {
+        return $query->where('booking_type', 'walk_in');
+    }
+
+    public function scopeOnline($query)
+    {
+        return $query->where('booking_type', 'online');
+    }
 
     public function user()
     {

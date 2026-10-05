@@ -181,6 +181,7 @@ class StaffWalkInController extends Controller
                 'start_time' => $startTime,
                 'end_time' => $endTime,
                 'booking_status' => $validated['attendance_status'],
+                'booking_type' => 'walk_in',
             ]);
 
             Payment::create([

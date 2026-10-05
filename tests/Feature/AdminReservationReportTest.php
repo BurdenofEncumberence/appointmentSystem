@@ -1,0 +1,201 @@
+<?php
+
+use App\Models\Booking;
+use App\Models\Court;
+use App\Models\Payment;
+use App\Models\User;
+
+test('online booking store assigns booking_type online', function () {
+    $player = User::factory()->create(['role' => 'player']);
+    $court = Court::create([
+        'court_name' => 'Court North',
+        'price_per_hour' => 600,
+        'court_status' => 'available',
+    ]);
+
+    $this->actingAs($player)->post(route('bookings.store'), [
+        'court_id' => $court->id,
+        'date' => today()->addDay()->toDateString(),
+        'time_slot' => '10:00 AM - 11:00 AM',
+    ])->assertRedirect(route('bookings.index'));
+
+    $booking = Booking::where('user_id', $player->id)->latest()->first();
+    expect($booking)->not->toBeNull();
+    expect($booking->booking_type)->toBe('online');
+    expect($booking->isOnline())->toBeTrue();
+    expect($booking->isWalkIn())->toBeFalse();
+});
+
+test('staff walk-in booking store assigns booking_type walk_in', function () {
+    $staff = User::factory()->create(['role' => 'staff']);
+    $court = Court::create([
+        'court_name' => 'Court South',
+        'price_per_hour' => 600,
+        'court_status' => 'available',
+    ]);
+
+    $this->actingAs($staff)->post(route('staff.walkin.store'), [
+        'first_name' => 'Maria',
+        'last_name' => 'Santos',
+        'date' => today()->toDateString(),
+        'court_id' => $court->id,
+        'time_slot' => '11:00 AM - 12:00 PM',
+        'payment_method' => 'cash',
+        'attendance_status' => 'show',
+    ])->assertRedirect(route('staff.today'));
+
+    $booking = Booking::where('booking_type', 'walk_in')->latest()->first();
+    expect($booking)->not->toBeNull();
+    expect($booking->booking_type)->toBe('walk_in');
+    expect($booking->isWalkIn())->toBeTrue();
+    expect($booking->isOnline())->toBeFalse();
+});
+
+test('admin dashboard accurately displays online and walk-in reservation counts and revenues', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $court = Court::create([
+        'court_name' => 'Grand Arena',
+        'price_per_hour' => 500,
+        'court_status' => 'available',
+    ]);
+
+    $player1 = User::factory()->create(['role' => 'player', 'name' => 'Online Player']);
+    $player2 = User::factory()->create(['role' => 'player', 'name' => 'Walkin Player']);
+
+    // 1 online booking today
+    $onlineBooking = Booking::create([
+        'user_id' => $player1->id,
+        'court_id' => $court->id,
+        'date' => today()->toDateString(),
+        'start_time' => '08:00:00',
+        'end_time' => '09:00:00',
+        'booking_status' => 'confirmed',
+        'attendance_status' => 'upcoming',
+        'booking_type' => 'online',
+    ]);
+    Payment::create([
+        'booking_id' => $onlineBooking->id,
+        'amount' => 500,
+        'payment_status' => 'paid',
+        'payment_method' => 'gcash',
+        'date' => today()->toDateString(),
+        'time' => '10:00:00',
+        'ref_num' => 'PAY-ONL-1',
+    ]);
+
+    // 1 walk-in booking today
+    $walkInBooking = Booking::create([
+        'user_id' => $player2->id,
+        'court_id' => $court->id,
+        'date' => today()->toDateString(),
+        'start_time' => '09:00:00',
+        'end_time' => '10:00:00',
+        'booking_status' => 'confirmed',
+        'attendance_status' => 'show',
+        'booking_type' => 'walk_in',
+    ]);
+    Payment::create([
+        'booking_id' => $walkInBooking->id,
+        'amount' => 500,
+        'payment_status' => 'paid',
+        'payment_method' => 'cash',
+        'date' => today()->toDateString(),
+        'time' => '10:00:00',
+        'ref_num' => 'WALK-001',
+    ]);
+
+    $response = $this->actingAs($admin)->get(route('admin.dashboard'));
+    $response->assertOk();
+
+    // Assert counts passed to view
+    $response->assertViewHas('todayOnlineCount', 1);
+    $response->assertViewHas('todayWalkInCount', 1);
+    $response->assertViewHas('totalOnlineCount', 1);
+    $response->assertViewHas('totalWalkInCount', 1);
+    $response->assertViewHas('onlineRevenue', 500.0);
+    $response->assertViewHas('walkInRevenue', 500.0);
+
+    // Assert page content
+    $response->assertSee('Online Reservations');
+    $response->assertSee('Walk-In Reservations');
+    $response->assertSee('1 Online');
+    $response->assertSee('1 Walk-in');
+    $response->assertSee('🌐 Online');
+    $response->assertSee('🚶 Walk-In');
+});
+
+test('admin financial reports include online and walk-in reservation counts and collections', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $court = Court::create([
+        'court_name' => 'Grand Arena',
+        'price_per_hour' => 500,
+        'court_status' => 'available',
+    ]);
+
+    $player = User::factory()->create(['role' => 'player']);
+
+    // 2 online bookings this month
+    for ($i = 0; $i < 2; $i++) {
+        $b = Booking::create([
+            'user_id' => $player->id,
+            'court_id' => $court->id,
+            'date' => today()->toDateString(),
+            'start_time' => sprintf('%02d:00:00', 8 + $i),
+            'end_time' => sprintf('%02d:00:00', 9 + $i),
+            'booking_status' => 'confirmed',
+            'attendance_status' => 'upcoming',
+            'booking_type' => 'online',
+        ]);
+        Payment::create([
+            'booking_id' => $b->id,
+            'amount' => 500,
+            'payment_status' => 'paid',
+            'payment_method' => 'gcash',
+            'date' => today()->toDateString(),
+            'time' => '10:00:00',
+            'ref_num' => 'PAY-ONL-' . ($i + 1),
+        ]);
+    }
+
+    // 1 walk-in booking this month
+    $w = Booking::create([
+        'user_id' => $player->id,
+        'court_id' => $court->id,
+        'date' => today()->toDateString(),
+        'start_time' => '14:00:00',
+        'end_time' => '15:00:00',
+        'booking_status' => 'confirmed',
+        'attendance_status' => 'show',
+        'booking_type' => 'walk_in',
+    ]);
+    Payment::create([
+        'booking_id' => $w->id,
+        'amount' => 500,
+        'payment_status' => 'paid',
+        'payment_method' => 'cash',
+        'date' => today()->toDateString(),
+        'time' => '14:00:00',
+        'ref_num' => 'WALK-002',
+    ]);
+
+    $response = $this->actingAs($admin)->get(route('admin.finance'));
+    $response->assertOk();
+
+    // Assert counts passed to view
+    $response->assertViewHas('totalOnlineCount', 2);
+    $response->assertViewHas('totalWalkInCount', 1);
+    $response->assertViewHas('monthOnlineCount', 2);
+    $response->assertViewHas('monthWalkInCount', 1);
+    $response->assertViewHas('onlineRevenue', 1000.0);
+    $response->assertViewHas('walkInRevenue', 500.0);
+    $response->assertViewHas('onlinePaidTransactions', 2);
+    $response->assertViewHas('walkInPaidTransactions', 1);
+
+    // Assert content rendered
+    $response->assertSee('Online Reservations');
+    $response->assertSee('Walk-In Reservations');
+    $response->assertSee('1,000.00');
+    $response->assertSee('500.00');
+    $response->assertSee('🌐 Online');
+    $response->assertSee('🚶 Walk-In');
+});
