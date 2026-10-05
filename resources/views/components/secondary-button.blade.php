@@ -1,3 +1,3 @@
-<button {{ $attributes->merge(['type' => 'button', 'class' => 'pixel-btn bg-[color:var(--parchment)]']) }}>
+<button {{ $attributes->merge(['type' => 'button', 'class' => 'gz-btn-outline gz-btn-sm']) }}>
     {{ $slot }}
 </button>
