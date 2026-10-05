@@ -7,6 +7,33 @@ test('registration screen can be rendered', function () {
     $response = $this->get('/register');
 
     $response->assertStatus(200);
+    $response->assertSee('Terms and Conditions');
+    $response->assertSee('Privacy Policy');
+});
+
+test('submitting registration without agreeing to terms and conditions is rejected', function () {
+    $response = $this->post('/register', [
+        'first_name' => 'John',
+        'middle_name' => 'Fitzgerald',
+        'last_name' => 'Kennedy',
+        'email' => 'john.kennedy@example.com',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+        // 'terms' omitted!
+    ]);
+
+    $response->assertSessionHasErrors(['terms']);
+    $this->assertGuest();
+});
+
+test('terms and privacy policy pages can be rendered', function () {
+    $termsResponse = $this->get(route('terms'));
+    $termsResponse->assertOk();
+    $termsResponse->assertSee('Terms and Conditions');
+
+    $privacyResponse = $this->get(route('privacy'));
+    $privacyResponse->assertOk();
+    $privacyResponse->assertSee('Privacy Policy');
 });
 
 test('submitting registration dispatches OTP email and redirects to verification page without creating user yet', function () {
@@ -19,6 +46,7 @@ test('submitting registration dispatches OTP email and redirects to verification
         'email' => 'john.kennedy@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'terms' => '1',
     ]);
 
     // Should redirect to OTP screen, and user is NOT authenticated yet
@@ -49,6 +77,7 @@ test('otp verification screen can be rendered when registration is pending', fun
         'email' => 'john.kennedy@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'terms' => '1',
     ]);
 
     $response = $this->get(route('register.otp.show'));
@@ -67,6 +96,7 @@ test('entering valid otp creates user, marks email verified, logs in, and redire
         'email' => 'john.kennedy@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'terms' => '1',
     ]);
 
     $pending = session('pending_registration');
@@ -104,6 +134,7 @@ test('entering invalid otp is rejected with errors and does not create user', fu
         'email' => 'jane.doe@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'terms' => '1',
     ]);
 
     $verifyResponse = $this->from(route('register.otp.show'))->post(route('register.otp.verify'), [
@@ -128,6 +159,7 @@ test('users can request resend of otp code after cooldown', function () {
         'email' => 'alice@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'terms' => '1',
     ]);
 
     // Immediate resend should be blocked by cooldown
@@ -154,6 +186,7 @@ test('user can cancel registration and return to register form with prefilled in
         'email' => 'bob@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'terms' => '1',
     ]);
 
     $response = $this->get(route('register.otp.cancel'));
@@ -172,6 +205,7 @@ test('submitting registration with lowercase names automatically capitalizes fir
         'email' => 'lowercase.user@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'terms' => '1',
     ]);
 
     $pending = session('pending_registration');

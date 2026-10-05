@@ -829,10 +829,11 @@
                 </ul>
             </div>
             <div>
-                <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: var(--surface);">Support</h4>
+                <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: var(--surface);">Support & Legal</h4>
                 <ul class="space-y-2 text-sm">
                     <li><a href="#faq" class="footer-link">Frequently Asked Questions</a></li>
-                    <li><a href="{{ route('booking') }}" class="footer-link">Live Slot Availability</a></li>
+                    <li><a href="{{ route('terms') }}" class="footer-link">Terms & Conditions</a></li>
+                    <li><a href="{{ route('privacy') }}" class="footer-link">Privacy Policy</a></li>
                     <li><a href="mailto:support@kymnet.ph" class="footer-link">Contact Desk</a></li>
                 </ul>
             </div>

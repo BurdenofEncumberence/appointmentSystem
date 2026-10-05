@@ -91,6 +91,158 @@
             </div>
         </div>
 
+        {{-- Terms and Conditions & Privacy Policy Agreement --}}
+        <div class="mt-5 pt-1" x-data="{ modal: null, agreed: {{ old('terms') ? 'true' : 'false' }} }">
+            <div class="flex items-start gap-3 p-3.5 rounded-xl border border-[color:var(--gz-border)] bg-[color:var(--gz-bg)]/40 hover:bg-[color:var(--gz-bg)]/70 transition-colors">
+                <input
+                    id="terms"
+                    type="checkbox"
+                    name="terms"
+                    value="1"
+                    x-model="agreed"
+                    required
+                    class="mt-1 h-4 w-4 rounded border-stone-300 text-emerald-600 focus:ring-emerald-500 focus:ring-offset-0 cursor-pointer"
+                >
+                <label for="terms" class="text-xs sm:text-sm text-stone-700 dark:text-stone-300 leading-relaxed cursor-pointer select-none">
+                    I have read, understood, and agree to the
+                    <button
+                        type="button"
+                        @click.prevent="modal = 'terms'"
+                        class="font-semibold text-emerald-600 dark:text-emerald-400 hover:underline inline underline-offset-2 focus:outline-none"
+                    >
+                        Terms & Conditions
+                    </button>
+                    and the
+                    <button
+                        type="button"
+                        @click.prevent="modal = 'privacy'"
+                        class="font-semibold text-emerald-600 dark:text-emerald-400 hover:underline inline underline-offset-2 focus:outline-none"
+                    >
+                        Privacy Policy
+                    </button>.
+                </label>
+            </div>
+            @error('terms')
+                <p class="gz-error mt-1.5 text-xs" role="alert">{{ $message }}</p>
+            @enderror
+
+            {{-- Terms and Conditions Modal --}}
+            <div
+                x-show="modal === 'terms'"
+                x-cloak
+                @keydown.escape.window="modal = null"
+                class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+            >
+                <div
+                    @click.outside="modal = null"
+                    class="bg-[color:var(--gz-surface)] border-2 border-[color:var(--gz-ink)] rounded-2xl max-w-xl w-full p-6 shadow-2xl flex flex-col max-h-[85vh]"
+                >
+                    <div class="flex items-center justify-between border-b pb-3 mb-4" style="border-color: var(--gz-border);">
+                        <div class="flex items-center gap-2">
+                            <span class="gz-badge text-xs">Policy</span>
+                            <h3 class="gz-font-display font-bold text-lg text-stone-900 dark:text-white">Terms and Conditions</h3>
+                        </div>
+                        <button type="button" @click="modal = null" class="p-1 rounded-lg text-stone-400 hover:text-stone-900 dark:hover:text-white text-lg leading-none font-bold">✕</button>
+                    </div>
+
+                    <div class="overflow-y-auto space-y-4 text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed pr-2 flex-1">
+                        <div>
+                            <h4 class="font-bold text-stone-900 dark:text-white mb-1">1. Acceptance of Terms</h4>
+                            <p>By creating an account and booking courts with KYMNET, you agree to comply with and be bound by all terms, conditions, and court policies.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-stone-900 dark:text-white mb-1">2. Reservations & Payments</h4>
+                            <p>All reservations must be completed through our authorized online platform or front desk. Confirmed bookings are non-transferable without front desk authorization.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-stone-900 dark:text-white mb-1">3. Check-In & Attendance</h4>
+                            <p>Please check in at the front desk 10–15 minutes before your scheduled slot. Slots may be marked as a no-show if unverified after 15 minutes.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-stone-900 dark:text-white mb-1">4. Court Conduct & Equipment</h4>
+                            <p>Players must wear proper non-marking court shoes and observe fair play. Damage to nets or equipment through negligence is the player's responsibility.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-stone-900 dark:text-white mb-1">5. Liability Waiver</h4>
+                            <p>Participation in racquet sports is voluntary. KYMNET is not liable for personal property lost or accidental injuries during normal gameplay.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 pt-3 border-t flex items-center justify-between gap-3" style="border-color: var(--gz-border);">
+                        <a href="{{ route('terms') }}" target="_blank" class="text-xs text-emerald-600 hover:underline">Open in new tab ↗</a>
+                        <div class="flex gap-2">
+                            <button type="button" @click="modal = null" class="gz-btn-outline gz-btn-sm text-xs">Close</button>
+                            <button type="button" @click="agreed = true; modal = null" class="gz-btn-primary gz-btn-sm text-xs">I Agree & Accept</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Privacy Policy Modal --}}
+            <div
+                x-show="modal === 'privacy'"
+                x-cloak
+                @keydown.escape.window="modal = null"
+                class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+            >
+                <div
+                    @click.outside="modal = null"
+                    class="bg-[color:var(--gz-surface)] border-2 border-[color:var(--gz-ink)] rounded-2xl max-w-xl w-full p-6 shadow-2xl flex flex-col max-h-[85vh]"
+                >
+                    <div class="flex items-center justify-between border-b pb-3 mb-4" style="border-color: var(--gz-border);">
+                        <div class="flex items-center gap-2">
+                            <span class="gz-badge text-xs">Privacy</span>
+                            <h3 class="gz-font-display font-bold text-lg text-stone-900 dark:text-white">Privacy Policy</h3>
+                        </div>
+                        <button type="button" @click="modal = null" class="p-1 rounded-lg text-stone-400 hover:text-stone-900 dark:hover:text-white text-lg leading-none font-bold">✕</button>
+                    </div>
+
+                    <div class="overflow-y-auto space-y-4 text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed pr-2 flex-1">
+                        <div>
+                            <h4 class="font-bold text-stone-900 dark:text-white mb-1">1. Information We Collect</h4>
+                            <p>We collect your name, email address, password hash, and reservation history to facilitate court bookings and send automated OTP and receipt notifications.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-stone-900 dark:text-white mb-1">2. Use of Information</h4>
+                            <p>Your data is used strictly for scheduling match times, managing court capacity, verifying identity, and sending match confirmations.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-stone-900 dark:text-white mb-1">3. Data Security & Storage</h4>
+                            <p>We employ encrypted storage for passwords and session security cookies in accordance with the Philippine Data Privacy Act of 2012.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-stone-900 dark:text-white mb-1">4. No Third-Party Sales</h4>
+                            <p>We do not sell, distribute, or rent your personal contact information to any external advertisers or third parties.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-stone-900 dark:text-white mb-1">5. Your Data Rights</h4>
+                            <p>You may view, edit, or delete your registered profile and reservation data at any time via your Profile settings.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 pt-3 border-t flex items-center justify-between gap-3" style="border-color: var(--gz-border);">
+                        <a href="{{ route('privacy') }}" target="_blank" class="text-xs text-emerald-600 hover:underline">Open in new tab ↗</a>
+                        <div class="flex gap-2">
+                            <button type="button" @click="modal = null" class="gz-btn-outline gz-btn-sm text-xs">Close</button>
+                            <button type="button" @click="agreed = true; modal = null" class="gz-btn-primary gz-btn-sm text-xs">I Agree & Accept</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="flex items-center justify-between mt-7">
             <a href="{{ route('login') }}" class="gz-link">Already registered?</a>
             <button type="submit" class="gz-btn-primary">Register</button>

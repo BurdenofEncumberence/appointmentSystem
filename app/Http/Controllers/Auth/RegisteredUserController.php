@@ -50,6 +50,10 @@ class RegisteredUserController extends Controller
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'terms' => ['accepted', 'required'],
+        ], [
+            'terms.accepted' => 'You must agree to the Terms and Conditions and Privacy Policy to register.',
+            'terms.required' => 'You must agree to the Terms and Conditions and Privacy Policy to register.',
         ]);
 
         $firstName = User::titleCaseName($request->first_name);

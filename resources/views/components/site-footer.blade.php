@@ -32,10 +32,10 @@
             </ul>
         </div>
         <div>
-            <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: var(--gz-surface);">For users</h4>
+            <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: var(--gz-surface);">Legal & Support</h4>
             <ul class="space-y-2 text-sm">
-                <li><a href="#" class="footer-link">Support</a></li>
-                <li><a href="#" class="footer-link">Pricing</a></li>
+                <li><a href="{{ route('terms') }}" class="footer-link">Terms & Conditions</a></li>
+                <li><a href="{{ route('privacy') }}" class="footer-link">Privacy Policy</a></li>
             </ul>
         </div>
         <div>

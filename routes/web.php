@@ -29,6 +29,9 @@ Route::get('/', function () {
     return view('welcome', compact('courts', 'events', 'siteSettings'));
 })->name('welcome');
 
+Route::view('/terms', 'legal.terms')->name('terms');
+Route::view('/privacy', 'legal.privacy')->name('privacy');
+
 /*
 |--------------------------------------------------------------------------
 | Central Authenticated Dashboard Router
