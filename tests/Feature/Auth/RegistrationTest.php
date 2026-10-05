@@ -57,7 +57,7 @@ test('otp verification screen can be rendered when registration is pending', fun
     $response->assertSee('Verify your email');
 });
 
-test('entering valid otp creates user, marks email verified, logs in, and redirects to booking', function () {
+test('entering valid otp creates user, marks email verified, logs in, and redirects to homepage', function () {
     Mail::fake();
 
     $this->post('/register', [
@@ -77,7 +77,7 @@ test('entering valid otp creates user, marks email verified, logs in, and redire
         'otp' => $otp,
     ]);
 
-    $verifyResponse->assertRedirect(route('booking'));
+    $verifyResponse->assertRedirect(route('welcome'));
     $this->assertAuthenticated();
 
     $this->assertDatabaseHas('users', [
@@ -186,7 +186,7 @@ test('submitting registration with lowercase names automatically capitalizes fir
         'otp' => $otp,
     ]);
 
-    $verifyResponse->assertRedirect(route('booking'));
+    $verifyResponse->assertRedirect(route('welcome'));
 
     $this->assertDatabaseHas('users', [
         'first_name' => 'Geoff Patrick',

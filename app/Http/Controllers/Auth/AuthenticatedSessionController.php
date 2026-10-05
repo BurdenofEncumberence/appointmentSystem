@@ -40,7 +40,8 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('staff.today');
         }
 
-        return redirect()->intended(route('booking', absolute: false));
+        $request->session()->forget('url.intended');
+        return redirect()->route('welcome');
     }
 
     /**

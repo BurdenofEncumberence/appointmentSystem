@@ -140,13 +140,13 @@ test('manager logging in with intended booking is redirected to admin dashboard'
     $response->assertRedirect(route('admin.dashboard'));
 });
 
-test('player logging in with intended booking is redirected to booking', function () {
+test('player logging in is redirected to homepage', function () {
     $player = User::factory()->create([
         'role' => 'player',
         'password' => 'password',
     ]);
 
-    // Guest attempts to visit booking and gets redirected to login, setting intended url
+    // Guest attempts to visit booking and gets redirected to login
     $this->get(route('booking'))->assertRedirect(route('login'));
 
     $response = $this->post(route('login'), [
@@ -154,7 +154,7 @@ test('player logging in with intended booking is redirected to booking', functio
         'password' => 'password',
     ]);
 
-    $response->assertRedirect(route('booking', absolute: false));
+    $response->assertRedirect(route('welcome'));
 });
 
 test('welcome page reserve court link adapts to role', function () {
@@ -178,10 +178,10 @@ test('welcome page reserve court link adapts to role', function () {
         ->assertSee(route('staff.today'));
 });
 
-test('player accessing dashboard route is redirected to booking', function () {
+test('player accessing dashboard route is redirected to homepage', function () {
     $player = User::factory()->create(['role' => 'player']);
 
     $this->actingAs($player)
         ->get('/dashboard')
-        ->assertRedirect(route('booking'));
+        ->assertRedirect(route('welcome'));
 });

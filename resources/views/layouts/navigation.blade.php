@@ -3,7 +3,6 @@
     $homeUrl = match(true) {
         Auth::check() && (Auth::user()->isAdmin() || Auth::user()->hasRole('manager')) => route('admin.dashboard'),
         Auth::check() && Auth::user()->hasRole('staff') => route('staff.today'),
-        Auth::check() => route('booking'),
         default => url('/'),
     };
 @endphp

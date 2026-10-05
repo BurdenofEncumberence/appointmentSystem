@@ -186,7 +186,7 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('booking')->with('status', 'Your account has been verified and created successfully!');
+        return redirect()->route('welcome')->with('status', 'Your account has been verified and created successfully!');
     }
 
     /**

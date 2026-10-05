@@ -42,13 +42,13 @@ Route::get('/dashboard', function () {
     return match (true) {
         $user?->isAdmin() || $user?->hasRole('manager') => redirect()->route('admin.dashboard'),
         $user?->hasRole('staff') => redirect()->route('staff.today'),
-        default => redirect()->route('booking'),
+        default => redirect()->route('welcome'),
     };
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->prefix('customer')->name('customer.')->group(function () {
     Route::get('/dashboard', function () {
-        return redirect()->route('booking');
+        return redirect()->route('welcome');
     })->name('dashboard');
 });
 
