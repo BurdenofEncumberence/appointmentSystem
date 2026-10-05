@@ -62,11 +62,16 @@
 
             <div class="hidden sm:flex items-center gap-4 relative">
                 @auth
+                    @php
+                        $userShortName = Auth::user()->first_name 
+                            ?: (\Illuminate\Support\Str::of(Auth::user()->name ?? 'Account')->before(' ')->value() ?: 'Account');
+                    @endphp
                     <button @click="profileOpen = !profileOpen" @click.outside="profileOpen = false"
                             :aria-expanded="profileOpen.toString()"
-                            class="gz-btn-outline gz-btn-sm flex items-center gap-2">
-                        <span>{{ Auth::user()->name ?? 'Account' }}</span>
-                        <svg class="w-4 h-4 transition-transform duration-150" :class="{'rotate-180': profileOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            class="gz-btn-outline gz-btn-sm flex items-center gap-2"
+                            title="{{ Auth::user()->name }}">
+                        <span class="max-w-[110px] truncate">{{ $userShortName }}</span>
+                        <svg class="w-4 h-4 transition-transform duration-150 shrink-0" :class="{'rotate-180': profileOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
                     <div x-show="profileOpen" x-cloak
                          class="absolute right-0 top-full mt-2 w-56 gz-dropdown z-50 overflow-hidden"
@@ -79,8 +84,8 @@
                         
                         <div class="px-4 py-3 border-b border-[color:var(--gz-border)] bg-[color:var(--gz-bg)]/40">
                             <p class="text-[10px] uppercase font-bold tracking-wider text-[color:var(--gz-muted)]">Signed in as</p>
-                            <p class="text-sm font-bold truncate text-[color:var(--gz-ink)]">{{ Auth::user()->name }}</p>
-                            <p class="text-xs text-[color:var(--gz-muted)] truncate">{{ Auth::user()->email }}</p>
+                            <p class="text-sm font-bold truncate text-[color:var(--gz-ink)]" title="{{ Auth::user()->name }}">{{ $userShortName }}</p>
+                            <p class="text-xs text-[color:var(--gz-muted)] truncate" title="{{ Auth::user()->email }}">{{ Auth::user()->email }}</p>
                             <div class="mt-1.5">
                                 <span class="gz-badge-outline text-[10px] px-2 py-0.5 uppercase tracking-wider font-mono font-bold">
                                     {{ Auth::user()->isAdmin() ? 'ADMIN' : (Auth::user()->hasRole('manager') ? 'MANAGER' : (Auth::user()->hasRole('staff') ? 'STAFF' : 'PLAYER')) }}
@@ -136,7 +141,9 @@
         @auth
             <div class="px-4 py-3 border-b border-[color:var(--gz-border)] bg-[color:var(--gz-bg)]/40">
                 <p class="text-[10px] uppercase font-bold tracking-wider text-[color:var(--gz-muted)]">Signed in as</p>
-                <p class="text-sm font-bold truncate text-[color:var(--gz-ink)]">{{ Auth::user()->name }}</p>
+                <p class="text-sm font-bold truncate text-[color:var(--gz-ink)]" title="{{ Auth::user()->name }}">
+                    {{ Auth::user()->first_name ?: (\Illuminate\Support\Str::of(Auth::user()->name ?? 'Account')->before(' ')->value() ?: 'Account') }}
+                </p>
                 <span class="gz-badge-outline text-[10px] px-2 py-0.5 uppercase tracking-wider font-mono font-bold mt-1 inline-block">
                     {{ Auth::user()->isAdmin() ? 'ADMIN' : (Auth::user()->hasRole('manager') ? 'MANAGER' : (Auth::user()->hasRole('staff') ? 'STAFF' : 'PLAYER')) }}
                 </span>
