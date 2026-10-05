@@ -83,3 +83,47 @@ test('correct password must be provided to delete account', function () {
 
     $this->assertNotNull($user->fresh());
 });
+
+test('updating profile with lowercase names automatically capitalizes first letter of names', function () {
+    $user = User::factory()->create([
+        'first_name' => 'Initial',
+        'middle_name' => 'Middle',
+        'last_name' => 'Name',
+        'name' => 'Initial Middle Name',
+    ]);
+
+    $response = $this
+        ->actingAs($user)
+        ->patch('/profile', [
+            'first_name' => 'juan carlos',
+            'middle_name' => 'de la cruz',
+            'last_name' => 'reyes',
+            'email' => $user->email,
+        ]);
+
+    $response
+        ->assertSessionHasNoErrors()
+        ->assertRedirect('/profile');
+
+    $user->refresh();
+
+    $this->assertSame('Juan Carlos', $user->first_name);
+    $this->assertSame('De La Cruz', $user->middle_name);
+    $this->assertSame('Reyes', $user->last_name);
+    $this->assertSame('Juan Carlos De La Cruz Reyes', $user->name);
+});
+
+test('user model automatically capitalizes first letter of names on direct creation', function () {
+    $user = User::create([
+        'first_name' => 'maria clara',
+        'middle_name' => 'de los santos',
+        'last_name' => 'ibarra',
+        'email' => 'maria.clara@example.com',
+        'password' => 'secret123',
+    ]);
+
+    $this->assertSame('Maria Clara', $user->first_name);
+    $this->assertSame('De Los Santos', $user->middle_name);
+    $this->assertSame('Ibarra', $user->last_name);
+    $this->assertSame('Maria Clara De Los Santos Ibarra', $user->name);
+});

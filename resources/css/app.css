@@ -230,9 +230,9 @@ input:focus-visible {
 .gz-card {
     background: var(--gz-surface);
     border: 1.5px solid var(--gz-border);
-    padding: 40px;
+    padding: 42px;
     width: 100%;
-    max-width: 440px;
+    max-width: 580px;
 }
 
 .gz-font-display {

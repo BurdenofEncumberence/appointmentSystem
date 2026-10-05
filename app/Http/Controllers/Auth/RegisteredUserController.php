@@ -52,8 +52,12 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        $firstName = User::titleCaseName($request->first_name);
+        $middleName = User::titleCaseName($request->middle_name);
+        $lastName = User::titleCaseName($request->last_name);
+
         $parts = array_filter(
-            [$request->first_name, $request->middle_name, $request->last_name],
+            [$firstName, $middleName, $lastName],
             fn ($part) => ! empty(trim((string) $part))
         );
         $fullName = implode(' ', $parts);
@@ -61,9 +65,9 @@ class RegisteredUserController extends Controller
         $otp = (string) random_int(100000, 999999);
 
         $pendingData = [
-            'first_name' => $request->first_name,
-            'middle_name' => $request->middle_name,
-            'last_name' => $request->last_name,
+            'first_name' => $firstName,
+            'middle_name' => $middleName,
+            'last_name' => $lastName,
             'name' => $fullName,
             'email' => $request->email,
             'password_hash' => Hash::make($request->password),

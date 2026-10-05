@@ -30,18 +30,45 @@ class User extends Authenticatable
     ];
 
     /**
+     * Capitalize the first letter of each word in a name string.
+     */
+    public static function titleCaseName(?string $name): ?string
+    {
+        if ($name === null) {
+            return null;
+        }
+
+        $trimmed = trim(preg_replace('/\s+/', ' ', (string) $name));
+        if ($trimmed === '') {
+            return null;
+        }
+
+        return mb_convert_case($trimmed, MB_CASE_TITLE, 'UTF-8');
+    }
+
+    /**
      * Bootstrap the model and its traits.
      */
     protected static function booted(): void
     {
         static::saving(function (User $user) {
+            if ($user->first_name !== null) {
+                $user->first_name = static::titleCaseName($user->first_name);
+            }
+            if ($user->middle_name !== null) {
+                $user->middle_name = static::titleCaseName($user->middle_name);
+            }
+            if ($user->last_name !== null) {
+                $user->last_name = static::titleCaseName($user->last_name);
+            }
+
             $computedName = trim(implode(' ', array_filter([$user->first_name, $user->middle_name, $user->last_name])));
 
             if ($user->name && $user->name !== $computedName && ($user->isDirty('name') || empty($computedName))) {
                 $nameParts = preg_split('/\s+/', trim((string) $user->name));
-                $user->first_name = array_shift($nameParts) ?: null;
-                $user->last_name = ! empty($nameParts) ? array_pop($nameParts) : null;
-                $user->middle_name = ! empty($nameParts) ? implode(' ', $nameParts) : null;
+                $user->first_name = static::titleCaseName(array_shift($nameParts) ?: null);
+                $user->last_name = ! empty($nameParts) ? static::titleCaseName(array_pop($nameParts)) : null;
+                $user->middle_name = ! empty($nameParts) ? static::titleCaseName(implode(' ', $nameParts)) : null;
             } elseif ($user->first_name || $user->last_name) {
                 $parts = array_filter(
                     [$user->first_name, $user->middle_name, $user->last_name],
@@ -49,7 +76,31 @@ class User extends Authenticatable
                 );
                 $user->name = implode(' ', $parts);
             }
+
+            if ($user->name !== null) {
+                $user->name = static::titleCaseName($user->name);
+            }
         });
+    }
+
+    public function setFirstNameAttribute(?string $value): void
+    {
+        $this->attributes['first_name'] = static::titleCaseName($value);
+    }
+
+    public function setMiddleNameAttribute(?string $value): void
+    {
+        $this->attributes['middle_name'] = static::titleCaseName($value);
+    }
+
+    public function setLastNameAttribute(?string $value): void
+    {
+        $this->attributes['last_name'] = static::titleCaseName($value);
+    }
+
+    public function setNameAttribute(?string $value): void
+    {
+        $this->attributes['name'] = static::titleCaseName($value);
     }
 
     /**
@@ -58,7 +109,7 @@ class User extends Authenticatable
     public function getNameAttribute(?string $value): ?string
     {
         if (! empty($value)) {
-            return $value;
+            return static::titleCaseName($value);
         }
 
         $parts = array_filter(
@@ -67,7 +118,7 @@ class User extends Authenticatable
         );
         $fullName = implode(' ', $parts);
 
-        return $fullName !== '' ? $fullName : null;
+        return $fullName !== '' ? static::titleCaseName($fullName) : null;
     }
 
     /**
@@ -76,12 +127,24 @@ class User extends Authenticatable
     public function getFirstNameAttribute(?string $value): ?string
     {
         if (! empty($value)) {
-            return $value;
+            return static::titleCaseName($value);
         }
 
         if (! empty($this->attributes['name'] ?? null)) {
             $parts = explode(' ', trim((string) $this->attributes['name']), 2);
-            return $parts[0] ?? null;
+            return static::titleCaseName($parts[0] ?? null);
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the user's middle name.
+     */
+    public function getMiddleNameAttribute(?string $value): ?string
+    {
+        if (! empty($value)) {
+            return static::titleCaseName($value);
         }
 
         return null;
@@ -93,12 +156,12 @@ class User extends Authenticatable
     public function getLastNameAttribute(?string $value): ?string
     {
         if (! empty($value)) {
-            return $value;
+            return static::titleCaseName($value);
         }
 
         if (! empty($this->attributes['name'] ?? null)) {
             $parts = explode(' ', trim((string) $this->attributes['name']), 2);
-            return $parts[1] ?? null;
+            return static::titleCaseName($parts[1] ?? null);
         }
 
         return null;

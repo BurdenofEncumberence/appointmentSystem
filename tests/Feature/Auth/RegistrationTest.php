@@ -161,3 +161,38 @@ test('user can cancel registration and return to register form with prefilled in
     $response->assertRedirect(route('register'));
     $this->assertFalse(session()->has('pending_registration'));
 });
+
+test('submitting registration with lowercase names automatically capitalizes first letter of names', function () {
+    Mail::fake();
+
+    $this->post('/register', [
+        'first_name' => 'geoff patrick',
+        'middle_name' => 'dela cruz',
+        'last_name' => 'granada',
+        'email' => 'lowercase.user@example.com',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+    ]);
+
+    $pending = session('pending_registration');
+    $this->assertNotNull($pending);
+    $this->assertSame('Geoff Patrick', $pending['first_name']);
+    $this->assertSame('Dela Cruz', $pending['middle_name']);
+    $this->assertSame('Granada', $pending['last_name']);
+    $this->assertSame('Geoff Patrick Dela Cruz Granada', $pending['name']);
+
+    $otp = $pending['otp_plain_dev'];
+    $verifyResponse = $this->post(route('register.otp.verify'), [
+        'otp' => $otp,
+    ]);
+
+    $verifyResponse->assertRedirect(route('booking'));
+
+    $this->assertDatabaseHas('users', [
+        'first_name' => 'Geoff Patrick',
+        'middle_name' => 'Dela Cruz',
+        'last_name' => 'Granada',
+        'name' => 'Geoff Patrick Dela Cruz Granada',
+        'email' => 'lowercase.user@example.com',
+    ]);
+});
