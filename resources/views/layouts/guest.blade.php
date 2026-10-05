@@ -27,7 +27,7 @@
 
     <main id="main-content" class="relative z-10">
         <section class="max-w-6xl mx-auto px-6 py-16 flex justify-center" aria-label="{{ $label }}">
-            <div class="gz-card w-full {{ $cardClass }}">
+            <div class="gz-card w-full rounded-3xl {{ $cardClass }}">
                 {{ $slot }}
             </div>
         </section>

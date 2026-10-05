@@ -10,7 +10,12 @@
     --cream: #FDF6E3;
 }
 
-* { border-radius: 0 !important; }
+.pixel-border,
+.pixel-btn,
+.pixel-input,
+.font-pixel {
+    border-radius: 0;
+}
 [x-cloak] { display: none !important; }
 
 body {
@@ -230,9 +235,17 @@ input:focus-visible {
 .gz-card {
     background: var(--gz-surface);
     border: 1.5px solid var(--gz-border);
+    border-radius: 24px;
     padding: 42px;
     width: 100%;
     max-width: 580px;
+}
+
+@media (max-width: 640px) {
+    .gz-card {
+        padding: 24px 20px;
+        border-radius: 20px;
+    }
 }
 
 .gz-font-display {
@@ -388,7 +401,14 @@ input:focus-visible {
 .gz-kpi-card {
     background: var(--gz-surface);
     border: 1.5px solid var(--gz-border);
+    border-radius: 18px;
     padding: 18px;
+}
+
+.surface-card {
+    background: var(--gz-surface);
+    border: 1.5px solid var(--gz-border);
+    border-radius: 24px;
 }
 
 .gz-kpi-value {

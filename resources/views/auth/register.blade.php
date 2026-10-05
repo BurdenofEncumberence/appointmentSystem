@@ -143,7 +143,7 @@
                     <div
                         @click.outside="modal = null"
                         class="relative w-full max-w-xl my-auto p-6 sm:p-8 rounded-2xl flex flex-col max-h-[85vh] shadow-2xl"
-                        style="background-color: #FCFBF7 !important; border: 2px solid #12150F !important; box-shadow: 6px 8px 0px #12150F !important; color: #12150F !important;"
+                        style="background-color: #FCFBF7 !important; border: 2px solid #12150F !important; box-shadow: 6px 8px 0px #12150F !important; color: #12150F !important; border-radius: 20px !important;"
                     >
                         <div class="flex items-center justify-between border-b pb-4 mb-4" style="border-color: #E4E0D4 !important;">
                             <div class="flex items-center gap-2.5">
@@ -210,7 +210,7 @@
                     <div
                         @click.outside="modal = null"
                         class="relative w-full max-w-xl my-auto p-6 sm:p-8 rounded-2xl flex flex-col max-h-[85vh] shadow-2xl"
-                        style="background-color: #FCFBF7 !important; border: 2px solid #12150F !important; box-shadow: 6px 8px 0px #12150F !important; color: #12150F !important;"
+                        style="background-color: #FCFBF7 !important; border: 2px solid #12150F !important; box-shadow: 6px 8px 0px #12150F !important; color: #12150F !important; border-radius: 20px !important;"
                     >
                         <div class="flex items-center justify-between border-b pb-4 mb-4" style="border-color: #E4E0D4 !important;">
                             <div class="flex items-center gap-2.5">
