@@ -1,21 +1,29 @@
+@php
+    $siteSettings = $siteSettings ?? \App\Models\SiteSettings::first();
+    $homeUrl = match(true) {
+        Auth::check() && (Auth::user()->isAdmin() || Auth::user()->hasRole('manager')) => route('admin.dashboard'),
+        Auth::check() && Auth::user()->hasRole('staff') => route('staff.today'),
+        Auth::check() => route('booking'),
+        default => url('/'),
+    };
+@endphp
+
 <nav x-data="{ mobileOpen: false, profileOpen: false }" class="border-b relative" style="border-color: var(--gz-border);">
     <div class="max-w-6xl mx-auto px-6">
         <div class="flex justify-between h-16 items-center">
-            <div class="flex items-center gap-8">
-                @php
-                    $homeUrl = match(true) {
-                        Auth::check() && (Auth::user()->isAdmin() || Auth::user()->hasRole('manager')) => route('admin.dashboard'),
-                        Auth::check() && Auth::user()->hasRole('staff') => route('staff.today'),
-                        Auth::check() => route('booking'),
-                        default => url('/'),
-                    };
-                @endphp
-                <a href="{{ $homeUrl }}" class="flex items-center gap-2">
+            {{-- Left: logo --}}
+            <a href="{{ $homeUrl }}" class="flex items-center gap-2">
+                @if($siteSettings && $siteSettings->logo)
+                    <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="{{ $siteSettings->system_name ?? 'Logo' }}" class="h-8 w-8 object-contain">
+                @else
                     <div class="pixel-mark" aria-hidden="true" style="width:32px; height:32px; background: var(--gz-ink); display:grid; grid-template-columns:repeat(8,1fr); grid-template-rows:repeat(8,1fr); padding:6px;" id="nav-seal"></div>
-                    <span class="gz-font-display font-bold text-base">KYMNET</span>
-                </a>
+                @endif
+                <span class="gz-font-display font-bold text-base">{{ $siteSettings->system_name ?? 'KYMNET' }}</span>
+            </a>
 
-                <div class="hidden sm:flex gap-6 text-sm font-semibold" style="color: var(--gz-muted);">
+            {{-- Center: navigation links (desktop) --}}
+            <div class="hidden sm:flex items-center gap-8 flex-1 justify-center">
+                <div class="flex gap-6 text-sm font-semibold" style="color: var(--gz-muted);">
                     @auth
                         @if(Auth::user()->isAdmin() || Auth::user()->hasRole('manager'))
                             {{-- Admin/Manager only sees Admin Panel navigation --}}
@@ -26,8 +34,14 @@
                             <a href="{{ route('admin.courts.index') }}" class="nav-link" @if(request()->routeIs('admin.courts.*')) aria-current="page" @endif>
                                 Courts
                             </a>
+                            <a href="{{ route('admin.events.index') }}" class="nav-link" @if(request()->routeIs('admin.events.*')) aria-current="page" @endif>
+                                Events
+                            </a>
                             <a href="{{ route('admin.finance') }}" class="nav-link" @if(request()->routeIs('admin.finance')) aria-current="page" @endif>
                                 Financials
+                            </a>
+                            <a href="{{ route('admin.customization.index') }}" class="nav-link" @if(request()->routeIs('admin.customization.*')) aria-current="page" @endif>
+                                Customization
                             </a>
                         @elseif(Auth::user()->hasRole('staff'))
                             <a href="{{ route('staff.today') }}" class="nav-link" @if(request()->routeIs('staff.today')) aria-current="page" @endif>
@@ -59,6 +73,7 @@
                 </div>
             </div>
 
+            {{-- Right: account/auth buttons (desktop) --}}
             <div class="hidden sm:flex items-center gap-4 relative">
                 @auth
                     @php
@@ -96,7 +111,9 @@
                             @if(Auth::user()->isAdmin() || Auth::user()->hasRole('manager'))
                                 <a href="{{ route('admin.dashboard') }}" class="gz-dropdown-item">Admin Overview</a>
                                 <a href="{{ route('admin.courts.index') }}" class="gz-dropdown-item">Courts Inventory</a>
+                                <a href="{{ route('admin.events.index') }}" class="gz-dropdown-item">Events Management</a>
                                 <a href="{{ route('admin.finance') }}" class="gz-dropdown-item">Financial Reports</a>
+                                <a href="{{ route('admin.customization.index') }}" class="gz-dropdown-item">Customization</a>
                             @elseif(Auth::user()->hasRole('staff'))
                                 <a href="{{ route('staff.today') }}" class="gz-dropdown-item">Today's Schedule</a>
                                 <a href="{{ route('staff.walkin.create') }}" class="gz-dropdown-item">Walk-In Booking</a>
@@ -128,7 +145,8 @@
                 @endauth
             </div>
 
-            <div class="sm:hidden flex items-center gap-2">
+            {{-- Mobile menu button --}}
+            <div class="sm:hidden flex items-center gap-2 flex-1 justify-end">
                 <button @click="mobileOpen = !mobileOpen" :aria-expanded="mobileOpen.toString()" aria-controls="mobile-nav-genz" class="gz-btn-outline gz-btn-sm">
                     <span x-show="!mobileOpen">Menu</span>
                     <span x-show="mobileOpen" x-cloak>Close</span>
@@ -151,7 +169,9 @@
             @if(Auth::user()->isAdmin() || Auth::user()->hasRole('manager'))
                 <a href="{{ route('admin.dashboard') }}" class="gz-dropdown-item">Admin Overview</a>
                 <a href="{{ route('admin.courts.index') }}" class="gz-dropdown-item">Courts</a>
+                <a href="{{ route('admin.events.index') }}" class="gz-dropdown-item">Events</a>
                 <a href="{{ route('admin.finance') }}" class="gz-dropdown-item">Financials</a>
+                <a href="{{ route('admin.customization.index') }}" class="gz-dropdown-item">Customization</a>
             @elseif(Auth::user()->hasRole('staff'))
                 <a href="{{ route('staff.today') }}" class="gz-dropdown-item">Today's Schedule</a>
                 <a href="{{ route('staff.walkin.create') }}" class="gz-dropdown-item">Walk-In Booking</a>

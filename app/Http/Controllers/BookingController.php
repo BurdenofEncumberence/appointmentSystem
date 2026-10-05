@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreBookingRequest;
 use App\Models\Booking;
 use App\Models\Court;
+use App\Models\Event;
 use App\Models\Payment;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -52,9 +53,22 @@ class BookingController extends Controller
             $bookedSlots[$dateStr][$booking->court_id][] = $formattedSlot;
         }
 
+        $events = Event::query()
+            ->where('start_date', '<=', now()->addDays(30)->toDateString())
+            ->where('end_date', '>=', now()->toDateString())
+            ->get()
+            ->map(fn (Event $event) => [
+                'id' => $event->id,
+                'title' => $event->event_title,
+                'discount' => (float) $event->discount,
+                'startDate' => $event->start_date->toDateString(),
+                'endDate' => $event->end_date->toDateString(),
+            ]);
+
         return view('booking', [
             'courts' => $courts,
             'bookedSlots' => $bookedSlots,
+            'events' => $events,
         ]);
     }
 
@@ -73,16 +87,26 @@ class BookingController extends Controller
         $slots = $request->parsedSlots();
         $refNum = 'PAY-' . strtoupper(Str::random(8));
         $paymentMethod = $request->input('payment_method', 'online') ?: 'online';
+        $eventId = $request->input('event_id');
         $createdBookings = [];
 
-        DB::transaction(function () use ($slots, $refNum, $paymentMethod, &$createdBookings) {
+        // Calculate potential event discount
+        $discountPercent = 0;
+        if ($eventId) {
+            $event = Event::find($eventId);
+            if ($event && $event->discount) {
+                $discountPercent = (float) $event->discount;
+            }
+        }
+
+        DB::transaction(function () use ($slots, $refNum, $paymentMethod, $eventId, $discountPercent, &$createdBookings) {
             foreach ($slots as $item) {
                 $court = Court::findOrFail($item['court_id']);
 
                 $booking = Booking::create([
                     'user_id' => Auth::id(),
                     'court_id' => $court->id,
-                    'event_id' => null,
+                    'event_id' => $eventId,
                     'date' => $item['date'],
                     'start_time' => $item['start_time'],
                     'end_time' => $item['end_time'],
@@ -93,12 +117,15 @@ class BookingController extends Controller
                 $start = Carbon::parse($item['start_time']);
                 $end = Carbon::parse($item['end_time']);
                 $hours = max(1, $start->diffInMinutes($end) / 60);
-                $amount = round($court->price_per_hour * $hours, 2);
+                $rawAmount = round($court->price_per_hour * $hours, 2);
+                $amount = $discountPercent > 0
+                    ? round($rawAmount * (1 - ($discountPercent / 100)), 2)
+                    : $rawAmount;
 
                 Payment::create([
                     'booking_id' => $booking->id,
                     'payment_method' => $paymentMethod,
-                    'payment_status' => 'paid',
+                    'payment_status' => $paymentMethod === 'cash' ? 'pending' : 'paid',
                     'amount' => $amount,
                     'ref_num' => $refNum,
                     'date' => now()->toDateString(),
@@ -111,8 +138,8 @@ class BookingController extends Controller
 
         $count = count($createdBookings);
         $message = $count > 1
-            ? "{$count} court reservations fully paid and confirmed under transaction {$refNum}."
-            : 'Booking fully paid and confirmed for ' . ($slots[0]['date'] ?? today()->toDateString()) . '.';
+            ? "{$count} court reservations confirmed under transaction {$refNum}."
+            : 'Booking confirmed for ' . ($slots[0]['date'] ?? today()->toDateString()) . '.';
 
         return redirect()
             ->route('bookings.index')
@@ -121,7 +148,7 @@ class BookingController extends Controller
 
     public function index()
     {
-        $bookings = Booking::with(['court', 'payments'])
+        $bookings = Booking::with(['court', 'payments', 'event'])
             ->where('user_id', Auth::id())
             ->orderByDesc('date')
             ->orderByDesc('start_time')

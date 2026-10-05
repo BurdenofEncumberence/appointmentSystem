@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AdminCourtController;
+use App\Http\Controllers\AdminCustomizationController;
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\AdminEventController;
 use App\Http\Controllers\AdminFinanceController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ProfileController;
@@ -17,8 +19,14 @@ use Illuminate\Support\Facades\Route;
 */
 Route::get('/', function () {
     $courts = \App\Models\Court::where('court_status', 'available')->get();
+    $events = \App\Models\Event::query()
+        ->where('start_date', '<=', now()->addDays(30)->toDateString())
+        ->where('end_date', '>=', now()->toDateString())
+        ->orderBy('start_date')
+        ->get();
+    $siteSettings = \App\Models\SiteSettings::first();
 
-    return view('welcome', compact('courts'));
+    return view('welcome', compact('courts', 'events', 'siteSettings'));
 })->name('welcome');
 
 /*
@@ -38,6 +46,12 @@ Route::get('/dashboard', function () {
     };
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::middleware(['auth', 'verified'])->prefix('customer')->name('customer.')->group(function () {
+    Route::get('/dashboard', function () {
+        return redirect()->route('booking');
+    })->name('dashboard');
+});
+
 /*
 |--------------------------------------------------------------------------
 | Admin & Manager Workspace
@@ -53,6 +67,9 @@ Route::middleware(['auth', 'verified', 'role:admin,manager'])
         Route::resource('courts', AdminCourtController::class)
             ->except(['show'])
             ->whereNumber('court');
+        Route::resource('events', AdminEventController::class);
+        Route::get('/customization', [AdminCustomizationController::class, 'index'])->name('customization.index');
+        Route::patch('/customization', [AdminCustomizationController::class, 'update'])->name('customization.update');
     });
 
 /*

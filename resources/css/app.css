@@ -480,8 +480,8 @@ input:focus-visible {
     gap: 6px;
 }
 .gz-btn-outline:hover {
-    background: var(--gz-ink);
-    color: var(--gz-surface);
+    background: var(--gz-bg);
+    color: var(--gz-ink);
 }
 .gz-btn-outline:focus-visible {
     outline: 3px solid var(--gz-pop-dark);
@@ -612,6 +612,23 @@ input:focus-visible {
     font-size: 13px;
 }
 
+/* =====================================================================
+   NOT-READY STATE FOR PRIMARY BUTTONS
+   Looks unavailable but, when set via aria-disabled="true", the button
+   stays focusable and clickable so the page can explain what is missing
+   instead of silently doing nothing. Uses only existing tokens.
+   Placed after .gz-btn-sm so it wins over the hover/active lift.
+   ===================================================================== */
+.gz-btn-primary[aria-disabled="true"],
+.gz-btn-primary[aria-disabled="true"]:hover,
+.gz-btn-primary[aria-disabled="true"]:active,
+.gz-btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 0 var(--gz-pop-dark);
+}
+
 .gz-badge-info {
     background: var(--gz-bg);
     color: var(--gz-ink);
@@ -624,7 +641,7 @@ input:focus-visible {
    Now global, so it works everywhere the class is used. */
 .nav-link {
     text-decoration: none;
-    color: var(--gz-muted);
+    color: var(--gz-ink);
     transition: color 0.15s ease;
 }
 .nav-link:hover { color: var(--gz-ink); }

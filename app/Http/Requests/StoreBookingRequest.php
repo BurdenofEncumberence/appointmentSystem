@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Booking;
+use App\Models\Court;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
@@ -15,30 +16,77 @@ class StoreBookingRequest extends FormRequest
     }
 
     /**
-     * Prepare inputs for validation: allow both JSON string or array of slots,
-     * and fallback to legacy single slot format.
+     * Prepare inputs for validation: allow JSON strings or arrays from 'slots' or 'courts',
+     * and fallback to single slot legacy submission.
      */
     protected function prepareForValidation(): void
     {
+        $rawSlots = [];
+
         if ($this->has('slots')) {
-            $slots = $this->input('slots');
-            if (is_string($slots)) {
-                $decoded = json_decode($slots, true);
+            $slotsInput = $this->input('slots');
+            if (is_string($slotsInput)) {
+                $decoded = json_decode($slotsInput, true);
                 if (is_array($decoded)) {
-                    $this->merge(['slots' => $decoded]);
+                    $rawSlots = $decoded;
                 }
+            } elseif (is_array($slotsInput)) {
+                $rawSlots = $slotsInput;
             }
-        } elseif ($this->filled('court_id') && $this->filled('date') && $this->filled('time_slot')) {
-            $this->merge([
-                'slots' => [
-                    [
-                        'court_id' => $this->input('court_id'),
-                        'date' => $this->input('date'),
-                        'time_slot' => $this->input('time_slot'),
-                    ],
+        } elseif ($this->has('courts')) {
+            $courtsInput = $this->input('courts');
+            if (is_array($courtsInput)) {
+                $rawSlots = array_map(function ($item) {
+                    return [
+                        'court_id' => $item['court_id'] ?? $item['courtId'] ?? null,
+                        'time_slot' => $item['time_slot'] ?? $item['timeSlot'] ?? null,
+                        'date' => $item['date'] ?? $this->input('date'),
+                    ];
+                }, $courtsInput);
+            }
+        } elseif ($this->filled('courts_json')) {
+            $decoded = json_decode($this->input('courts_json'), true);
+            if (is_array($decoded)) {
+                $rawSlots = array_map(function ($item) {
+                    return [
+                        'court_id' => $item['court_id'] ?? $item['courtId'] ?? null,
+                        'time_slot' => $item['time_slot'] ?? $item['timeSlot'] ?? null,
+                        'date' => $item['date'] ?? $this->input('date'),
+                    ];
+                }, $decoded);
+            }
+        } elseif ($this->filled('court_id') && $this->filled('time_slot')) {
+            $rawSlots = [
+                [
+                    'court_id' => $this->input('court_id'),
+                    'date' => $this->input('date', today()->toDateString()),
+                    'time_slot' => $this->input('time_slot'),
                 ],
-            ]);
+            ];
         }
+
+        // Clean & normalize items
+        $normalized = [];
+        foreach ($rawSlots as $item) {
+            if (is_array($item) && !empty($item['court_id']) && !empty($item['time_slot'])) {
+                $normalized[] = [
+                    'court_id' => (int) $item['court_id'],
+                    'date' => $item['date'] ?? $this->input('date'),
+                    'time_slot' => $item['time_slot'],
+                ];
+            }
+        }
+
+        $mergeData = [
+            'slots' => $normalized,
+            'courts' => $normalized,
+        ];
+
+        if (!$this->has('payment_method')) {
+            $mergeData['payment_method'] = 'online';
+        }
+
+        $this->merge($mergeData);
     }
 
     public function rules(): array
@@ -48,7 +96,20 @@ class StoreBookingRequest extends FormRequest
             'slots.*.court_id' => ['required', 'integer', 'exists:courts,id'],
             'slots.*.date' => ['required', 'date', 'after_or_equal:today'],
             'slots.*.time_slot' => ['required', 'string'],
+            'event_id' => ['nullable', 'integer', 'exists:events,id'],
             'payment_method' => ['nullable', 'string'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'slots.required' => 'Please select at least one court.',
+            'slots.min' => 'Please select at least one court.',
+            'slots.*.court_id.required' => 'Court selection is required.',
+            'slots.*.time_slot.required' => 'Time slot is required.',
+            'slots.*.date.required' => 'Date is required for each court booking.',
+            'slots.*.date.after_or_equal' => 'Booking date cannot be in the past.',
         ];
     }
 
@@ -99,7 +160,8 @@ class StoreBookingRequest extends FormRequest
                     ->exists();
 
                 if ($conflict) {
-                    $validator->errors()->add("slots.{$index}.time_slot", "A selected court is already booked for {$date} at {$timeSlot}.");
+                    $courtName = Court::find($courtId)?->court_name ?? "Court {$courtId}";
+                    $validator->errors()->add("slots.{$index}.time_slot", "{$courtName} is already booked for {$date} at {$timeSlot}.");
                 }
             }
         });
@@ -158,10 +220,14 @@ class StoreBookingRequest extends FormRequest
     }
 
     /**
-     * Legacy single slot helper.
+     * Parse times helper, supporting optional string parameter or fallback to inputs.
      */
-    public function parsedTimes(): ?array
+    public function parsedTimes(?string $timeSlot = null): ?array
     {
+        if ($timeSlot !== null) {
+            return $this->parseSlotTimes($timeSlot);
+        }
+
         $slots = $this->parsedSlots();
         if (! empty($slots)) {
             return [$slots[0]['start_time'], $slots[0]['end_time']];

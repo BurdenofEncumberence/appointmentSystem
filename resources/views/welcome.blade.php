@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>KYMNET - Book Your Court, Rally with Ease</title>
+    <title>{{ $siteSettings->system_name ?? 'KYMNET' }} - Book Your Court, Rally with Ease</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -218,7 +218,7 @@
             <p class="font-semibold">
                 <span style="color: var(--pop);">●</span>
                 Grand Opening Tournament — registration opens soon.
-                <a href="#" class="underline underline-offset-2 ml-1">Learn more →</a>
+                <a href="#events" class="underline underline-offset-2 ml-1">Learn more →</a>
             </p>
             <button
                 type="button"
@@ -319,6 +319,58 @@
             </div>
         </div>
     </section>
+
+    @if(isset($events) && $events->isNotEmpty())
+    <!-- Active Events & Promotions Section -->
+    <section id="events" class="relative z-10 max-w-6xl mx-auto px-6 pb-20" aria-labelledby="events-heading">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--pop-dark)]">
+                    Events & Tournaments
+                </span>
+                <h2 id="events-heading" class="font-display text-2xl md:text-3xl font-bold mt-2">Active Events & Special Promotions</h2>
+                <p class="text-sm mt-1" style="color: var(--muted);">Join upcoming tournaments or claim exclusive promotional discounts on court bookings.</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach($events as $event)
+                <div class="surface-card p-5">
+                    @if($event->image)
+                        <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->event_title }}" class="w-full h-40 object-cover rounded-lg mb-4">
+                    @else
+                        <div class="w-full h-40 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 rounded-lg mb-4 flex items-center justify-center">
+                            <span class="text-4xl">🎉</span>
+                        </div>
+                    @endif
+                    
+                    <h3 class="font-display font-bold text-lg mb-2">{{ $event->event_title }}</h3>
+                    
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="text-sm" style="color: var(--muted);">
+                            {{ $event->start_date ? \Carbon\Carbon::parse($event->start_date)->format('M d, Y') : '' }} - {{ $event->end_date ? \Carbon\Carbon::parse($event->end_date)->format('M d, Y') : '' }}
+                        </span>
+                    </div>
+                    
+                    @if($event->discount)
+                        <div class="inline-block bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm font-semibold mb-3">
+                            {{ $event->discount }}% OFF
+                        </div>
+                    @endif
+                    
+                    @if($event->details)
+                        <p class="text-sm mb-4" style="color: var(--muted); line-clamp-2">
+                            {{ $event->details }}
+                        </p>
+                    @endif
+                    
+                    <a href="{{ route('booking') }}" class="btn-primary text-sm w-full justify-center">
+                        Book a Court
+                    </a>
+                </div>
+            @endforeach
+        </div>
+    </section>
+    @endif
 
     <!-- Championship Court Fleet Showcase -->
     <section id="courts" class="relative z-10 max-w-6xl mx-auto px-6 pb-24" aria-labelledby="courts-heading">

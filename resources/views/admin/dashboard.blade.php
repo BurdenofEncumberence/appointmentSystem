@@ -162,6 +162,25 @@
         </div>
     </div>
 
+    @if(isset($eventsCount))
+        <div class="mb-8">
+            <div class="gz-kpi-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-base" style="background: rgba(62, 207, 126, 0.15); color: var(--gz-pop-dark);">
+                        📅
+                    </div>
+                    <div>
+                        <div class="gz-eyebrow">Tournaments & Promotions</div>
+                        <div class="text-sm font-bold">{{ $eventsCount }} Active Events & Tournaments</div>
+                    </div>
+                </div>
+                <a href="{{ route('admin.events.index') }}" class="gz-btn-outline gz-btn-sm">
+                    Manage Events & Tournaments →
+                </a>
+            </div>
+        </div>
+    @endif
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <div class="lg:col-span-2 gz-panel">
             <div class="gz-panel-header">
@@ -343,4 +362,38 @@
             @endif
         </div>
     </div>
+
+    <script>
+        if (typeof window.renderPixelGrid === 'undefined') {
+            window.renderPixelGrid = function(id, rows, colorMap) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.innerHTML = '';
+                rows.forEach(row => {
+                    [...row].forEach(ch => {
+                        const cell = document.createElement('div');
+                        cell.style.background = colorMap[ch] || 'transparent';
+                        cell.style.width = '100%';
+                        cell.style.height = '100%';
+                        el.appendChild(cell);
+                    });
+                });
+            };
+        }
+        window.renderPixelGrid('icon-revenue', [
+            "........", ".1111...", ".1....1.", ".1.11.1.", ".1.11.1.", ".1....1.", ".1111...", "........"
+        ], { '.': 'transparent', '1': '#FCFBF7' });
+        window.renderPixelGrid('icon-fleet', [
+            "........", "..11....", ".1..1...", ".1..1...", ".11111..", ".1..1...", ".1..1...", "........"
+        ], { '.': 'transparent', '1': '#FCFBF7' });
+        window.renderPixelGrid('icon-matches', [
+            "........", "..11....", ".1111...", "..11....", "..11....", "..11....", ".1111...", "........"
+        ], { '.': 'transparent', '1': '#FCFBF7' });
+        window.renderPixelGrid('icon-audits', [
+            "........", ".1111...", ".1..1...", ".1..1...", ".1..1...", ".1..1...", ".1111...", "........"
+        ], { '.': 'transparent', '1': '#FCFBF7' });
+        window.renderPixelGrid('icon-events', [
+            "........", "..1.....", ".111....", "..1.....", "..1.....", ".11111..", "........", "........"
+        ], { '.': 'transparent', '1': '#FCFBF7' });
+    </script>
 </x-admin-layout>

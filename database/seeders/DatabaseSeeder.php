@@ -20,11 +20,11 @@ class DatabaseSeeder extends Seeder
 
         // Seed Admin account
         User::firstOrCreate(
-            ['email' => 'admin@kymnet.com'],
+            ['email' => 'wewdbertulano@gmail.com'],
             [
                 'first_name' => 'Admin',
                 'last_name' => 'User',
-                'name' => 'Admin User',
+                'name' => 'admin',
                 'password' => Hash::make('admin123'),
                 'role' => 'admin',
             ]

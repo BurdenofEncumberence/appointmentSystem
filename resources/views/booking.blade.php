@@ -58,6 +58,18 @@
                 this.selectedSlots = [];
             },
 
+            events: @json($events ?? []),
+            selectedEvent: null,
+            get selectedEventObj() {
+                return this.events.find(e => e.id === this.selectedEvent);
+            },
+            get eventDiscountPercent() {
+                return this.selectedEventObj ? (Number(this.selectedEventObj.discount) || 0) : 0;
+            },
+            get discountAmount() {
+                return this.eventDiscountPercent > 0 ? (this.courtsSubtotal * (this.eventDiscountPercent / 100)) : 0;
+            },
+
             // Legacy helpers
             get selectedCourt() {
                 return this.selectedSlots.length > 0 ? this.selectedSlots[0].courtId : null;
@@ -76,7 +88,9 @@
             serviceFee: 25,
 
             get totalDue() {
-                return this.selectedSlots.length > 0 ? (this.courtsSubtotal + this.serviceFee) : 0;
+                if (this.selectedSlots.length === 0) return 0;
+                const sub = this.courtsSubtotal - this.discountAmount;
+                return Math.max(0, sub + this.serviceFee);
             },
 
             get canPay() {
@@ -391,12 +405,31 @@
                             </template>
                         </div>
 
+                        {{-- Event Discounts --}}
+                        <template x-if="events && events.length > 0">
+                            <div class="pt-3 border-t mb-3" style="border-color: var(--gz-border);">
+                                <label class="text-xs font-bold uppercase tracking-wider block mb-2" style="color: var(--gz-pop-dark);">Special Event Promotion</label>
+                                <select x-model="selectedEvent" class="gz-input text-xs w-full py-1.5 mb-2">
+                                    <option :value="null">No promotional discount</option>
+                                    <template x-for="event in events" :key="event.id">
+                                        <option :value="event.id" x-text="event.title + ' (' + event.discount + '% OFF)'"></option>
+                                    </template>
+                                </select>
+                            </div>
+                        </template>
+
                         {{-- Financial Totals --}}
                         <div class="pt-3 border-t space-y-2 text-sm" style="border-color: var(--gz-border);">
                             <div class="flex justify-between">
                                 <span style="color: var(--gz-muted);">Court Subtotal</span>
                                 <span class="font-semibold" x-text="'₱' + courtsSubtotal.toFixed(2)"></span>
                             </div>
+                            <template x-if="discountAmount > 0">
+                                <div class="flex justify-between" style="color: var(--gz-pop-dark);">
+                                    <span>Event Discount (<span x-text="eventDiscountPercent + '%'"></span>)</span>
+                                    <span class="font-semibold" x-text="'-₱' + discountAmount.toFixed(2)"></span>
+                                </div>
+                            </template>
                             <div class="flex justify-between">
                                 <span style="color: var(--gz-muted);">Transaction Service Fee</span>
                                 <span class="font-semibold" x-text="'₱' + serviceFee.toFixed(2)"></span>
@@ -477,6 +510,7 @@
                             <input type="hidden" name="time_slot" :value="selectedTimeSlot">
 
                             <input type="hidden" name="payment_method" :value="paymentMethod">
+                            <input type="hidden" name="event_id" :value="selectedEvent">
 
                             <button type="submit" :disabled="!canConfirm" class="gz-btn-primary w-full justify-center">
                                 Confirm & Pay (<span x-text="'₱' + totalDue.toFixed(2)"></span>)

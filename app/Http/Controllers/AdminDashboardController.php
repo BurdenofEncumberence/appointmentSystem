@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Court;
+use App\Models\Event;
 use App\Models\Payment;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
@@ -80,6 +81,7 @@ class AdminDashboardController extends Controller
             'pendingPayments' => Payment::where('payment_status', 'pending')->count(),
             'totalBookings' => Booking::count(),
             'confirmedBookingsCount' => Booking::where('booking_status', 'confirmed')->count(),
+            'eventsCount' => Event::count(),
             'recentPayments' => $recentPayments,
             'today' => Carbon::today(),
         ]);
