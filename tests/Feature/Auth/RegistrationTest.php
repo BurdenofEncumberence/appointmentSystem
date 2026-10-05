@@ -26,14 +26,35 @@ test('submitting registration without agreeing to terms and conditions is reject
     $this->assertGuest();
 });
 
-test('terms and privacy policy pages can be rendered', function () {
+test('terms and privacy policy pages can be rendered for guest and authenticated user', function () {
+    // Guest view
     $termsResponse = $this->get(route('terms'));
     $termsResponse->assertOk();
     $termsResponse->assertSee('Terms and Conditions');
+    $termsResponse->assertSee('Back to Registration');
+    $termsResponse->assertSee('Return to Register');
 
     $privacyResponse = $this->get(route('privacy'));
     $privacyResponse->assertOk();
     $privacyResponse->assertSee('Privacy Policy');
+    $privacyResponse->assertSee('Back to Registration');
+    $privacyResponse->assertSee('Return to Register');
+
+    // Authenticated user view
+    $user = \App\Models\User::factory()->create();
+    $this->actingAs($user);
+
+    $authTermsResponse = $this->get(route('terms'));
+    $authTermsResponse->assertOk();
+    $authTermsResponse->assertSee('Back to Home');
+    $authTermsResponse->assertSee('Return to Home');
+    $authTermsResponse->assertDontSee('Return to Register');
+
+    $authPrivacyResponse = $this->get(route('privacy'));
+    $authPrivacyResponse->assertOk();
+    $authPrivacyResponse->assertSee('Back to Home');
+    $authPrivacyResponse->assertSee('Return to Home');
+    $authPrivacyResponse->assertDontSee('Return to Register');
 });
 
 test('submitting registration dispatches OTP email and redirects to verification page without creating user yet', function () {

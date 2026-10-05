@@ -1,8 +1,14 @@
 <x-guest-layout title="Privacy Policy — KYMNET" label="Privacy Policy" card-class="max-w-[760px]">
     <div class="mb-6">
-        <a href="{{ route('register') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 hover:text-emerald-700 mb-3">
-            ← Back to Registration
-        </a>
+        @auth
+            <a href="{{ url('/') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 hover:text-emerald-700 mb-3">
+                ← Back to Home
+            </a>
+        @else
+            <a href="{{ route('register') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 hover:text-emerald-700 mb-3">
+                ← Back to Registration
+            </a>
+        @endauth
         <h1 class="gz-font-display font-bold text-2xl md:text-3xl text-stone-900 mb-1">Privacy Policy</h1>
         <p class="gz-hint text-sm">Last updated: {{ date('F Y') }} · Data Privacy Act of 2012 Compliance</p>
     </div>
@@ -66,6 +72,10 @@
 
     <div class="mt-6 flex items-center justify-between">
         <a href="{{ route('terms') }}" class="gz-link text-sm">Read Terms & Conditions →</a>
-        <a href="{{ route('register') }}" class="gz-btn-primary">Return to Register</a>
+        @auth
+            <a href="{{ url('/') }}" class="gz-btn-primary">Return to Home</a>
+        @else
+            <a href="{{ route('register') }}" class="gz-btn-primary">Return to Register</a>
+        @endauth
     </div>
 </x-guest-layout>
