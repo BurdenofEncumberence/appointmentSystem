@@ -20,7 +20,9 @@
 
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <x-site-header />
+    <div style="background: var(--gz-bg); position: sticky; top: 0; z-index: 50;">
+        @include('layouts.navigation')
+    </div>
 
     <main id="main-content" class="relative z-10">
         <section class="max-w-6xl mx-auto px-6 py-16 flex justify-center" aria-label="{{ $label }}">

@@ -231,80 +231,9 @@
         </div>
     </div>
 
-    <header
-        class="site-header relative"
-        x-data="{ mobileNavOpen: false, scrolled: false }"
-        @scroll.window="scrolled = window.scrollY > 8"
-        :class="{ 'is-scrolled': scrolled }"
-    >
-        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-            <a href="{{ url('/') }}" class="flex items-center gap-3">
-                <div class="pixel-mark" id="brand-mark" aria-hidden="true"></div>
-                <span class="font-display font-bold text-lg">KYMNET</span>
-            </a>
-
-            <nav class="hidden sm:flex items-center gap-8 text-sm font-semibold" style="color: var(--muted);" aria-label="Primary">
-                <a href="{{ url('/') }}" class="nav-link" aria-current="page">Home</a>
-                <a href="{{ route('booking') }}" class="nav-link">Courts</a>
-                <a href="#features" class="nav-link">Features</a>
-            </nav>
-
-            <div class="flex items-center gap-3">
-                @auth
-                    @php
-                        $userDashboard = match(true) {
-                            Auth::user()->isAdmin() || Auth::user()->hasRole('manager') => route('admin.dashboard'),
-                            Auth::user()->hasRole('staff') => route('staff.today'),
-                            default => route('booking'),
-                        };
-                    @endphp
-                    <a href="{{ $userDashboard }}" class="btn-primary text-sm">
-                        Dashboard
-                    </a>
-                @else
-                    <a href="{{ route('login') }}" class="btn-outline text-sm hidden sm:inline-flex">Login</a>
-                    <a href="{{ route('register') }}" class="btn-primary text-sm hidden sm:inline-flex">Register</a>
-                @endauth
-
-                <button
-                    type="button"
-                    class="sm:hidden btn-outline text-sm"
-                    @click="mobileNavOpen = !mobileNavOpen"
-                    :aria-expanded="mobileNavOpen.toString()"
-                    aria-controls="mobile-nav"
-                >
-                    <span x-show="!mobileNavOpen">Menu</span>
-                    <span x-show="mobileNavOpen" x-cloak>Close</span>
-                </button>
-            </div>
-        </div>
-
-        <nav
-            id="mobile-nav"
-            x-show="mobileNavOpen"
-            x-cloak
-            class="sm:hidden px-6 pb-5 flex flex-col gap-4 text-sm font-semibold border-t"
-            style="border-color: var(--border); color: var(--muted);"
-            aria-label="Primary, mobile"
-        >
-            <a href="{{ url('/') }}" class="nav-link">Home</a>
-            <a href="{{ route('booking') }}" class="nav-link">Courts</a>
-            <a href="#features" class="nav-link">Features</a>
-            @auth
-                @php
-                    $userDashboard = match(true) {
-                        Auth::user()->isAdmin() || Auth::user()->hasRole('manager') => route('admin.dashboard'),
-                        Auth::user()->hasRole('staff') => route('staff.today'),
-                        default => route('booking'),
-                    };
-                @endphp
-                <a href="{{ $userDashboard }}" class="btn-primary text-sm justify-center">Dashboard</a>
-            @else
-                <a href="{{ route('login') }}" class="btn-outline text-sm text-center">Login</a>
-                <a href="{{ route('register') }}" class="btn-primary text-sm justify-center">Register</a>
-            @endauth
-        </nav>
-    </header>
+    <div style="background: var(--bg); position: sticky; top: 0; z-index: 50;">
+        @include('layouts.navigation')
+    </div>
 
     <main id="main-content">
 
