@@ -1,232 +1,36 @@
+@php
+    $oldCourts = old('courts', []);
+    $transformed = [];
+    if (is_array($oldCourts) && count($oldCourts) > 0) {
+        foreach ($oldCourts as $court) {
+            if (is_array($court) && isset($court['court_id']) && isset($court['time_slot'])) {
+                $transformed[] = [
+                    'courtId' => (int) $court['court_id'],
+                    'timeSlot' => $court['time_slot'],
+                    'date' => $court['date'] ?? old('date', now()->toDateString()),
+                ];
+            }
+        }
+    } elseif (old('courts_json')) {
+        $decoded = json_decode(old('courts_json'), true);
+        if (is_array($decoded)) {
+            foreach ($decoded as $court) {
+                $transformed[] = [
+                    'courtId' => (int) ($court['courtId'] ?? $court['court_id']),
+                    'timeSlot' => $court['timeSlot'] ?? $court['time_slot'],
+                    'date' => $court['date'] ?? old('date', now()->toDateString()),
+                ];
+            }
+        }
+    }
+@endphp
+
 <x-app-layout title="Book a Court — KYMNET">
     {{-- Wider wrapper: breaks out of the layout's narrow container --}}
     <div
         class="min-h-screen pb-8"
         style="width: min(92vw, 1280px); position: relative; left: 50%; transform: translateX(-50%);"
-        x-data='{
-            selectedCourt: null,
-            selectedDate: "{{ now()->toDateString() }}",
-            selectedTimeSlot: null,
-            currentMonth: {{ now()->month - 1 }},
-            currentYear: {{ now()->year }},
-            todayStr: "{{ now()->toDateString() }}",
-            showCalendar: false,
-            showLayout: false,
-            notice: "",
-            submitting: false,
-            gcashNumber: "",
-            cardNumber: "",
-            cardExpiry: "",
-            cardCvc: "",
-
-            /* Feedback state: errors only show after the user tries to continue */
-            showErrors: false,
-            showPayErrors: false,
-
-            courts: @json($courts, JSON_HEX_APOS),
-            timeSlots: [
-                "6:00 AM - 7:00 AM","7:00 AM - 8:00 AM","8:00 AM - 9:00 AM","9:00 AM - 10:00 AM",
-                "10:00 AM - 11:00 AM","11:00 AM - 12:00 PM","12:00 PM - 1:00 PM","1:00 PM - 2:00 PM",
-            ],
-
-            bookedSlots: @json($bookedSlots ?? [], JSON_HEX_APOS),
-
-            isBooked(time, courtId) {
-                const dayBookings = this.bookedSlots[this.selectedDate] || {};
-                const courtBookings = dayBookings[courtId] || [];
-                return courtBookings.includes(time);
-            },
-            isSelected(time, courtId) {
-                return this.selectedCourt === courtId && this.selectedTimeSlot === time;
-            },
-            pickSlot(time, courtId) {
-                if (this.isBooked(time, courtId)) return;
-                if (this.isSelected(time, courtId)) { this.clearSelection(); return; }
-                this.selectedCourt = courtId;
-                this.selectedTimeSlot = time;
-                this.notice = "";
-                this.showErrors = false;
-            },
-            clearSelection() {
-                this.selectedCourt = null;
-                this.selectedTimeSlot = null;
-                this.notice = "";
-            },
-            pickCourt(courtId) {
-                this.selectedCourt = courtId;
-                this.selectedTimeSlot = null;
-            },
-            pickDate(date) {
-                if (date !== this.selectedDate && this.selectedTimeSlot) {
-                    this.notice = "Date changed. Please choose a time again.";
-                }
-                this.selectedDate = date;
-                this.selectedTimeSlot = null;
-                const d = new Date(date + "T00:00:00");
-                this.currentMonth = d.getMonth();
-                this.currentYear = d.getFullYear();
-            },
-            longLabel(day) {
-                const d = new Date(this.currentYear, this.currentMonth, day);
-                return d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" }) + (this.isToday(day) ? ", today" : "");
-            },
-            get calendarDays() {
-                const firstDay = new Date(this.currentYear, this.currentMonth, 1).getDay();
-                const daysInMonth = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
-                const days = [];
-                for (let i = 0; i < firstDay; i++) days.push(null);
-                for (let d = 1; d <= daysInMonth; d++) days.push(d);
-                return days;
-            },
-            dateStringFor(day) {
-                const mm = String(this.currentMonth + 1).padStart(2, "0");
-                const dd = String(day).padStart(2, "0");
-                return `${this.currentYear}-${mm}-${dd}`;
-            },
-            isPast(day) {
-                return this.dateStringFor(day) < this.todayStr;
-            },
-            isToday(day) {
-                return this.dateStringFor(day) === this.todayStr;
-            },
-            pickDay(day) {
-                if (this.isPast(day)) return;
-                this.pickDate(this.dateStringFor(day));
-                this.showCalendar = false;
-            },
-            prevMonth() {
-                if (this.currentMonth === 0) {
-                    this.currentMonth = 11;
-                    this.currentYear--;
-                } else {
-                    this.currentMonth--;
-                }
-            },
-            nextMonth() {
-                if (this.currentMonth === 11) {
-                    this.currentMonth = 0;
-                    this.currentYear++;
-                } else {
-                    this.currentMonth++;
-                }
-            },
-            get monthLabel() {
-                const names = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-                return names[this.currentMonth] + " " + this.currentYear;
-            },
-            get canPay() {
-                return this.selectedCourt !== null && this.selectedDate !== null && this.selectedTimeSlot !== null;
-            },
-            get selectedCourtName() {
-                const c = this.courts.find(c => c.id === this.selectedCourt);
-                return c ? c.name : null;
-            },
-
-            /* Step 1 message: says exactly what is missing */
-            get missingMessage() {
-                if (!this.selectedCourt || !this.selectedTimeSlot) {
-                    return "Pick an open time slot on a court in the table above to continue.";
-                }
-                return "";
-            },
-
-            step: 1,
-            paymentMethod: null,
-            serviceFee: 25,
-
-            get selectedCourtRate() {
-                const c = this.courts.find(c => c.id === this.selectedCourt);
-                return c ? c.rate : 0;
-            },
-            get totalDue() {
-                return this.selectedCourtRate + this.serviceFee;
-            },
-            goToReview() {
-                if (!this.canPay) {
-                    this.showErrors = true;
-                    this.$nextTick(() => this.$refs.step1Error?.focus());
-                    return;
-                }
-                this.showErrors = false;
-                this.step = 2;
-                this.$nextTick(() => this.$refs.step2Heading?.focus());
-            },
-            goBack() {
-                this.step = 1;
-                this.showPayErrors = false;
-                this.$nextTick(() => this.$refs.step1Heading?.focus());
-            },
-            get gcashValid() {
-                return /^09\d{9}$/.test(this.gcashNumber.replace(/\s/g, ""));
-            },
-            get cardNumberValid() {
-                return /^\d{13,19}$/.test(this.cardNumber.replace(/\s/g, ""));
-            },
-            get cardExpiryValid() {
-                const m = /^(\d{2})\/(\d{2})$/.exec(this.cardExpiry);
-                if (!m) return false;
-                const mm = parseInt(m[1], 10);
-                const yy = 2000 + parseInt(m[2], 10);
-                if (mm < 1 || mm > 12) return false;
-                const now = new Date();
-                return yy > now.getFullYear() || (yy === now.getFullYear() && mm >= now.getMonth() + 1);
-            },
-            get cardCvcValid() {
-                return /^\d{3,4}$/.test(this.cardCvc);
-            },
-            get paymentValid() {
-                if (this.paymentMethod === "gcash") return this.gcashValid;
-                if (this.paymentMethod === "card") return this.cardNumberValid && this.cardExpiryValid && this.cardCvcValid;
-                return this.paymentMethod === "cash";
-            },
-            formatCard() {
-                this.cardNumber = this.cardNumber.replace(/\D/g, "").slice(0, 19).replace(/(.{4})/g, "$1 ").trim();
-            },
-            formatExpiry() {
-                let v = this.cardExpiry.replace(/\D/g, "").slice(0, 4);
-                if (v.length > 2) v = v.slice(0, 2) + "/" + v.slice(2);
-                this.cardExpiry = v;
-            },
-            get canConfirm() {
-                return this.canPay && this.paymentValid && !this.submitting;
-            },
-            get confirmHint() {
-                if (this.submitting) return "Processing your booking. Please wait.";
-                if (this.paymentMethod === null) return "Choose a payment method to continue.";
-                if (!this.paymentValid) return "Complete your payment details to continue.";
-                return "";
-            },
-            /* Moves keyboard focus to the first thing the user still has to fix */
-            focusFirstProblem() {
-                this.$nextTick(() => {
-                    if (this.paymentMethod === null) {
-                        this.$refs.payGroup?.querySelector("button")?.focus();
-                        return;
-                    }
-                    const ids = this.paymentMethod === "gcash"
-                        ? ["gcash_number"]
-                        : ["card_number", "card_expiry", "card_cvc"];
-                    const ok = {
-                        gcash_number: this.gcashValid,
-                        card_number: this.cardNumberValid,
-                        card_expiry: this.cardExpiryValid,
-                        card_cvc: this.cardCvcValid,
-                    };
-                    const id = ids.find(i => !ok[i]);
-                    if (id) document.getElementById(id)?.focus();
-                });
-            },
-            onSubmit(e) {
-                if (this.submitting) { e.preventDefault(); return; }
-                if (!this.canConfirm) {
-                    e.preventDefault();
-                    this.showPayErrors = true;
-                    this.focusFirstProblem();
-                    return;
-                }
-                this.submitting = true;
-            },
-        }'
+        x-data="bookingApp()"
         @keydown.escape.window="showLayout = false; showCalendar = false"
         @pageshow.window="submitting = false"
     >
@@ -252,7 +56,7 @@
         {{-- Intro line: the service fee now lives here since the Rates modal was removed --}}
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <p class="text-sm" style="color: var(--gz-muted);">
-                Pick a court and a time, then pay online or at the counter.
+                Pick one or more courts and times, then pay online or at the counter.
             </p>
             <button type="button" @click="showLayout = true" class="gz-btn-outline gz-btn-sm">Court Layout</button>
         </div>
@@ -261,11 +65,22 @@
             <h2 class="gz-font-display font-bold text-sm mb-1" tabindex="-1" x-ref="step1Heading">Set Your Date and Time</h2>
             <p class="text-xs mb-3" style="color: var(--gz-muted);" role="status" aria-live="polite">
                 <span x-show="notice" x-text="notice" style="color: var(--gz-danger);"></span>
-                <span x-show="!notice && selectedCourt && selectedTimeSlot">
-                    Selected: <span class="font-semibold" style="color: var(--gz-pop-dark);" x-text="selectedCourtName"></span> at <span class="font-semibold" style="color: var(--gz-pop-dark);" x-text="selectedTimeSlot"></span> on <span class="font-semibold" style="color: var(--gz-pop-dark);" x-text="selectedDate"></span>
-                </span>
-                <span x-show="!notice && (!selectedCourt || !selectedTimeSlot)">
-                    Choose a date, then select an open time slot.
+                <template x-if="!notice && selectedCourts.length > 0">
+                    <div>
+                        <span class="font-semibold" style="color: var(--gz-pop-dark);" x-text="selectedCourts.length + ' court(s) selected' + selectedDatesText"></span>
+                        <ul class="mt-1 flex flex-wrap gap-x-4 gap-y-1">
+                            <template x-for="sc in selectedCourts" :key="sc.courtId + '-' + sc.date + '-' + sc.timeSlot">
+                                <li class="inline-flex items-center gap-1 text-xs">
+                                    <span class="font-semibold" style="color: var(--gz-pop-dark);" x-text="courts.find(c => c.id === sc.courtId)?.name"></span>
+                                    <span style="color: var(--gz-pop-dark);" x-text="sc.timeSlot"></span>
+                                    <span class="text-[11px] font-medium" style="color: var(--gz-muted);" x-text="'(' + sc.date + ')'"></span>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+                </template>
+                <span x-show="!notice && selectedCourts.length === 0">
+                    Choose a date, then select one or more open time slots.
                 </span>
             </p>
 
@@ -296,9 +111,11 @@
                                             ? 'background: transparent; color: var(--gz-border); cursor: not-allowed;'
                                             : (day !== null && selectedDate === dateStringFor(day)
                                                 ? 'background: var(--gz-pop); color: var(--gz-ink); font-weight: 700;'
-                                                : (day !== null && isToday(day)
-                                                    ? 'background: var(--gz-bg); border: 1.5px solid var(--gz-pop-dark); font-weight: 700;'
-                                                    : 'background: transparent; border: 1px solid transparent;'))
+                                                : (day !== null && hasSelectedOn(day)
+                                                    ? 'background: rgba(62,207,126,0.18); border: 1.5px solid var(--gz-pop); font-weight: 700; color: var(--gz-pop-dark);'
+                                                    : (day !== null && isToday(day)
+                                                        ? 'background: var(--gz-bg); border: 1.5px solid var(--gz-pop-dark); font-weight: 700;'
+                                                        : 'background: transparent; border: 1px solid transparent;')))
                                     "
                                     x-text="day"
                                 ></button>
@@ -392,16 +209,50 @@
             <span aria-hidden="true">⚠</span> <span x-text="missingMessage"></span>
         </div>
 
+        {{-- Event Selection Section --}}
+        <section class="gz-panel mb-4" style="padding: 16px;" x-show="events.length > 0">
+            <h2 class="gz-font-display font-bold text-sm mb-3">Special Events & Promotions</h2>
+            <p class="text-xs mb-3" style="color: var(--gz-muted);">
+                <template x-if="events.length > 0">
+                    <span>Select an event to apply its discount to your booking.</span>
+                </template>
+                <template x-if="events.length === 0">
+                    <span>No active events or promotions available.</span>
+                </template>
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <template x-for="event in events" :key="event.id">
+                    <button
+                        type="button"
+                        @click="selectedEvent = selectedEvent === event.id ? null : event.id"
+                        :aria-pressed="selectedEvent === event.id ? 'true' : 'false'"
+                        class="p-3 rounded-lg text-left transition"
+                        :style="selectedEvent === event.id
+                            ? 'background: var(--gz-pop); color: var(--gz-ink); border: 2px solid var(--gz-pop);'
+                            : 'background: var(--gz-surface); border: 1px solid var(--gz-border);'"
+                    >
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-semibold text-sm" x-text="event.title"></span>
+                            <span x-show="event.discount" class="gz-badge gz-badge-pop text-xs" x-text="event.discount + '% OFF'"></span>
+                        </div>
+                        <p class="text-xs" style="color: var(--gz-muted);">
+                            <span x-text="event.startDate"></span> - <span x-text="event.endDate"></span>
+                        </p>
+                    </button>
+                </template>
+            </div>
+        </section>
+
         <section class="gz-panel flex flex-col sm:flex-row items-center justify-between gap-3" style="padding: 14px 16px;">
             <div>
                 <p class="gz-font-display font-bold text-sm mb-0.5">Your booking</p>
                 <p class="text-xs" style="color: var(--gz-muted);" x-show="canPay">
-                    <span x-text="selectedCourtName"></span> ·
-                    <span x-text="selectedDate"></span> ·
-                    <span x-text="selectedTimeSlot"></span>
+                    <span x-text="selectedCourts.length + ' court(s) selected'"></span>
+                    <span x-text="selectedDatesText"></span>
                 </p>
                 <p class="text-xs" style="color: var(--gz-muted);" x-show="!canPay">
-                    Choose a court, a date, and an open time slot to continue.
+                    Choose courts, a date, and open time slots to continue.
                 </p>
             </div>
 
@@ -446,27 +297,44 @@
                 <div class="lg:col-span-5">
                     <div class="gz-panel gz-panel-body">
                         <h3 class="gz-font-display font-bold text-base mb-6">Booking Summary</h3>
+                        <p class="text-xs mb-4" style="color: var(--gz-muted);" x-show="selectedCourts.length > 1">
+                            You're booking <span x-text="selectedCourts.length"></span> courts in one payment.
+                        </p>
 
                         <div class="pb-3 mb-3 border-b" style="border-color: var(--gz-border);">
-                            <p class="text-xs" style="color: var(--gz-muted);">Court</p>
-                            <p class="text-base font-semibold" x-text="selectedCourtName"></p>
+                            <p class="text-xs" style="color: var(--gz-muted);">Dates</p>
+                            <p class="text-base font-semibold" x-text="selectedDatesList"></p>
                         </div>
+
                         <div class="pb-3 mb-3 border-b" style="border-color: var(--gz-border);">
-                            <p class="text-xs" style="color: var(--gz-muted);">Date</p>
-                            <p class="text-base font-semibold" x-text="selectedDate"></p>
+                            <p class="text-xs mb-1" style="color: var(--gz-muted);">Selected Courts</p>
+                            <ul class="text-base space-y-1">
+                                <template x-for="(sc, idx) in selectedCourts" :key="idx + '-' + sc.courtId + '-' + sc.date + '-' + sc.timeSlot">
+                                    <li class="font-semibold text-sm">
+                                        <span x-text="courts.find(c => c.id === sc.courtId)?.name"></span> — 
+                                        <span x-text="sc.timeSlot"></span>
+                                        <span class="text-xs font-normal ml-1" style="color: var(--gz-muted);" x-text="'(' + sc.date + ')'"></span>
+                                    </li>
+                                </template>
+                            </ul>
                         </div>
-                        <div class="pb-3 mb-3 border-b" style="border-color: var(--gz-border);">
-                            <p class="text-xs" style="color: var(--gz-muted);">Time</p>
-                            <p class="text-base font-semibold" x-text="selectedTimeSlot"></p>
+
+                        <div x-show="selectedEvent" class="pb-3 mb-3 border-b" style="border-color: var(--gz-border);">
+                            <p class="text-xs" style="color: var(--gz-muted);">Event</p>
+                            <p class="text-base font-semibold" x-text="selectedEventName"></p>
                         </div>
 
                         <div class="flex justify-between text-sm mb-2">
-                            <span>Court Fee (1 hour)</span>
-                            <span x-text="'₱' + selectedCourtRate.toFixed(2)"></span>
+                            <span>Court Fees (<span x-text="selectedCourts.length"></span> court(s))</span>
+                            <span x-text="'₱' + totalCourtRate.toFixed(2)"></span>
                         </div>
-                        <div class="flex justify-between text-sm mb-4">
-                            <span>Service Fee</span>
-                            <span x-text="'₱' + serviceFee.toFixed(2)"></span>
+                        <div class="flex justify-between text-sm mb-2">
+                            <span>Service Fees (<span x-text="selectedCourts.length"></span> × ₱25)</span>
+                            <span x-text="'₱' + (serviceFee * selectedCourts.length).toFixed(2)"></span>
+                        </div>
+                        <div x-show="selectedEvent && selectedEventDiscount > 0" class="flex justify-between text-sm mb-2" style="color: var(--gz-pop-dark);">
+                            <span>Event Discount (<span x-text="selectedEventDiscount + '%'"></span>)</span>
+                            <span x-text="'-₱' + discountAmount.toFixed(2)"></span>
                         </div>
 
                         <div class="flex justify-between items-center pt-4 border-t" style="border-color: var(--gz-border);">
@@ -558,9 +426,16 @@
 
                         <form id="booking-form" method="POST" action="{{ route('bookings.store') }}" @submit="onSubmit($event)">
                             @csrf
-                            <input type="hidden" name="court_id" :value="selectedCourt">
+                            <input type="hidden" name="courts_json" :value="JSON.stringify(selectedCourts)">
+                            <template x-for="(sc, index) in selectedCourts" :key="index + '-' + sc.courtId + '-' + sc.date + '-' + sc.timeSlot">
+                                <div>
+                                    <input type="hidden" :name="'courts[' + index + '][court_id]'" :value="sc.courtId">
+                                    <input type="hidden" :name="'courts[' + index + '][time_slot]'" :value="sc.timeSlot">
+                                    <input type="hidden" :name="'courts[' + index + '][date]'" :value="sc.date">
+                                </div>
+                            </template>
                             <input type="hidden" name="date" :value="selectedDate">
-                            <input type="hidden" name="time_slot" :value="selectedTimeSlot">
+                            <input type="hidden" name="event_id" :value="selectedEvent">
                             <input type="hidden" name="payment_method" :value="paymentMethod">
 
                             {{-- Turns red and shows a warning icon after a failed attempt --}}
@@ -583,6 +458,261 @@
     </div>
 
     <script>
+        function bookingApp() {
+            return {
+                selectedCourts: @json($transformed),
+                selectedDate: @json(old('date', now()->toDateString())),
+                selectedEvent: null,
+                currentMonth: {{ now()->month - 1 }},
+                currentYear: {{ now()->year }},
+                todayStr: @json(now()->toDateString()),
+                showCalendar: false,
+                showLayout: false,
+                notice: "",
+                submitting: false,
+                gcashNumber: "",
+                cardNumber: "",
+                cardExpiry: "",
+                cardCvc: "",
+
+                /* Feedback state: errors only show after the user tries to continue */
+                showErrors: false,
+                showPayErrors: false,
+
+                courts: @json($courts),
+                timeSlots: [
+                    "6:00 AM - 7:00 AM","7:00 AM - 8:00 AM","8:00 AM - 9:00 AM","9:00 AM - 10:00 AM",
+                    "10:00 AM - 11:00 AM","11:00 AM - 12:00 PM","12:00 PM - 1:00 PM","1:00 PM - 2:00 PM",
+                ],
+
+                bookedSlots: @json($bookedSlots ?? []),
+                events: @json($events ?? []),
+
+                isBooked(time, courtId) {
+                    const dayBookings = this.bookedSlots[this.selectedDate] || {};
+                    const courtBookings = dayBookings[courtId] || [];
+                    return courtBookings.includes(time);
+                },
+                isSelected(time, courtId) {
+                    return this.selectedCourts.some(c => c.courtId === courtId && c.timeSlot === time && c.date === this.selectedDate);
+                },
+                pickSlot(time, courtId) {
+                    if (this.isBooked(time, courtId)) return;
+                    if (this.isSelected(time, courtId)) {
+                        this.selectedCourts = this.selectedCourts.filter(c => !(c.courtId === courtId && c.timeSlot === time && c.date === this.selectedDate));
+                        return;
+                    }
+                    this.selectedCourts.push({ courtId, timeSlot: time, date: this.selectedDate });
+                    this.notice = "";
+                    this.showErrors = false;
+                },
+                clearSelection() {
+                    this.selectedCourts = [];
+                    this.notice = "";
+                },
+                pickDate(date) {
+                    this.selectedDate = date;
+                    const d = new Date(date + "T00:00:00");
+                    this.currentMonth = d.getMonth();
+                    this.currentYear = d.getFullYear();
+                    this.notice = "";
+                },
+                longLabel(day) {
+                    const d = new Date(this.currentYear, this.currentMonth, day);
+                    return d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" }) + (this.isToday(day) ? ", today" : "");
+                },
+                get calendarDays() {
+                    const firstDay = new Date(this.currentYear, this.currentMonth, 1).getDay();
+                    const daysInMonth = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
+                    const days = [];
+                    for (let i = 0; i < firstDay; i++) days.push(null);
+                    for (let d = 1; d <= daysInMonth; d++) days.push(d);
+                    return days;
+                },
+                dateStringFor(day) {
+                    const mm = String(this.currentMonth + 1).padStart(2, "0");
+                    const dd = String(day).padStart(2, "0");
+                    return `${this.currentYear}-${mm}-${dd}`;
+                },
+                isPast(day) {
+                    return this.dateStringFor(day) < this.todayStr;
+                },
+                isToday(day) {
+                    return this.dateStringFor(day) === this.todayStr;
+                },
+                hasSelectedOn(day) {
+                    if (day === null) return false;
+                    const dStr = this.dateStringFor(day);
+                    return this.selectedCourts.some(c => c.date === dStr);
+                },
+                get selectedDatesText() {
+                    const dates = [...new Set(this.selectedCourts.map(c => c.date))];
+                    if (dates.length === 1) return ' on ' + dates[0];
+                    if (dates.length > 1) return ' across ' + dates.length + ' dates (' + dates.join(', ') + ')';
+                    return '';
+                },
+                get selectedDatesList() {
+                    const dates = [...new Set(this.selectedCourts.map(c => c.date))];
+                    return dates.join(', ');
+                },
+                pickDay(day) {
+                    if (this.isPast(day)) return;
+                    this.pickDate(this.dateStringFor(day));
+                    this.showCalendar = false;
+                },
+                prevMonth() {
+                    if (this.currentMonth === 0) {
+                        this.currentMonth = 11;
+                        this.currentYear--;
+                    } else {
+                        this.currentMonth--;
+                    }
+                },
+                nextMonth() {
+                    if (this.currentMonth === 11) {
+                        this.currentMonth = 0;
+                        this.currentYear++;
+                    } else {
+                        this.currentMonth++;
+                    }
+                },
+                get monthLabel() {
+                    const names = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+                    return names[this.currentMonth] + " " + this.currentYear;
+                },
+                get canPay() {
+                    return this.selectedCourts.length > 0;
+                },
+
+                /* Step 1 message: says exactly what is missing */
+                get missingMessage() {
+                    if (this.selectedCourts.length === 0) {
+                        return "Pick an open time slot on a court in the table above to continue.";
+                    }
+                    return "";
+                },
+
+                step: 1,
+                paymentMethod: null,
+                serviceFee: 25,
+
+                get totalCourtRate() {
+                    return this.selectedCourts.reduce((sum, sc) => {
+                        const c = this.courts.find(c => c.id === sc.courtId);
+                        return sum + (c ? c.rate : 0);
+                    }, 0);
+                },
+                get totalDue() {
+                    let total = this.totalCourtRate + (this.serviceFee * this.selectedCourts.length);
+                    if (this.selectedEvent) {
+                        const event = this.events.find(e => e.id === this.selectedEvent);
+                        if (event && event.discount) {
+                            total = total * (1 - event.discount / 100);
+                        }
+                    }
+                    return total;
+                },
+                get selectedEventName() {
+                    const e = this.events.find(e => e.id === this.selectedEvent);
+                    return e ? e.title : null;
+                },
+                get selectedEventDiscount() {
+                    const e = this.events.find(e => e.id === this.selectedEvent);
+                    return e ? e.discount : 0;
+                },
+                get discountAmount() {
+                    if (!this.selectedEvent) return 0;
+                    const event = this.events.find(e => e.id === this.selectedEvent);
+                    if (!event || !event.discount) return 0;
+                    return (this.totalCourtRate + (this.serviceFee * this.selectedCourts.length)) * (event.discount / 100);
+                },
+                goToReview() {
+                    if (!this.canPay) {
+                        this.showErrors = true;
+                        this.$nextTick(() => this.$refs.step1Error?.focus());
+                        return;
+                    }
+                    this.showErrors = false;
+                    this.step = 2;
+                    this.$nextTick(() => this.$refs.step2Heading?.focus());
+                },
+                goBack() {
+                    this.step = 1;
+                    this.showPayErrors = false;
+                    this.$nextTick(() => this.$refs.step1Heading?.focus());
+                },
+                get gcashValid() {
+                    return /^09\d{9}$/.test(this.gcashNumber.replace(/\s/g, ""));
+                },
+                get cardNumberValid() {
+                    return /^\d{13,19}$/.test(this.cardNumber.replace(/\s/g, ""));
+                },
+                get cardExpiryValid() {
+                    const m = /^(\d{2})\/(\d{2})$/.exec(this.cardExpiry);
+                    if (!m) return false;
+                    const mm = parseInt(m[1], 10);
+                    const yy = 2000 + parseInt(m[2], 10);
+                    if (mm < 1 || mm > 12) return false;
+                    const now = new Date();
+                    return yy > now.getFullYear() || (yy === now.getFullYear() && mm >= now.getMonth() + 1);
+                },
+                get cardCvcValid() {
+                    return /^\d{3,4}$/.test(this.cardCvc);
+                },
+                get paymentValid() {
+                    if (this.paymentMethod === "gcash") return this.gcashValid;
+                    if (this.paymentMethod === "card") return this.cardNumberValid && this.cardExpiryValid && this.cardCvcValid;
+                    return this.paymentMethod === "cash";
+                },
+                formatCard() {
+                    this.cardNumber = this.cardNumber.replace(/\D/g, "").slice(0, 19).replace(/(.{4})/g, "$1 ").trim();
+                },
+                formatExpiry() {
+                    let v = this.cardExpiry.replace(/\D/g, "").slice(0, 4);
+                    if (v.length > 2) v = v.slice(0, 2) + "/" + v.slice(2);
+                    this.cardExpiry = v;
+                },
+                get canConfirm() {
+                    return this.canPay && this.paymentValid && !this.submitting;
+                },
+                get confirmHint() {
+                    if (this.submitting) return "Processing your booking. Please wait.";
+                    if (this.paymentMethod === null) return "Choose a payment method to continue.";
+                    if (!this.paymentValid) return "Complete your payment details to continue.";
+                    return "";
+                },
+                focusFirstProblem() {
+                    this.$nextTick(() => {
+                        if (this.paymentMethod === null) {
+                            this.$refs.payGroup?.querySelector("button")?.focus();
+                            return;
+                        }
+                        const ids = this.paymentMethod === "gcash"
+                            ? ["gcash_number"]
+                            : ["card_number", "card_expiry", "card_cvc"];
+                        const ok = {
+                            gcash_number: this.gcashValid,
+                            card_number: this.cardNumberValid,
+                            card_expiry: this.cardExpiryValid,
+                            card_cvc: this.cardCvcValid,
+                        };
+                        const id = ids.find(i => !ok[i]);
+                        if (id) document.getElementById(id)?.focus();
+                    });
+                },
+                onSubmit(e) {
+                    if (this.submitting) { e.preventDefault(); return; }
+                    if (!this.canConfirm) {
+                        e.preventDefault();
+                        this.showPayErrors = true;
+                        this.focusFirstProblem();
+                        return;
+                    }
+                    this.submitting = true;
+                },
+            };
+        }
+
         (function () {
             const glyphs = {
                 'icon-pay-gcash': [

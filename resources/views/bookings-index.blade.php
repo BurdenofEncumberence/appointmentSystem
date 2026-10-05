@@ -135,6 +135,14 @@
                                                     <span class="ml-1 text-[11px] font-bold" style="color: var(--gz-pop-dark);">{{ $when }}</span>
                                                 @endif
                                             </p>
+                                            @if ($b->event)
+                                                <p class="text-xs mt-1" style="color: var(--gz-pop-dark);">
+                                                    <span class="gz-badge gz-badge-pop text-xs">{{ $b->event->event_title }}</span>
+                                                    @if ($b->event->discount)
+                                                        <span class="ml-1">{{ $b->event->discount }}% OFF</span>
+                                                    @endif
+                                                </p>
+                                            @endif
                                         </div>
 
                                         <div>

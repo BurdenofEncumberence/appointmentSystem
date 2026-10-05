@@ -15,6 +15,12 @@ class Event extends Model
         'end_date',
         'discount',
         'details',
+        'image',
+    ];
+
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date' => 'date',
     ];
 
     public function bookings()

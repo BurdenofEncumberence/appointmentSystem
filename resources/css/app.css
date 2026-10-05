@@ -480,8 +480,8 @@ input:focus-visible {
     gap: 6px;
 }
 .gz-btn-outline:hover {
-    background: var(--gz-ink);
-    color: var(--gz-surface);
+    background: var(--gz-bg);
+    color: var(--gz-ink);
 }
 .gz-btn-outline:focus-visible {
     outline: 3px solid var(--gz-pop-dark);
@@ -641,7 +641,7 @@ input:focus-visible {
    Now global, so it works everywhere the class is used. */
 .nav-link {
     text-decoration: none;
-    color: var(--gz-muted);
+    color: var(--gz-ink);
     transition: color 0.15s ease;
 }
 .nav-link:hover { color: var(--gz-ink); }

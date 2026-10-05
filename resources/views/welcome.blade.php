@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>KYMNET - Book Your Court, Rally with Ease</title>
+    <title>{{ $siteSettings->system_name ?? 'KYMNET' }} - Book Your Court, Rally with Ease</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -206,6 +206,57 @@
 
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
+    @auth
+        @include('layouts.navigation')
+
+        <div class="py-8">
+            {{-- Events Section --}}
+            @if($events->isNotEmpty())
+            <div class="relative z-10 max-w-6xl mx-auto px-6">
+            <h2 class="font-display text-2xl md:text-3xl font-bold mb-6">Active Events & Promotions</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach($events as $event)
+                    <div class="surface-card p-5">
+                        @if($event->image)
+                            <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->event_title }}" class="w-full h-40 object-cover rounded-lg mb-4">
+                        @else
+                            <div class="w-full h-40 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 rounded-lg mb-4 flex items-center justify-center">
+                                <span class="text-4xl">🎉</span>
+                            </div>
+                        @endif
+                        
+                        <h3 class="font-display font-bold text-lg mb-2">{{ $event->event_title }}</h3>
+                        
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="text-sm" style="color: var(--muted);">
+                                {{ $event->start_date->format('M d, Y') }} - {{ $event->end_date->format('M d, Y') }}
+                            </span>
+                        </div>
+                        
+                        @if($event->discount)
+                            <div class="inline-block bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm font-semibold mb-3">
+                                {{ $event->discount }}% OFF
+                            </div>
+                        @endif
+                        
+                        @if($event->details)
+                            <p class="text-sm mb-4" style="color: var(--muted); line-clamp-2">
+                                {{ $event->details }}
+                            </p>
+                        @endif
+                        
+                        <a href="{{ route('booking') }}" class="btn-primary text-sm w-full justify-center">
+                            Book a Court
+                        </a>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+        </div>
+    @endauth
+
+    @guest
     <div
         x-data="{ show: !localStorage.getItem('kymnet_event_banner_dismissed') }"
         x-show="show"
@@ -238,8 +289,12 @@
     >
         <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="pixel-mark" id="brand-mark" aria-hidden="true"></div>
-                <span class="font-display font-bold text-lg">KYMNET</span>
+                @if($siteSettings && $siteSettings->logo)
+                    <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="{{ $siteSettings->system_name ?? 'Logo' }}" class="h-10 w-10 object-contain">
+                @else
+                    <div class="pixel-mark" id="brand-mark" aria-hidden="true"></div>
+                @endif
+                <span class="font-display font-bold text-lg">{{ $siteSettings->system_name ?? 'KYMNET' }}</span>
             </div>
 
             <div class="flex items-center gap-3">
@@ -271,6 +326,7 @@
             <a href="{{ route('register') }}" class="btn-primary text-sm justify-center">Register</a>
         </nav>
     </header>
+    @endguest
 
     <main id="main-content">
 

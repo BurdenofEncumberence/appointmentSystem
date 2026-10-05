@@ -4,13 +4,24 @@
     Shared footer used by every page. Purely static — no per-page
     variation, so no props needed.
 --}}
+@php
+    $siteSettings = \App\Models\SiteSettings::first();
+@endphp
 <footer class="relative z-10" style="background: var(--gz-ink); color: rgba(255,255,255,0.7);">
     <div class="max-w-6xl mx-auto px-6 py-14 grid md:grid-cols-4 gap-10">
         <div>
-            <span class="gz-font-display font-bold text-lg" style="color: var(--gz-surface);">KYMNET</span>
+            <span class="gz-font-display font-bold text-lg" style="color: var(--gz-surface);">{{ $siteSettings->business_name ?? 'KYMNET' }}</span>
             <p class="mt-4 text-sm max-w-xs leading-relaxed">
-                Court booking for the Davao pickleball community. Built by players, for players.
+                {{ $siteSettings->tagline ?? 'Court booking for the Davao pickleball community. Built by players, for players.' }}
             </p>
+            @if($siteSettings && $siteSettings->email_address)
+                <p class="mt-2 text-sm">
+                    <a href="mailto:{{ $siteSettings->email_address }}" class="footer-link">{{ $siteSettings->email_address }}</a>
+                </p>
+            @endif
+            @if($siteSettings && $siteSettings->contact_number)
+                <p class="mt-1 text-sm">{{ $siteSettings->contact_number }}</p>
+            @endif
         </div>
         <div>
             <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: var(--gz-surface);">Explore</h4>
@@ -28,14 +39,24 @@
             </ul>
         </div>
         <div>
-            <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: var(--gz-surface);">Company</h4>
+            <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: var(--gz-surface);">Connect</h4>
             <ul class="space-y-2 text-sm">
-                <li><a href="#" class="footer-link">About us</a></li>
-                <li><a href="#" class="footer-link">Contact</a></li>
+                @if($siteSettings && $siteSettings->facebook_link)
+                    <li><a href="{{ $siteSettings->facebook_link }}" target="_blank" class="footer-link">Facebook</a></li>
+                @endif
+                @if($siteSettings && $siteSettings->twitter_link)
+                    <li><a href="{{ $siteSettings->twitter_link }}" target="_blank" class="footer-link">Twitter</a></li>
+                @endif
+                @if($siteSettings && $siteSettings->instagram_link)
+                    <li><a href="{{ $siteSettings->instagram_link }}" target="_blank" class="footer-link">Instagram</a></li>
+                @endif
+                @if($siteSettings && $siteSettings->linkedin_link)
+                    <li><a href="{{ $siteSettings->linkedin_link }}" target="_blank" class="footer-link">LinkedIn</a></li>
+                @endif
             </ul>
         </div>
     </div>
     <div class="max-w-6xl mx-auto px-6 pb-8 text-sm" style="color: rgba(255,255,255,0.4);">
-        © {{ date('Y') }} KYMNET. All rights reserved.
+        © {{ date('Y') }} {{ $siteSettings->business_name ?? 'KYMNET' }}. All rights reserved.
     </div>
 </footer>

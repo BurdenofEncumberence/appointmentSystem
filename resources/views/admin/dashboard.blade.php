@@ -28,25 +28,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div class="gz-kpi-card">
-            <div class="flex items-center justify-between mb-3">
-                <div class="icon-badge" style="width:32px; height:32px; padding:6px;" id="icon-revenue" aria-hidden="true"></div>
-                <span class="gz-badge gz-badge-neutral">PHP</span>
-            </div>
-            <div class="gz-eyebrow mb-1">Month revenue</div>
-            <div class="gz-kpi-value" style="color: var(--gz-pop-dark); font-size: 22px;">
-                ₱{{ number_format($monthlyRevenue, 2) }}
-            </div>
-            <p class="text-xs mt-2 font-semibold" style="color: {{ $revenueChange !== null ? ($revenueChange >= 0 ? 'var(--gz-pop-dark)' : 'var(--gz-danger)') : 'var(--gz-muted)' }};">
-                @if($revenueChange !== null)
-                    {{ $revenueChange >= 0 ? '▲ +' : '▼ ' }}{{ $revenueChange }}% vs last mo
-                @else
-                    Base month benchmark
-                @endif
-            </p>
-        </div>
-
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <div class="gz-kpi-card">
             <div class="flex items-center justify-between mb-3">
                 <div class="icon-badge" style="width:32px; height:32px; padding:6px;" id="icon-fleet" aria-hidden="true"></div>
@@ -85,6 +67,40 @@
             </div>
             <p class="text-xs mt-2" style="color: {{ $pendingPayments > 0 ? 'var(--gz-danger)' : 'var(--gz-muted)' }};">
                 {{ $pendingPayments > 0 ? 'Payments need review' : 'All reconciled' }}
+            </p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+        <div class="gz-kpi-card">
+            <div class="flex items-center justify-between mb-3">
+                <div class="icon-badge" style="width:32px; height:32px; padding:6px;" id="icon-revenue" aria-hidden="true"></div>
+                <span class="gz-badge gz-badge-neutral">PHP</span>
+            </div>
+            <div class="gz-eyebrow mb-1">Month revenue</div>
+            <div class="gz-kpi-value" style="color: var(--gz-pop-dark); font-size: 22px;">
+                ₱{{ number_format($monthlyRevenue, 2) }}
+            </div>
+            <p class="text-xs mt-2 font-semibold" style="color: {{ $revenueChange !== null ? ($revenueChange >= 0 ? 'var(--gz-pop-dark)' : 'var(--gz-danger)') : 'var(--gz-muted)' }};">
+                @if($revenueChange !== null)
+                    {{ $revenueChange >= 0 ? '▲ +' : '▼ ' }}{{ $revenueChange }}% vs last mo
+                @else
+                    Base month benchmark
+                @endif
+            </p>
+        </div>
+
+        <div class="gz-kpi-card">
+            <div class="flex items-center justify-between mb-3">
+                <div class="icon-badge" style="width:32px; height:32px; padding:6px;" id="icon-events" aria-hidden="true"></div>
+                <span class="gz-badge gz-badge-pop">Events</span>
+            </div>
+            <div class="gz-eyebrow mb-1">Events count</div>
+            <div class="gz-kpi-value" style="color: var(--gz-pop-dark); font-size: 22px;">
+                {{ $eventsCount }}
+            </div>
+            <p class="text-xs mt-2 font-semibold" style="color: var(--gz-pop-dark);">
+                <a href="{{ route('admin.events.index') }}" class="gz-link">Manage events →</a>
             </p>
         </div>
     </div>
@@ -253,4 +269,38 @@
             @endif
         </div>
     </div>
+
+    <script>
+        if (typeof window.renderPixelGrid === 'undefined') {
+            window.renderPixelGrid = function(id, rows, colorMap) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.innerHTML = '';
+                rows.forEach(row => {
+                    [...row].forEach(ch => {
+                        const cell = document.createElement('div');
+                        cell.style.background = colorMap[ch] || 'transparent';
+                        cell.style.width = '100%';
+                        cell.style.height = '100%';
+                        el.appendChild(cell);
+                    });
+                });
+            };
+        }
+        window.renderPixelGrid('icon-revenue', [
+            "........", ".1111...", ".1....1.", ".1.11.1.", ".1.11.1.", ".1....1.", ".1111...", "........"
+        ], { '.': 'transparent', '1': '#FCFBF7' });
+        window.renderPixelGrid('icon-fleet', [
+            "........", "..11....", ".1..1...", ".1..1...", ".11111..", ".1..1...", ".1..1...", "........"
+        ], { '.': 'transparent', '1': '#FCFBF7' });
+        window.renderPixelGrid('icon-matches', [
+            "........", "..11....", ".1111...", "..11....", "..11....", "..11....", ".1111...", "........"
+        ], { '.': 'transparent', '1': '#FCFBF7' });
+        window.renderPixelGrid('icon-audits', [
+            "........", ".1111...", ".1..1...", ".1..1...", ".1..1...", ".1..1...", ".1111...", "........"
+        ], { '.': 'transparent', '1': '#FCFBF7' });
+        window.renderPixelGrid('icon-events', [
+            "........", "..1.....", ".111....", "..1.....", "..1.....", ".11111..", "........", "........"
+        ], { '.': 'transparent', '1': '#FCFBF7' });
+    </script>
 </x-admin-layout>
