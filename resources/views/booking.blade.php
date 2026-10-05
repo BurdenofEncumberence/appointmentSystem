@@ -1,5 +1,8 @@
-<x-app-layout title="Reserve a Court — KYMNET">
+<x-app-layout title="Book a Court — KYMNET">
+    {{-- Wider wrapper: breaks out of the layout's narrow container --}}
     <div
+        class="min-h-screen pb-8"
+        style="width: min(92vw, 1280px); position: relative; left: 50%; transform: translateX(-50%);"
         x-data='{
             selectedCourt: null,
             selectedDate: "{{ now()->toDateString() }}",
@@ -7,14 +10,26 @@
             currentMonth: {{ now()->month - 1 }},
             currentYear: {{ now()->year }},
             todayStr: "{{ now()->toDateString() }}",
+            showCalendar: false,
+            showLayout: false,
+            notice: "",
+            submitting: false,
+            gcashNumber: "",
+            cardNumber: "",
+            cardExpiry: "",
+            cardCvc: "",
 
-            courts: @json($courts),
+            /* Feedback state: errors only show after the user tries to continue */
+            showErrors: false,
+            showPayErrors: false,
+
+            courts: @json($courts, JSON_HEX_APOS),
             timeSlots: [
                 "6:00 AM - 7:00 AM","7:00 AM - 8:00 AM","8:00 AM - 9:00 AM","9:00 AM - 10:00 AM",
                 "10:00 AM - 11:00 AM","11:00 AM - 12:00 PM","12:00 PM - 1:00 PM","1:00 PM - 2:00 PM",
             ],
 
-            bookedSlots: @json($bookedSlots ?? []),
+            bookedSlots: @json($bookedSlots ?? [], JSON_HEX_APOS),
 
             isBooked(time, courtId) {
                 const dayBookings = this.bookedSlots[this.selectedDate] || {};
@@ -26,16 +41,34 @@
             },
             pickSlot(time, courtId) {
                 if (this.isBooked(time, courtId)) return;
+                if (this.isSelected(time, courtId)) { this.clearSelection(); return; }
                 this.selectedCourt = courtId;
                 this.selectedTimeSlot = time;
+                this.notice = "";
+                this.showErrors = false;
+            },
+            clearSelection() {
+                this.selectedCourt = null;
+                this.selectedTimeSlot = null;
+                this.notice = "";
             },
             pickCourt(courtId) {
                 this.selectedCourt = courtId;
                 this.selectedTimeSlot = null;
             },
             pickDate(date) {
+                if (date !== this.selectedDate && this.selectedTimeSlot) {
+                    this.notice = "Date changed. Please choose a time again.";
+                }
                 this.selectedDate = date;
                 this.selectedTimeSlot = null;
+                const d = new Date(date + "T00:00:00");
+                this.currentMonth = d.getMonth();
+                this.currentYear = d.getFullYear();
+            },
+            longLabel(day) {
+                const d = new Date(this.currentYear, this.currentMonth, day);
+                return d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" }) + (this.isToday(day) ? ", today" : "");
             },
             get calendarDays() {
                 const firstDay = new Date(this.currentYear, this.currentMonth, 1).getDay();
@@ -59,6 +92,7 @@
             pickDay(day) {
                 if (this.isPast(day)) return;
                 this.pickDate(this.dateStringFor(day));
+                this.showCalendar = false;
             },
             prevMonth() {
                 if (this.currentMonth === 0) {
@@ -88,6 +122,14 @@
                 return c ? c.name : null;
             },
 
+            /* Step 1 message: says exactly what is missing */
+            get missingMessage() {
+                if (!this.selectedCourt || !this.selectedTimeSlot) {
+                    return "Pick an open time slot on a court in the table above to continue.";
+                }
+                return "";
+            },
+
             step: 1,
             paymentMethod: null,
             serviceFee: 25,
@@ -100,39 +142,135 @@
                 return this.selectedCourtRate + this.serviceFee;
             },
             goToReview() {
-                if (this.canPay) {
-                    this.step = 2;
-                    this.$nextTick(() => this.$refs.step2Heading?.focus());
+                if (!this.canPay) {
+                    this.showErrors = true;
+                    this.$nextTick(() => this.$refs.step1Error?.focus());
+                    return;
                 }
+                this.showErrors = false;
+                this.step = 2;
+                this.$nextTick(() => this.$refs.step2Heading?.focus());
             },
             goBack() {
                 this.step = 1;
+                this.showPayErrors = false;
                 this.$nextTick(() => this.$refs.step1Heading?.focus());
             },
+            get gcashValid() {
+                return /^09\d{9}$/.test(this.gcashNumber.replace(/\s/g, ""));
+            },
+            get cardNumberValid() {
+                return /^\d{13,19}$/.test(this.cardNumber.replace(/\s/g, ""));
+            },
+            get cardExpiryValid() {
+                const m = /^(\d{2})\/(\d{2})$/.exec(this.cardExpiry);
+                if (!m) return false;
+                const mm = parseInt(m[1], 10);
+                const yy = 2000 + parseInt(m[2], 10);
+                if (mm < 1 || mm > 12) return false;
+                const now = new Date();
+                return yy > now.getFullYear() || (yy === now.getFullYear() && mm >= now.getMonth() + 1);
+            },
+            get cardCvcValid() {
+                return /^\d{3,4}$/.test(this.cardCvc);
+            },
+            get paymentValid() {
+                if (this.paymentMethod === "gcash") return this.gcashValid;
+                if (this.paymentMethod === "card") return this.cardNumberValid && this.cardExpiryValid && this.cardCvcValid;
+                return this.paymentMethod === "cash";
+            },
+            formatCard() {
+                this.cardNumber = this.cardNumber.replace(/\D/g, "").slice(0, 19).replace(/(.{4})/g, "$1 ").trim();
+            },
+            formatExpiry() {
+                let v = this.cardExpiry.replace(/\D/g, "").slice(0, 4);
+                if (v.length > 2) v = v.slice(0, 2) + "/" + v.slice(2);
+                this.cardExpiry = v;
+            },
             get canConfirm() {
-                return this.canPay && this.paymentMethod !== null;
+                return this.canPay && this.paymentValid && !this.submitting;
+            },
+            get confirmHint() {
+                if (this.submitting) return "Processing your booking. Please wait.";
+                if (this.paymentMethod === null) return "Choose a payment method to continue.";
+                if (!this.paymentValid) return "Complete your payment details to continue.";
+                return "";
+            },
+            /* Moves keyboard focus to the first thing the user still has to fix */
+            focusFirstProblem() {
+                this.$nextTick(() => {
+                    if (this.paymentMethod === null) {
+                        this.$refs.payGroup?.querySelector("button")?.focus();
+                        return;
+                    }
+                    const ids = this.paymentMethod === "gcash"
+                        ? ["gcash_number"]
+                        : ["card_number", "card_expiry", "card_cvc"];
+                    const ok = {
+                        gcash_number: this.gcashValid,
+                        card_number: this.cardNumberValid,
+                        card_expiry: this.cardExpiryValid,
+                        card_cvc: this.cardCvcValid,
+                    };
+                    const id = ids.find(i => !ok[i]);
+                    if (id) document.getElementById(id)?.focus();
+                });
+            },
+            onSubmit(e) {
+                if (this.submitting) { e.preventDefault(); return; }
+                if (!this.canConfirm) {
+                    e.preventDefault();
+                    this.showPayErrors = true;
+                    this.focusFirstProblem();
+                    return;
+                }
+                this.submitting = true;
             },
         }'
+        @keydown.escape.window="showLayout = false; showCalendar = false"
+        @pageshow.window="submitting = false"
     >
-        <p class="text-sm mb-4" style="color: var(--gz-muted);">
-            Pick a court, choose your time, and secure it with online advance payment.
-        </p>
+        {{-- Step marker --}}
+        <ol class="flex items-center justify-center gap-2 text-xs mb-6" aria-label="Booking progress">
+            <template x-for="(label, i) in ['Choose time', 'Review &amp; pay', 'Confirmed']" :key="label">
+                <li class="flex items-center gap-2" :aria-current="step === i + 1 ? 'step' : null">
+                    <span class="inline-flex items-center justify-center rounded-full text-[11px] font-bold"
+                          :style="step === i + 1
+                              ? 'width: 22px; height: 22px; background: var(--gz-pop); color: var(--gz-ink);'
+                              : (step > i + 1
+                                  ? 'width: 22px; height: 22px; background: var(--gz-pop-dark); color: #fff;'
+                                  : 'width: 22px; height: 22px; background: var(--gz-surface); border: 1px solid var(--gz-border); color: var(--gz-muted);')"
+                          x-text="step > i + 1 ? '✓' : i + 1"></span>
+                    <span class="font-semibold" :style="step === i + 1 ? '' : 'color: var(--gz-muted);'" x-text="label"></span>
+                    <span x-show="i < 2" aria-hidden="true" style="color: var(--gz-border);">—</span>
+                </li>
+            </template>
+        </ol>
 
         <div x-show="step === 1">
+
+        {{-- Intro line: the service fee now lives here since the Rates modal was removed --}}
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <p class="text-sm" style="color: var(--gz-muted);">
+                Pick a court and a time, then pay online or at the counter.
+            </p>
+            <button type="button" @click="showLayout = true" class="gz-btn-outline gz-btn-sm">Court Layout</button>
+        </div>
 
         <section class="gz-panel mb-4" style="padding: 16px;">
             <h2 class="gz-font-display font-bold text-sm mb-1" tabindex="-1" x-ref="step1Heading">Set Your Date and Time</h2>
             <p class="text-xs mb-3" style="color: var(--gz-muted);" role="status" aria-live="polite">
-                <span x-show="selectedCourt && selectedTimeSlot">
+                <span x-show="notice" x-text="notice" style="color: var(--gz-danger);"></span>
+                <span x-show="!notice && selectedCourt && selectedTimeSlot">
                     Selected: <span class="font-semibold" style="color: var(--gz-pop-dark);" x-text="selectedCourtName"></span> at <span class="font-semibold" style="color: var(--gz-pop-dark);" x-text="selectedTimeSlot"></span> on <span class="font-semibold" style="color: var(--gz-pop-dark);" x-text="selectedDate"></span>
                 </span>
-                <span x-show="!selectedCourt || !selectedTimeSlot">
+                <span x-show="!notice && (!selectedCourt || !selectedTimeSlot)">
                     Choose a date, then select an open time slot.
                 </span>
             </p>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-                <div class="lg:col-span-4">
+                <div class="lg:col-span-3">
                     <div class="gz-kpi-card" style="padding: 12px;">
                         <div class="flex items-center justify-between mb-2">
                             <button type="button" @click="prevMonth()" class="gz-btn-outline gz-btn-sm" style="padding: 5px 10px;" aria-label="Previous month">‹</button>
@@ -142,7 +280,7 @@
                         <div class="grid grid-cols-7 gap-1 text-[10px] text-center mb-1" style="color: var(--gz-muted);" aria-hidden="true">
                             <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
                         </div>
-                        <div class="grid grid-cols-7 gap-1 text-xs" role="grid" aria-label="Choose a date">
+                        <div class="grid grid-cols-7 gap-1 text-xs" role="group" aria-label="Choose a date">
                             <template x-for="(day, idx) in calendarDays" :key="idx">
                                 <button
                                     type="button"
@@ -151,7 +289,7 @@
                                     :disabled="day === null || isPast(day)"
                                     :aria-current="day !== null && isToday(day) ? 'date' : null"
                                     :aria-pressed="day !== null && selectedDate === dateStringFor(day) ? 'true' : 'false'"
-                                    :aria-label="day !== null ? (isToday(day) ? day + ', today' : day) : null"
+                                    :aria-label="day !== null ? longLabel(day) : null"
                                     class="h-7 flex items-center justify-center rounded-lg"
                                     :style="
                                         day !== null && isPast(day)
@@ -166,18 +304,17 @@
                                 ></button>
                             </template>
                         </div>
-                        <p class="text-[11px] mt-2" style="color: var(--gz-muted);">
-                            Selected: <span class="font-semibold" x-text="selectedDate" style="color: var(--gz-ink);"></span>
-                        </p>
                     </div>
                 </div>
 
-                <div class="lg:col-span-8">
-                    <div class="gz-panel overflow-hidden">
-                        <div style="max-height: 260px; overflow-y: auto; overflow-x: auto;">
+                <div class="lg:col-span-9">
+                    {{-- Border turns red when the user tried to continue without a slot --}}
+                    <div class="gz-panel overflow-hidden"
+                         :style="showErrors && !canPay ? 'border-color: var(--gz-danger);' : ''">
+                        <div style="overflow-x: auto;">
                             <table class="gz-table" style="font-size: 12px;">
                                 <caption class="sr-only">Court availability by time slot. Select an open slot to book it.</caption>
-                                <thead style="position: sticky; top: 0; z-index: 2; background: var(--gz-surface);">
+                                <thead>
                                     <tr>
                                         <th style="padding: 7px 10px;">Time</th>
                                         <template x-for="court in courts" :key="'head'+court.id">
@@ -236,15 +373,28 @@
             </div>
         </section>
 
-        @error('time_slot')
-            <div class="mb-4 p-3 rounded-xl text-sm" style="background: var(--gz-danger-bg); color: var(--gz-danger);" role="alert">
-                {{ $message }}
+        {{-- Server-side errors (e.g. slot taken meanwhile). Focused on load so it is announced. --}}
+        @if ($errors->any())
+            <div class="mb-4 p-3 rounded-xl text-sm" style="background: var(--gz-danger-bg); color: var(--gz-danger); border: 1.5px solid var(--gz-danger);"
+                 role="alert" tabindex="-1" x-init="$el.focus()">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li><span aria-hidden="true">⚠</span> {{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
-        @enderror
+        @endif
+
+        {{-- Step 1 alert: shown when "Next" is clicked before a slot is chosen --}}
+        <div x-show="showErrors && !canPay" x-cloak x-ref="step1Error" tabindex="-1" role="alert"
+             class="mb-4 p-3 rounded-xl text-sm font-semibold"
+             style="background: var(--gz-danger-bg); color: var(--gz-danger); border: 1.5px solid var(--gz-danger);">
+            <span aria-hidden="true">⚠</span> <span x-text="missingMessage"></span>
+        </div>
 
         <section class="gz-panel flex flex-col sm:flex-row items-center justify-between gap-3" style="padding: 14px 16px;">
             <div>
-                <p class="gz-font-display font-bold text-sm mb-0.5">Review your booking</p>
+                <p class="gz-font-display font-bold text-sm mb-0.5">Your booking</p>
                 <p class="text-xs" style="color: var(--gz-muted);" x-show="canPay">
                     <span x-text="selectedCourtName"></span> ·
                     <span x-text="selectedDate"></span> ·
@@ -255,25 +405,47 @@
                 </p>
             </div>
 
-            <button type="button" @click="goToReview()" :disabled="!canPay" class="gz-btn-primary gz-btn-sm">
-                Next
-            </button>
+            <div class="flex items-center gap-2">
+                <button type="button" x-show="canPay" x-cloak @click="clearSelection()" class="gz-btn-outline gz-btn-sm">Clear</button>
+                {{-- aria-disabled (not disabled) so the click still fires and can explain what is missing --}}
+                <button type="button" @click="goToReview()"
+                        :aria-disabled="!canPay ? 'true' : 'false'"
+                        class="gz-btn-primary gz-btn-sm">
+                    Next: Review &amp; Pay
+                </button>
+            </div>
         </section>
 
         </div>
 
-        <div x-show="step === 2" x-cloak>
-            <button type="button" @click="goBack()" class="gz-btn-outline gz-btn-sm mb-4">
-                ‹ Back
-            </button>
+        {{-- Court Layout modal: just the picture --}}
+        <div x-show="showLayout" x-cloak
+             class="fixed inset-0 z-50 flex items-center justify-center p-4"
+             style="background: rgba(0,0,0,0.6);"
+             role="dialog" aria-modal="true" aria-label="Court layout"
+             @click.self="showLayout = false">
+            <div class="gz-panel relative" style="padding: 12px; max-width: 900px; width: 100%; max-height: 92vh; overflow: auto;">
+                <button type="button" @click="showLayout = false" class="gz-btn-outline gz-btn-sm absolute" style="top: 10px; right: 10px; padding: 4px 10px; z-index: 1;" aria-label="Close court layout">✕</button>
+                <h3 class="gz-font-display font-bold text-sm mb-2">Court Layout</h3>
+                {{-- Put your picture at public/images/court-layout.png (or change the path) --}}
+                <img src="{{ asset('images/court-layout.png') }}" alt="Court layout showing the position of each court"
+                     style="width: 100%; height: auto; border-radius: 10px; display: block;"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <p style="display: none; color: var(--gz-muted);" class="text-sm py-8 text-center">
+                    Court layout image not found. Add it at <code>public/images/court-layout.png</code>.
+                </p>
+            </div>
+        </div>
 
+        {{-- Step 2 --}}
+        <div x-show="step === 2" x-cloak>
             <h2 class="sr-only" tabindex="-1" x-ref="step2Heading">Review and pay for your booking</h2>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
                 <div class="lg:col-span-5">
                     <div class="gz-panel gz-panel-body">
-                        <h3 class="gz-font-display font-bold text-base mb-6">Reservation Summary</h3>
+                        <h3 class="gz-font-display font-bold text-base mb-6">Booking Summary</h3>
 
                         <div class="pb-3 mb-3 border-b" style="border-color: var(--gz-border);">
                             <p class="text-xs" style="color: var(--gz-muted);">Court</p>
@@ -308,7 +480,10 @@
                     <div class="gz-panel gz-panel-body">
                         <h3 class="gz-font-display font-bold text-base mb-6">Payment Method</h3>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8" role="radiogroup" aria-label="Payment method">
+                        {{-- Outline turns red if the user tries to confirm with no method chosen --}}
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8" role="radiogroup" aria-label="Payment method"
+                             x-ref="payGroup"
+                             :style="showPayErrors && paymentMethod === null ? 'outline: 2px solid var(--gz-danger); outline-offset: 6px;' : ''">
                             <button type="button" @click="paymentMethod = 'gcash'"
                                     role="radio" :aria-checked="paymentMethod === 'gcash' ? 'true' : 'false'"
                                     class="gz-kpi-card text-center"
@@ -332,39 +507,74 @@
                             </button>
                         </div>
 
+{{-- GCash number is submitted with the form (form attribute). Card details are validated here only and have no name, so they are never sent: use your payment gateway's hosted fields for real card payments. --}}
                         <div x-show="paymentMethod === 'gcash'" x-cloak class="mb-6">
                             <label class="gz-label" for="gcash_number">GCash Mobile Number</label>
-                            <input type="tel" id="gcash_number" class="gz-input" placeholder="09XX XXX XXXX">
+                            <input type="tel" id="gcash_number" name="gcash_number" form="booking-form" class="gz-input"
+                                   x-model="gcashNumber" inputmode="numeric" autocomplete="tel" placeholder="09XX XXX XXXX"
+                                   :style="(gcashNumber !== '' || showPayErrors) && !gcashValid ? 'border-color: var(--gz-danger);' : ''"
+                                   :aria-invalid="(gcashNumber !== '' || showPayErrors) && !gcashValid ? 'true' : 'false'" aria-describedby="gcash_error">
+                            <p id="gcash_error" class="text-xs mt-1 font-semibold" style="color: var(--gz-danger);" x-show="(gcashNumber !== '' || showPayErrors) && !gcashValid">
+                                <span aria-hidden="true">⚠</span> Enter an 11-digit mobile number starting with 09.
+                            </p>
                         </div>
                         <div x-show="paymentMethod === 'card'" x-cloak class="mb-6 grid grid-cols-2 gap-4">
                             <div class="col-span-2">
                                 <label class="gz-label" for="card_number">Card Number</label>
-                                <input type="text" id="card_number" class="gz-input" placeholder="0000 0000 0000 0000">
+                                <input type="text" id="card_number" class="gz-input" x-model="cardNumber" @input="formatCard()"
+                                       inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000"
+                                       :style="(cardNumber !== '' || showPayErrors) && !cardNumberValid ? 'border-color: var(--gz-danger);' : ''"
+                                       :aria-invalid="(cardNumber !== '' || showPayErrors) && !cardNumberValid ? 'true' : 'false'" aria-describedby="card_number_error">
+                                <p id="card_number_error" class="text-xs mt-1 font-semibold" style="color: var(--gz-danger);" x-show="(cardNumber !== '' || showPayErrors) && !cardNumberValid">
+                                    <span aria-hidden="true">⚠</span> Enter a valid card number (13 to 19 digits).
+                                </p>
                             </div>
                             <div>
                                 <label class="gz-label" for="card_expiry">Expiry</label>
-                                <input type="text" id="card_expiry" class="gz-input" placeholder="MM/YY">
+                                <input type="text" id="card_expiry" class="gz-input" x-model="cardExpiry" @input="formatExpiry()"
+                                       inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY"
+                                       :style="(cardExpiry !== '' || showPayErrors) && !cardExpiryValid ? 'border-color: var(--gz-danger);' : ''"
+                                       :aria-invalid="(cardExpiry !== '' || showPayErrors) && !cardExpiryValid ? 'true' : 'false'" aria-describedby="card_expiry_error">
+                                <p id="card_expiry_error" class="text-xs mt-1 font-semibold" style="color: var(--gz-danger);" x-show="(cardExpiry !== '' || showPayErrors) && !cardExpiryValid">
+                                    <span aria-hidden="true">⚠</span> Use MM/YY. The card must not be expired.
+                                </p>
                             </div>
                             <div>
                                 <label class="gz-label" for="card_cvc">CVC</label>
-                                <input type="text" id="card_cvc" class="gz-input" placeholder="123">
+                                <input type="text" id="card_cvc" class="gz-input" x-model="cardCvc"
+                                       inputmode="numeric" autocomplete="cc-csc" maxlength="4" placeholder="123"
+                                       :style="(cardCvc !== '' || showPayErrors) && !cardCvcValid ? 'border-color: var(--gz-danger);' : ''"
+                                       :aria-invalid="(cardCvc !== '' || showPayErrors) && !cardCvcValid ? 'true' : 'false'" aria-describedby="card_cvc_error">
+                                <p id="card_cvc_error" class="text-xs mt-1 font-semibold" style="color: var(--gz-danger);" x-show="(cardCvc !== '' || showPayErrors) && !cardCvcValid">
+                                    <span aria-hidden="true">⚠</span> Enter the 3 or 4 digit code.
+                                </p>
                             </div>
                         </div>
-                        <div x-show="paymentMethod === 'cash'" x-cloak class="mb-6">
+<div x-show="paymentMethod === 'cash'" x-cloak class="mb-6">
                             <p class="text-sm" style="color: var(--gz-muted);">
                                 Pay in person at the KYMNET front desk when you arrive for your session.
                             </p>
                         </div>
 
-                        <form method="POST" action="{{ route('bookings.store') }}">
+                        <form id="booking-form" method="POST" action="{{ route('bookings.store') }}" @submit="onSubmit($event)">
                             @csrf
                             <input type="hidden" name="court_id" :value="selectedCourt">
                             <input type="hidden" name="date" :value="selectedDate">
                             <input type="hidden" name="time_slot" :value="selectedTimeSlot">
                             <input type="hidden" name="payment_method" :value="paymentMethod">
-                            <button type="submit" :disabled="!canConfirm" class="gz-btn-primary w-full justify-center">
-                                Confirm & Pay
-                            </button>
+
+                            {{-- Turns red and shows a warning icon after a failed attempt --}}
+                            <p class="text-xs mb-3" role="status" aria-live="polite"
+                               :style="showPayErrors && !canConfirm && !submitting ? 'color: var(--gz-danger); font-weight: 600;' : 'color: var(--gz-muted);'"
+                               x-text="(showPayErrors && !canConfirm && !submitting ? '⚠ ' : '') + confirmHint"></p>
+
+                            <div class="flex items-center gap-3">
+                                <button type="button" @click="goBack()" :disabled="submitting" class="gz-btn-outline">‹ Back</button>
+                                {{-- aria-disabled (not disabled) so the click still fires and can explain what is missing --}}
+                                <button type="submit" :aria-disabled="!canConfirm ? 'true' : 'false'"
+                                        class="gz-btn-primary flex-1 justify-center"
+                                        x-text="submitting ? 'Processing…' : (paymentMethod === 'cash' ? 'Confirm Booking' : 'Confirm &amp; Pay')"></button>
+                            </div>
                         </form>
                     </div>
                 </div>

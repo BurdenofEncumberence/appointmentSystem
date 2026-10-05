@@ -612,6 +612,23 @@ input:focus-visible {
     font-size: 13px;
 }
 
+/* =====================================================================
+   NOT-READY STATE FOR PRIMARY BUTTONS
+   Looks unavailable but, when set via aria-disabled="true", the button
+   stays focusable and clickable so the page can explain what is missing
+   instead of silently doing nothing. Uses only existing tokens.
+   Placed after .gz-btn-sm so it wins over the hover/active lift.
+   ===================================================================== */
+.gz-btn-primary[aria-disabled="true"],
+.gz-btn-primary[aria-disabled="true"]:hover,
+.gz-btn-primary[aria-disabled="true"]:active,
+.gz-btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 0 var(--gz-pop-dark);
+}
+
 .gz-badge-info {
     background: var(--gz-bg);
     color: var(--gz-ink);
