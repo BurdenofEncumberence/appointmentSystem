@@ -27,7 +27,7 @@ it('allows staff to view customers booked for today with show/no-show attendance
     $response->assertOk();
     $response->assertSee('John Customer');
     $response->assertSee('Court Alpha');
-    $response->assertSee('AWAITING ARRIVAL');
+    $response->assertSee('Awaiting arrival', false);
     $response->assertDontSee('PENDING PAYMENT');
     $response->assertDontSee('PAID');
 });
