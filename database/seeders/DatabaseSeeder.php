@@ -20,13 +20,27 @@ class DatabaseSeeder extends Seeder
 
         // Seed Admin account
         User::firstOrCreate(
-            ['email' => 'wewdbertulano@gmail.com'],
+            ['email' => 'admin@kymnet.com'],
             [
                 'first_name' => 'Admin',
                 'last_name' => 'User',
-                'name' => 'admin',
+                'name' => 'Admin User',
                 'password' => Hash::make('admin123'),
                 'role' => 'admin',
+                'email_verified_at' => now(),
+            ]
+        );
+
+        // Seed Manager account
+        User::firstOrCreate(
+            ['email' => 'manager@kymnet.com'],
+            [
+                'first_name' => 'Manager',
+                'last_name' => 'User',
+                'name' => 'Manager User',
+                'password' => Hash::make('manager123'),
+                'role' => 'manager',
+                'email_verified_at' => now(),
             ]
         );
 
@@ -39,6 +53,7 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Staff Member',
                 'password' => Hash::make('staff123'),
                 'role' => 'staff',
+                'email_verified_at' => now(),
             ]
         );
 
