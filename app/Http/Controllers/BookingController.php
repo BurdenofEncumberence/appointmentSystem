@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreBookingRequest;
+use App\Mail\BookingReceiptMail;
 use App\Models\Booking;
 use App\Models\Court;
 use App\Models\Event;
@@ -10,6 +11,7 @@ use App\Models\Payment;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class BookingController extends Controller
@@ -135,6 +137,27 @@ class BookingController extends Controller
                 $createdBookings[] = $booking;
             }
         });
+
+        // Dispatch official booking receipt email to customer
+        $user = Auth::user();
+        if ($user && $user->email) {
+            try {
+                foreach ($createdBookings as $b) {
+                    $b->loadMissing('court');
+                }
+
+                Mail::to($user->email)->send(new BookingReceiptMail(
+                    user: $user,
+                    bookings: $createdBookings,
+                    refNum: $refNum,
+                    paymentMethod: $paymentMethod,
+                    discountPercent: $discountPercent,
+                    event: isset($event) ? $event : null,
+                ));
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
 
         $count = count($createdBookings);
         $message = $count > 1

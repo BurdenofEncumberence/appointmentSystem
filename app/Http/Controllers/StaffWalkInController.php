@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\BookingReceiptMail;
 use App\Models\Booking;
 use App\Models\Court;
 use App\Models\Payment;
@@ -11,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -164,6 +166,8 @@ class StaffWalkInController extends Controller
         $hours = max(1, $start->diffInMinutes($end) / 60);
         $amount = round($court->price_per_hour * $hours, 2);
 
+        $createdBooking = null;
+
         DB::transaction(function () use (
             $user,
             $court,
@@ -171,9 +175,10 @@ class StaffWalkInController extends Controller
             $startTime,
             $endTime,
             $amount,
-            $paymentRef
+            $paymentRef,
+            &$createdBooking
         ) {
-            $booking = Booking::create([
+            $createdBooking = Booking::create([
                 'user_id' => $user->id,
                 'court_id' => $court->id,
                 'event_id' => null,
@@ -185,7 +190,7 @@ class StaffWalkInController extends Controller
             ]);
 
             Payment::create([
-                'booking_id' => $booking->id,
+                'booking_id' => $createdBooking->id,
                 'payment_method' => $validated['payment_method'],
                 'payment_status' => 'paid',
                 'amount' => $amount,
@@ -194,6 +199,23 @@ class StaffWalkInController extends Controller
                 'time' => now()->format('H:i:s'),
             ]);
         });
+
+        // Dispatch receipt email if user has a valid real email
+        if ($user && $user->email && ! str_ends_with($user->email, '@kymnet.local')) {
+            try {
+                $createdBooking->setRelation('court', $court);
+                Mail::to($user->email)->send(new BookingReceiptMail(
+                    user: $user,
+                    bookings: [$createdBooking],
+                    refNum: $paymentRef,
+                    paymentMethod: $validated['payment_method'],
+                    discountPercent: 0,
+                    event: null,
+                ));
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
 
         $methodLabel = strtoupper($validated['payment_method']);
         $statusText = $validated['attendance_status'] === 'show' ? 'SHOW (Present)' : 'SCHEDULED';
