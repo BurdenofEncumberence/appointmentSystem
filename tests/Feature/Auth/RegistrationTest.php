@@ -1,12 +1,17 @@
 <?php
 
+use App\Mail\RegistrationOtpMail;
+use Illuminate\Support\Facades\Mail;
+
 test('registration screen can be rendered', function () {
     $response = $this->get('/register');
 
     $response->assertStatus(200);
 });
 
-test('new users can register with first name, optional middle name, and last name', function () {
+test('submitting registration dispatches OTP email and redirects to verification page without creating user yet', function () {
+    Mail::fake();
+
     $response = $this->post('/register', [
         'first_name' => 'John',
         'middle_name' => 'Fitzgerald',
@@ -16,8 +21,64 @@ test('new users can register with first name, optional middle name, and last nam
         'password_confirmation' => 'password',
     ]);
 
+    // Should redirect to OTP screen, and user is NOT authenticated yet
+    $response->assertRedirect(route('register.otp.show'));
+    $this->assertGuest();
+
+    // Database should NOT have the user yet
+    $this->assertDatabaseMissing('users', [
+        'email' => 'john.kennedy@example.com',
+    ]);
+
+    // OTP mail should have been sent
+    Mail::assertSent(RegistrationOtpMail::class, function ($mail) {
+        return $mail->hasTo('john.kennedy@example.com');
+    });
+
+    // Session has pending registration
+    $this->assertTrue(session()->has('pending_registration'));
+});
+
+test('otp verification screen can be rendered when registration is pending', function () {
+    Mail::fake();
+
+    $this->post('/register', [
+        'first_name' => 'John',
+        'middle_name' => 'Fitzgerald',
+        'last_name' => 'Kennedy',
+        'email' => 'john.kennedy@example.com',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+    ]);
+
+    $response = $this->get(route('register.otp.show'));
+
+    $response->assertOk();
+    $response->assertSee('Verify your email');
+});
+
+test('entering valid otp creates user, marks email verified, logs in, and redirects to booking', function () {
+    Mail::fake();
+
+    $this->post('/register', [
+        'first_name' => 'John',
+        'middle_name' => 'Fitzgerald',
+        'last_name' => 'Kennedy',
+        'email' => 'john.kennedy@example.com',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+    ]);
+
+    $pending = session('pending_registration');
+    $otp = $pending['otp_plain_dev'];
+    $this->assertNotNull($otp);
+
+    $verifyResponse = $this->post(route('register.otp.verify'), [
+        'otp' => $otp,
+    ]);
+
+    $verifyResponse->assertRedirect(route('booking'));
     $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
 
     $this->assertDatabaseHas('users', [
         'first_name' => 'John',
@@ -25,11 +86,18 @@ test('new users can register with first name, optional middle name, and last nam
         'last_name' => 'Kennedy',
         'name' => 'John Fitzgerald Kennedy',
         'email' => 'john.kennedy@example.com',
+        'role' => 'player',
     ]);
+
+    $user = \App\Models\User::where('email', 'john.kennedy@example.com')->first();
+    $this->assertNotNull($user->email_verified_at);
+    $this->assertFalse(session()->has('pending_registration'));
 });
 
-test('new users can register without middle name', function () {
-    $response = $this->post('/register', [
+test('entering invalid otp is rejected with errors and does not create user', function () {
+    Mail::fake();
+
+    $this->post('/register', [
         'first_name' => 'Jane',
         'middle_name' => '',
         'last_name' => 'Doe',
@@ -38,15 +106,58 @@ test('new users can register without middle name', function () {
         'password_confirmation' => 'password',
     ]);
 
-    $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $verifyResponse = $this->from(route('register.otp.show'))->post(route('register.otp.verify'), [
+        'otp' => '000000',
+    ]);
 
-    $this->assertDatabaseHas('users', [
-        'first_name' => 'Jane',
-        'middle_name' => null,
-        'last_name' => 'Doe',
-        'name' => 'Jane Doe',
+    $verifyResponse->assertRedirect(route('register.otp.show'));
+    $verifyResponse->assertSessionHasErrors(['otp']);
+    $this->assertGuest();
+
+    $this->assertDatabaseMissing('users', [
         'email' => 'jane.doe@example.com',
     ]);
 });
 
+test('users can request resend of otp code after cooldown', function () {
+    Mail::fake();
+
+    $this->post('/register', [
+        'first_name' => 'Alice',
+        'last_name' => 'Smith',
+        'email' => 'alice@example.com',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+    ]);
+
+    // Immediate resend should be blocked by cooldown
+    $blockedResend = $this->post(route('register.otp.resend'));
+    $blockedResend->assertSessionHasErrors(['otp']);
+
+    // Advance time past cooldown
+    $pending = session('pending_registration');
+    $pending['resend_available_at'] = now()->subSeconds(5)->timestamp;
+    session(['pending_registration' => $pending]);
+
+    $resendResponse = $this->post(route('register.otp.resend'));
+    $resendResponse->assertSessionHas('status');
+
+    Mail::assertSent(RegistrationOtpMail::class, 2);
+});
+
+test('user can cancel registration and return to register form with prefilled inputs', function () {
+    Mail::fake();
+
+    $this->post('/register', [
+        'first_name' => 'Bob',
+        'last_name' => 'Marley',
+        'email' => 'bob@example.com',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+    ]);
+
+    $response = $this->get(route('register.otp.cancel'));
+
+    $response->assertRedirect(route('register'));
+    $this->assertFalse(session()->has('pending_registration'));
+});

@@ -10,7 +10,7 @@
 
             <div>
                 <label for="first_name" class="gz-label">First name</label>
-                <input id="first_name" class="gz-input" type="text" name="first_name" value="{{ old('first_name') }}" required autofocus autocomplete="given-name">
+                <input id="first_name" class="gz-input" type="text" name="first_name" value="{{ old('first_name', $pending['first_name'] ?? '') }}" required autofocus autocomplete="given-name">
                 @error('first_name')
                     <p class="gz-error" role="alert">{{ $message }}</p>
                 @enderror
@@ -18,7 +18,7 @@
 
             <div class="mt-5">
                 <label for="middle_name" class="gz-label">Middle name (optional)</label>
-                <input id="middle_name" class="gz-input" type="text" name="middle_name" value="{{ old('middle_name') }}" autocomplete="additional-name">
+                <input id="middle_name" class="gz-input" type="text" name="middle_name" value="{{ old('middle_name', $pending['middle_name'] ?? '') }}" autocomplete="additional-name">
                 @error('middle_name')
                     <p class="gz-error" role="alert">{{ $message }}</p>
                 @enderror
@@ -26,7 +26,7 @@
 
             <div class="mt-5">
                 <label for="last_name" class="gz-label">Last name</label>
-                <input id="last_name" class="gz-input" type="text" name="last_name" value="{{ old('last_name') }}" required autocomplete="family-name">
+                <input id="last_name" class="gz-input" type="text" name="last_name" value="{{ old('last_name', $pending['last_name'] ?? '') }}" required autocomplete="family-name">
                 @error('last_name')
                     <p class="gz-error" role="alert">{{ $message }}</p>
                 @enderror
@@ -35,7 +35,7 @@
 
         <div class="mt-5">
             <label for="email" class="gz-label">Email</label>
-            <input id="email" class="gz-input" type="email" name="email" value="{{ old('email') }}" required autocomplete="username">
+            <input id="email" class="gz-input" type="email" name="email" value="{{ old('email', $pending['email'] ?? '') }}" required autocomplete="username">
             @error('email')
                 <p class="gz-error" role="alert">{{ $message }}</p>
             @enderror
