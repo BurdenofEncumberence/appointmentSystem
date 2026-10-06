@@ -34,51 +34,55 @@
         </div>
     @endif
 
-    <div
-        x-data="{
-            selectedDate: '{{ old('date', $selectedDate) }}',
-            selectedCourtId: '{{ old('court_id', $courts->first()->id ?? '') }}',
-            selectedSlot: '{{ old('time_slot', '') }}',
-            selectedPaymentMethod: '{{ old('payment_method', 'cash') }}',
-            attendanceStatus: '{{ old('attendance_status', 'show') }}',
-            firstName: '{{ old('first_name', '') }}',
-            middleName: '{{ old('middle_name', '') }}',
-            lastName: '{{ old('last_name', '') }}',
-            email: '{{ old('email', '') }}',
+    <script>
+        function walkInBookingData() {
+            return {
+                selectedDate: @json(old('date', $selectedDate)),
+                selectedCourtId: @json((string) old('court_id', $courts->first()->id ?? '')),
+                selectedSlot: @json(old('time_slot', '')),
+                selectedPaymentMethod: @json(old('payment_method', 'cash')),
+                attendanceStatus: @json(old('attendance_status', 'show')),
+                firstName: @json(old('first_name', '')),
+                middleName: @json(old('middle_name', '')),
+                lastName: @json(old('last_name', '')),
+                email: @json(old('email', '')),
 
-            courts: @json($courts),
-            bookedSlots: @json($bookedSlots),
-            recentPlayers: @json($recentPlayers),
+                courts: @json($courts),
+                bookedSlots: @json($bookedSlots),
+                recentPlayers: @json($recentPlayers),
 
-            get currentCourt() {
-                return this.courts.find(c => c.id == this.selectedCourtId) || null;
-            },
+                get currentCourt() {
+                    return this.courts.find(c => c.id == this.selectedCourtId) || null;
+                },
 
-            get courtRate() {
-                return this.currentCourt ? Number(this.currentCourt.price_per_hour) : 0;
-            },
+                get courtRate() {
+                    return this.currentCourt ? Number(this.currentCourt.price_per_hour) : 0;
+                },
 
-            isSlotBooked(slot) {
-                const courtBookings = this.bookedSlots[this.selectedCourtId] || [];
-                return courtBookings.includes(slot);
-            },
+                isSlotBooked(slot) {
+                    const courtBookings = this.bookedSlots[this.selectedCourtId] || [];
+                    return courtBookings.includes(slot);
+                },
 
-            selectPlayer(event) {
-                const playerId = event.target.value;
-                if (!playerId) return;
-                const player = this.recentPlayers.find(p => p.id == playerId);
-                if (player) {
-                    this.firstName = player.first_name || '';
-                    this.lastName = player.last_name || '';
-                    this.email = player.email || '';
+                selectPlayer(event) {
+                    const playerId = event.target.value;
+                    if (!playerId) return;
+                    const player = this.recentPlayers.find(p => p.id == playerId);
+                    if (player) {
+                        this.firstName = player.first_name || '';
+                        this.lastName = player.last_name || '';
+                        this.email = player.email || '';
+                    }
+                },
+
+                onDateChange() {
+                    window.location.href = @json(route('staff.walkin.create')) + '?date=' + this.selectedDate;
                 }
-            },
+            };
+        }
+    </script>
 
-            onDateChange() {
-                window.location.href = '{{ route('staff.walkin.create') }}?date=' + this.selectedDate;
-            }
-        }"
-    >
+    <div x-data="walkInBookingData()">
         <form method="POST" action="{{ route('staff.walkin.store') }}" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             @csrf
 
