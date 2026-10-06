@@ -113,3 +113,29 @@ it('allows staff to mark customer as show, no-show, and reset to scheduled', fun
 
     $this->assertSame('confirmed', $booking->fresh()->booking_status);
 });
+
+it('allows staff to filter schedule by custom date', function () {
+    $staff = User::factory()->create(['role' => 'staff']);
+    $player = User::factory()->create(['role' => 'player', 'name' => 'Tomorrow Player']);
+    $court = Court::create([
+        'court_name' => 'Court Gamma',
+        'price_per_hour' => 450,
+        'court_status' => 'available',
+    ]);
+
+    $tomorrow = today()->addDay()->toDateString();
+    Booking::create([
+        'user_id' => $player->id,
+        'court_id' => $court->id,
+        'date' => $tomorrow,
+        'start_time' => '11:00:00',
+        'end_time' => '12:00:00',
+        'booking_status' => 'confirmed',
+    ]);
+
+    $response = $this->actingAs($staff)->get(route('staff.today', ['date' => $tomorrow]));
+    $response->assertOk();
+    $response->assertSee('Tomorrow Player');
+    $response->assertSee('Court Gamma');
+});
+

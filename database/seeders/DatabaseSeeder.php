@@ -69,5 +69,24 @@ class DatabaseSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
+
+        // Seed a sample booking for today's run-sheet
+        $testPlayer = User::where('email', 'test@example.com')->first();
+        $firstCourt = \App\Models\Court::first();
+        if ($testPlayer && $firstCourt) {
+            \App\Models\Booking::firstOrCreate(
+                [
+                    'user_id' => $testPlayer->id,
+                    'court_id' => $firstCourt->id,
+                    'date' => today()->toDateString(),
+                    'start_time' => '10:00:00',
+                ],
+                [
+                    'end_time' => '11:00:00',
+                    'booking_status' => 'confirmed',
+                    'booking_type' => 'online',
+                ]
+            );
+        }
     }
 }

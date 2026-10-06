@@ -9,10 +9,10 @@
                 <span class="gz-eyebrow" style="color: var(--gz-pop-dark);">Front desk · Attendance tracker</span>
             </div>
             <h1 class="gz-font-display font-bold text-xl">
-                Customers scheduled for today
+                {{ $selectedDate->isToday() ? 'Customers scheduled for today' : 'Customers scheduled for ' . $selectedDate->format('M j, Y') }}
             </h1>
             <p class="text-sm mt-1" style="color: var(--gz-muted);">
-                Track player arrival and attendance: Show or No-Show for {{ $today->format('l, F j, Y') }}.
+                Track player arrival and attendance: Show or No-Show for {{ $selectedDate->format('l, F j, Y') }}.
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-2 print:hidden">
@@ -112,8 +112,14 @@
                 @endif
             </div>
 
-            {{-- Court & Attendance Quick Filters --}}
+            {{-- Court, Date & Attendance Quick Filters --}}
             <div class="flex flex-wrap items-center gap-2">
+                {{-- Date Filter --}}
+                <div class="flex items-center gap-1 bg-[color:var(--gz-bg)] px-2 py-1 border border-[color:var(--gz-border)]">
+                    <span class="text-xs font-semibold" style="color: var(--gz-muted);">Date:</span>
+                    <input type="date" name="date" value="{{ $selectedDate->toDateString() }}" onchange="this.form.submit()" class="text-xs bg-transparent border-0 p-0 focus:ring-0" style="color: var(--gz-ink);">
+                </div>
+
                 {{-- Court Filter --}}
                 <select name="court_id" onchange="this.form.submit()" class="gz-input w-auto">
                     <option value="">All courts</option>
@@ -139,9 +145,9 @@
     <div class="gz-panel">
         <div class="gz-panel-header">
             <div>
-                <h2 class="gz-font-display font-bold text-base">Today's customer run-sheet</h2>
+                <h2 class="gz-font-display font-bold text-base">{{ $selectedDate->isToday() ? "Today's customer run-sheet" : "Customer run-sheet for " . $selectedDate->format('M j, Y') }}</h2>
                 <p class="text-xs" style="color: var(--gz-muted);">
-                    Showing {{ $bookings->count() }} customer reservation{{ $bookings->count() === 1 ? '' : 's' }} for {{ $today->format('D, M d, Y') }}
+                    Showing {{ $bookings->count() }} customer reservation{{ $bookings->count() === 1 ? '' : 's' }} for {{ $selectedDate->format('D, M d, Y') }}
                 </p>
             </div>
             <span class="gz-badge gz-badge-neutral">
@@ -251,43 +257,50 @@
 
                                 {{-- Staff Attendance Actions (Show / No Show) --}}
                                 <td class="text-right print:hidden">
-                                    <div class="flex items-center justify-end gap-2 flex-wrap">
-                                        {{-- Mark as SHOW --}}
-                                        @if(!$isShow)
-                                            <form method="POST" action="{{ route('staff.bookings.status', $booking) }}" class="inline">
-                                                @csrf
-                                                @method('PATCH')
-                                                <input type="hidden" name="attendance_status" value="show">
-                                                <button type="submit" class="gz-btn-success gz-btn-sm" title="Mark Customer as Present">
-                                                    ✓ Show
-                                                </button>
-                                            </form>
-                                        @endif
+                                    @php
+                                        $isBookingToday = \Carbon\Carbon::parse($booking->date)->isSameDay(now());
+                                    @endphp
+                                    @if($isBookingToday)
+                                        <div class="flex items-center justify-end gap-2 flex-wrap">
+                                            {{-- Mark as SHOW --}}
+                                            @if(!$isShow)
+                                                <form method="POST" action="{{ route('staff.bookings.status', $booking) }}" class="inline">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <input type="hidden" name="attendance_status" value="show">
+                                                    <button type="submit" class="gz-btn-success gz-btn-sm" title="Mark Customer as Present">
+                                                        ✓ Show
+                                                    </button>
+                                                </form>
+                                            @endif
 
-                                        {{-- Mark as NO-SHOW --}}
-                                        @if(!$isNoShow)
-                                            <form method="POST" action="{{ route('staff.bookings.status', $booking) }}" class="inline">
-                                                @csrf
-                                                @method('PATCH')
-                                                <input type="hidden" name="attendance_status" value="no_show">
-                                                <button type="submit" class="gz-btn-danger gz-btn-sm" title="Mark Customer as No-Show">
-                                                    ✕ No-show
-                                                </button>
-                                            </form>
-                                        @endif
+                                            {{-- Mark as NO-SHOW --}}
+                                            @if(!$isNoShow)
+                                                <form method="POST" action="{{ route('staff.bookings.status', $booking) }}" class="inline">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <input type="hidden" name="attendance_status" value="no_show">
+                                                    <button type="submit" class="gz-btn-danger gz-btn-sm" title="Mark Customer as No-Show">
+                                                        ✕ No-show
+                                                    </button>
+                                                </form>
+                                            @endif
 
-                                        {{-- Reset to Awaiting if already marked --}}
-                                        @if($isShow || $isNoShow)
-                                            <form method="POST" action="{{ route('staff.bookings.status', $booking) }}" class="inline">
-                                                @csrf
-                                                @method('PATCH')
-                                                <input type="hidden" name="attendance_status" value="scheduled">
-                                                <button type="submit" class="gz-btn-outline gz-btn-sm" title="Reset to Awaiting">
-                                                    Reset
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </div>
+                                            {{-- Reset to Awaiting if already marked --}}
+                                            @if($isShow || $isNoShow)
+                                                <form method="POST" action="{{ route('staff.bookings.status', $booking) }}" class="inline">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <input type="hidden" name="attendance_status" value="scheduled">
+                                                    <button type="submit" class="gz-btn-outline gz-btn-sm" title="Reset to Awaiting">
+                                                        Reset
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <span class="text-xs italic" style="color: var(--gz-muted);" title="Attendance check-in is performed on match day">Check-in on match day</span>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

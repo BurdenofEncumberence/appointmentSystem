@@ -14,9 +14,11 @@ class StaffTodayController extends Controller
     public function index(Request $request): View
     {
         $today = Carbon::today();
+        $dateParam = $request->input('date', $today->toDateString());
+        $selectedDate = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $dateParam) ? Carbon::parse($dateParam) : $today;
 
         $query = Booking::with(['court', 'user'])
-            ->whereDate('date', $today)
+            ->whereDate('date', $selectedDate)
             ->where('booking_status', '!=', 'cancelled')
             ->orderBy('start_time');
 
@@ -54,18 +56,19 @@ class StaffTodayController extends Controller
 
         $bookings = $query->get();
 
-        // Baseline attendance statistics for today
-        $todayAll = Booking::whereDate('date', $today)->where('booking_status', '!=', 'cancelled')->get();
-        $totalBookingsToday = $todayAll->count();
-        $showCount = $todayAll->where('booking_status', 'show')->count();
-        $noShowCount = $todayAll->filter(fn ($b) => in_array($b->booking_status, ['no_show', 'no-show']))->count();
+        // Baseline attendance statistics for the selected date
+        $selectedDateAll = Booking::whereDate('date', $selectedDate)->where('booking_status', '!=', 'cancelled')->get();
+        $totalBookingsToday = $selectedDateAll->count();
+        $showCount = $selectedDateAll->where('booking_status', 'show')->count();
+        $noShowCount = $selectedDateAll->filter(fn ($b) => in_array($b->booking_status, ['no_show', 'no-show']))->count();
         $awaitingCount = max(0, $totalBookingsToday - $showCount - $noShowCount);
-        $uniqueCustomersCount = $todayAll->pluck('user_id')->unique()->count();
+        $uniqueCustomersCount = $selectedDateAll->pluck('user_id')->unique()->count();
 
         $courts = Court::orderBy('court_name')->get();
 
         return view('staff.today', [
             'today' => $today,
+            'selectedDate' => $selectedDate,
             'bookings' => $bookings,
             'totalBookingsToday' => $totalBookingsToday,
             'showCount' => $showCount,
