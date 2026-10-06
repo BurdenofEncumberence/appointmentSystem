@@ -66,6 +66,7 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Test User',
                 'password' => Hash::make('password'),
                 'role' => 'player',
+                'email_verified_at' => now(),
             ]
         );
     }
