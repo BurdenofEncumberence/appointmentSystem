@@ -110,6 +110,10 @@ Route::middleware(['auth', 'verified', 'prevent.staff_admin_booking'])
         Route::post('/bookings', [BookingController::class, 'store'])
             ->middleware('throttle:20,1')
             ->name('bookings.store');
+        Route::get('/booking/paymongo/success', [BookingController::class, 'paymongoSuccess'])
+            ->name('booking.paymongo.success');
+        Route::get('/booking/paymongo/cancel', [BookingController::class, 'paymongoCancel'])
+            ->name('booking.paymongo.cancel');
     });
 
 /*

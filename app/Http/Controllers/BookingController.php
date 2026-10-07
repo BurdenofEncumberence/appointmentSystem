@@ -8,6 +8,8 @@ use App\Models\Booking;
 use App\Models\Court;
 use App\Models\Event;
 use App\Models\Payment;
+use App\Services\PayMongoService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -74,7 +76,7 @@ class BookingController extends Controller
         ]);
     }
 
-    public function store(StoreBookingRequest $request)
+    public function store(StoreBookingRequest $request, PayMongoService $payMongoService)
     {
         $user = Auth::user();
 
@@ -88,12 +90,12 @@ class BookingController extends Controller
 
         $slots = $request->parsedSlots();
         $refNum = 'PAY-' . strtoupper(Str::random(8));
-        $paymentMethod = $request->input('payment_method', 'online') ?: 'online';
+        $paymentMethod = $request->input('payment_method', 'paymongo') ?: 'paymongo';
         $eventId = $request->input('event_id');
-        $createdBookings = [];
 
         // Calculate potential event discount
         $discountPercent = 0;
+        $event = null;
         if ($eventId) {
             $event = Event::find($eventId);
             if ($event && $event->discount) {
@@ -101,34 +103,128 @@ class BookingController extends Controller
             }
         }
 
-        DB::transaction(function () use ($slots, $refNum, $paymentMethod, $eventId, $discountPercent, &$createdBookings) {
-            foreach ($slots as $item) {
-                $court = Court::findOrFail($item['court_id']);
+        // Build itemized slot records and PayMongo line items
+        $slotData = [];
+        $lineItems = [];
 
+        foreach ($slots as $item) {
+            $court = Court::findOrFail($item['court_id']);
+            $start = Carbon::parse($item['start_time']);
+            $end = Carbon::parse($item['end_time']);
+            $hours = max(1, $start->diffInMinutes($end) / 60);
+            $rawAmount = round($court->price_per_hour * $hours, 2);
+            $amount = $discountPercent > 0
+                ? round($rawAmount * (1 - ($discountPercent / 100)), 2)
+                : $rawAmount;
+
+            $slotData[] = [
+                'court' => $court,
+                'item' => $item,
+                'amount' => $amount,
+            ];
+
+            $lineItems[] = [
+                'name' => "{$court->court_name} Reservation",
+                'description' => "{$item['date']} (" . $start->format('g:i A') . ' - ' . $end->format('g:i A') . ')',
+                'amount' => (int) round($amount * 100), // PayMongo accepts amounts in centavos
+                'currency' => 'PHP',
+                'quantity' => 1,
+            ];
+        }
+
+        // Check if PayMongo checkout session should be created
+        $isPayMongo = ($paymentMethod === 'paymongo') && $payMongoService->isConfigured();
+
+        if ($isPayMongo) {
+            $successUrl = route('booking.paymongo.success') . '?session_id={CHECKOUT_SESSION_ID}&ref=' . $refNum;
+            $cancelUrl = route('booking.paymongo.cancel') . '?session_id={CHECKOUT_SESSION_ID}&ref=' . $refNum;
+
+            try {
+                $checkout = $payMongoService->createCheckoutSession($lineItems, [
+                    'description' => "KYMNET Court Reservation ({$refNum})",
+                    'reference_number' => $refNum,
+                    'success_url' => $successUrl,
+                    'cancel_url' => $cancelUrl,
+                    'customer' => [
+                        'name' => $user?->name,
+                        'email' => $user?->email,
+                    ],
+                    'payment_method_types' => [
+                        'qrph',
+                        'dob',
+                        'paymaya',
+                        'gcash',
+                        'card',
+                    ],
+                ]);
+            } catch (\Throwable $e) {
+                report($e);
+                return back()
+                    ->withInput()
+                    ->withErrors(['payment_method' => 'Unable to connect to PayMongo checkout: ' . $e->getMessage()]);
+            }
+
+            $sessionId = $checkout['id'] ?? null;
+            $checkoutUrl = $checkout['checkout_url'] ?? null;
+
+            if (! $sessionId || ! $checkoutUrl) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['payment_method' => 'Invalid response from PayMongo checkout portal.']);
+            }
+
+            // Reserve slots with pending status awaiting successful payment redirect
+            DB::transaction(function () use ($slotData, $eventId, $paymentMethod, $refNum, $sessionId) {
+                foreach ($slotData as $data) {
+                    $booking = Booking::create([
+                        'user_id' => Auth::id(),
+                        'court_id' => $data['court']->id,
+                        'event_id' => $eventId,
+                        'date' => $data['item']['date'],
+                        'start_time' => $data['item']['start_time'],
+                        'end_time' => $data['item']['end_time'],
+                        'booking_status' => 'pending',
+                        'booking_type' => 'online',
+                    ]);
+
+                    Payment::create([
+                        'booking_id' => $booking->id,
+                        'payment_method' => $paymentMethod,
+                        'payment_status' => 'pending',
+                        'amount' => $data['amount'],
+                        'ref_num' => $refNum,
+                        'checkout_session_id' => $sessionId,
+                        'date' => now()->toDateString(),
+                        'time' => now()->format('H:i:s'),
+                    ]);
+                }
+            });
+
+            return redirect()->away($checkoutUrl);
+        }
+
+        // Direct confirmation path: Cash at counter or direct non-gateway online simulation
+        $createdBookings = [];
+        $isCash = ($paymentMethod === 'cash');
+
+        DB::transaction(function () use ($slotData, $eventId, $paymentMethod, $isCash, $refNum, &$createdBookings) {
+            foreach ($slotData as $data) {
                 $booking = Booking::create([
                     'user_id' => Auth::id(),
-                    'court_id' => $court->id,
+                    'court_id' => $data['court']->id,
                     'event_id' => $eventId,
-                    'date' => $item['date'],
-                    'start_time' => $item['start_time'],
-                    'end_time' => $item['end_time'],
+                    'date' => $data['item']['date'],
+                    'start_time' => $data['item']['start_time'],
+                    'end_time' => $data['item']['end_time'],
                     'booking_status' => 'confirmed',
                     'booking_type' => 'online',
                 ]);
 
-                $start = Carbon::parse($item['start_time']);
-                $end = Carbon::parse($item['end_time']);
-                $hours = max(1, $start->diffInMinutes($end) / 60);
-                $rawAmount = round($court->price_per_hour * $hours, 2);
-                $amount = $discountPercent > 0
-                    ? round($rawAmount * (1 - ($discountPercent / 100)), 2)
-                    : $rawAmount;
-
                 Payment::create([
                     'booking_id' => $booking->id,
                     'payment_method' => $paymentMethod,
-                    'payment_status' => $paymentMethod === 'cash' ? 'pending' : 'paid',
-                    'amount' => $amount,
+                    'payment_status' => $isCash ? 'pending' : 'paid',
+                    'amount' => $data['amount'],
                     'ref_num' => $refNum,
                     'date' => now()->toDateString(),
                     'time' => now()->format('H:i:s'),
@@ -139,7 +235,6 @@ class BookingController extends Controller
         });
 
         // Dispatch official booking receipt email to customer
-        $user = Auth::user();
         if ($user && $user->email) {
             try {
                 foreach ($createdBookings as $b) {
@@ -152,7 +247,7 @@ class BookingController extends Controller
                     refNum: $refNum,
                     paymentMethod: $paymentMethod,
                     discountPercent: $discountPercent,
-                    event: isset($event) ? $event : null,
+                    event: $event,
                 ));
             } catch (\Throwable $e) {
                 report($e);
@@ -167,6 +262,141 @@ class BookingController extends Controller
         return redirect()
             ->route('bookings.index')
             ->with('status', $message);
+    }
+
+    /**
+     * Handle return redirect after player completes payment on PayMongo checkout page.
+     */
+    public function paymongoSuccess(Request $request, PayMongoService $payMongoService)
+    {
+        $sessionId = $request->query('session_id');
+        $refNum = $request->query('ref');
+
+        if (! $sessionId) {
+            return redirect()->route('bookings.index')
+                ->with('status', 'No payment session ID provided.');
+        }
+
+        try {
+            $sessionData = $payMongoService->getCheckoutSession($sessionId);
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->route('bookings.index')
+                ->with('status', 'Unable to verify checkout status with PayMongo: ' . $e->getMessage());
+        }
+
+        $isPaid = $payMongoService->isSessionPaid($sessionData);
+
+        // Find matching payments
+        $payments = Payment::where('checkout_session_id', $sessionId)
+            ->orWhere(function ($q) use ($refNum) {
+                if ($refNum) {
+                    $q->where('ref_num', $refNum);
+                }
+            })
+            ->get();
+
+        if ($payments->isEmpty()) {
+            return redirect()->route('bookings.index')
+                ->with('status', 'Payment received, but no reservations matched this session.');
+        }
+
+        $bookingIds = $payments->pluck('booking_id')->filter()->unique();
+        $bookings = Booking::whereIn('id', $bookingIds)->with(['court', 'event'])->get();
+
+        // Ownership authorization check
+        $currentUserId = Auth::id();
+        $firstBooking = $bookings->first();
+        if ($firstBooking && $firstBooking->user_id !== $currentUserId && ! Auth::user()?->isAdmin()) {
+            abort(403, 'Unauthorized access to this booking transaction.');
+        }
+
+        if ($isPaid) {
+            $details = $payMongoService->extractPaymentDetails($sessionData);
+            $paymongoPaymentId = $details['payment_id'] ?? null;
+            $sourceType = $details['source_type'] ?? 'online';
+
+            $alreadyPaid = $payments->every(fn ($p) => $p->payment_status === 'paid');
+
+            if (! $alreadyPaid) {
+                DB::transaction(function () use ($payments, $bookings, $sessionId, $paymongoPaymentId, $sourceType) {
+                    foreach ($payments as $payment) {
+                        $payment->update([
+                            'payment_status' => 'paid',
+                            'checkout_session_id' => $sessionId,
+                            'paymongo_payment_id' => $paymongoPaymentId,
+                            'payment_method' => 'paymongo_' . $sourceType,
+                        ]);
+                    }
+
+                    foreach ($bookings as $booking) {
+                        $booking->update([
+                            'booking_status' => 'confirmed',
+                        ]);
+                    }
+                });
+
+                // Dispatch receipt email
+                $user = Auth::user();
+                if ($user && $user->email) {
+                    try {
+                        $methodLabel = 'PayMongo (' . strtoupper(str_replace('_', ' ', $sourceType)) . ')';
+                        Mail::to($user->email)->send(new BookingReceiptMail(
+                            user: $user,
+                            bookings: $bookings,
+                            refNum: $payments->first()?->ref_num ?? 'N/A',
+                            paymentMethod: $methodLabel,
+                            discountPercent: (float) ($bookings->first()?->event?->discount ?? 0),
+                            event: $bookings->first()?->event,
+                        ));
+                    } catch (\Throwable $e) {
+                        report($e);
+                    }
+                }
+            }
+
+            return redirect()->route('bookings.index')
+                ->with('status', 'Payment successful via PayMongo (' . strtoupper(str_replace('_', ' ', $sourceType)) . ')! Your reservation is confirmed.');
+        }
+
+        return redirect()->route('bookings.index')
+            ->with('status', 'Your PayMongo checkout session is pending confirmation.');
+    }
+
+    /**
+     * Handle return redirect when player cancels checkout on PayMongo page.
+     */
+    public function paymongoCancel(Request $request)
+    {
+        $sessionId = $request->query('session_id');
+        $refNum = $request->query('ref');
+
+        $payments = Payment::query()
+            ->when($sessionId, fn ($q) => $q->where('checkout_session_id', $sessionId))
+            ->when($refNum && ! $sessionId, fn ($q) => $q->where('ref_num', $refNum))
+            ->get();
+
+        if ($payments->isNotEmpty()) {
+            $bookingIds = $payments->pluck('booking_id')->unique();
+            $bookings = Booking::whereIn('id', $bookingIds)
+                ->where('user_id', Auth::id())
+                ->where('booking_status', 'pending')
+                ->get();
+
+            DB::transaction(function () use ($payments, $bookings) {
+                foreach ($bookings as $booking) {
+                    $booking->update(['booking_status' => 'cancelled']);
+                }
+                foreach ($payments as $payment) {
+                    if ($payment->payment_status === 'pending') {
+                        $payment->update(['payment_status' => 'failed']);
+                    }
+                }
+            });
+        }
+
+        return redirect()->route('booking')
+            ->with('status', 'Payment was cancelled. Your pending court slots have been released.');
     }
 
     public function index()

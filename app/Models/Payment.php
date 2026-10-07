@@ -15,6 +15,8 @@ class Payment extends Model
         'payment_status',
         'amount',
         'ref_num',
+        'checkout_session_id',
+        'paymongo_payment_id',
         'time',
         'date',
     ];

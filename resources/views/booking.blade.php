@@ -85,7 +85,7 @@
                 return this.selectedSlots.reduce((acc, s) => acc + (Number(s.rate) || 0), 0);
             },
 
-            serviceFee: 25,
+            serviceFee: 0,
 
             get totalDue() {
                 if (this.selectedSlots.length === 0) return 0;
@@ -98,7 +98,7 @@
             },
 
             step: 1,
-            paymentMethod: null,
+            paymentMethod: 'paymongo',
 
             get canConfirm() {
                 return this.canPay && this.paymentMethod !== null;
@@ -430,10 +430,12 @@
                                     <span class="font-semibold" x-text="'-₱' + discountAmount.toFixed(2)"></span>
                                 </div>
                             </template>
-                            <div class="flex justify-between">
-                                <span style="color: var(--gz-muted);">Transaction Service Fee</span>
-                                <span class="font-semibold" x-text="'₱' + serviceFee.toFixed(2)"></span>
-                            </div>
+                            <template x-if="serviceFee > 0">
+                                <div class="flex justify-between">
+                                    <span style="color: var(--gz-muted);">Transaction Service Fee</span>
+                                    <span class="font-semibold" x-text="'₱' + serviceFee.toFixed(2)"></span>
+                                </div>
+                            </template>
                         </div>
 
                         <div class="flex justify-between items-center pt-4 mt-4 border-t" style="border-color: var(--gz-border);">
@@ -449,53 +451,101 @@
                 {{-- Right: Payment Method & Submission Form --}}
                 <div class="lg:col-span-7">
                     <div class="gz-panel gz-panel-body">
-                        <h3 class="gz-font-display font-bold text-base mb-6">Payment Method</h3>
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="gz-font-display font-bold text-base">Payment Method</h3>
+                                <p class="text-xs" style="color: var(--gz-muted);">Choose how you would like to settle your court reservation.</p>
+                            </div>
+                            <span class="gz-badge gz-badge-success text-[10px]">Instant Lock</span>
+                        </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6" role="radiogroup" aria-label="Payment method">
-                            <button type="button" @click="paymentMethod = 'gcash'"
-                                    role="radio" :aria-checked="paymentMethod === 'gcash' ? 'true' : 'false'"
-                                    class="gz-kpi-card text-center"
-                                    :style="paymentMethod === 'gcash' ? 'border-color: var(--gz-pop); background: rgba(62,207,126,0.08);' : ''">
-                                <div class="icon-badge mx-auto mb-2" style="width:32px; height:32px; padding:6px;" id="icon-pay-gcash" aria-hidden="true"></div>
-                                <span class="text-sm font-semibold block">GCash</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6" role="radiogroup" aria-label="Payment method">
+                            {{-- Option 1: PayMongo Online --}}
+                            <button type="button" @click="paymentMethod = 'paymongo'"
+                                    role="radio" :aria-checked="paymentMethod === 'paymongo' ? 'true' : 'false'"
+                                    class="gz-kpi-card text-left p-3.5 cursor-pointer transition relative"
+                                    :style="paymentMethod === 'paymongo' ? 'border-color: var(--gz-pop); background: rgba(62,207,126,0.08);' : ''">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-base" style="background: rgba(62,207,126,0.2); color: var(--gz-pop-dark);">
+                                            ⚡
+                                        </div>
+                                        <div>
+                                            <span class="text-sm font-bold block leading-tight">Pay Online</span>
+                                            <span class="text-[11px]" style="color: var(--gz-muted);">PayMongo Portal</span>
+                                        </div>
+                                    </div>
+                                    <span class="gz-badge gz-badge-success text-[9px]">Sandbox Test</span>
+                                </div>
+                                <div class="flex items-center gap-1 flex-wrap mt-2 pt-2 border-t text-[10px]" style="border-color: var(--gz-border);">
+                                    <span class="gz-badge gz-badge-pop font-semibold text-[9px]">QR Ph</span>
+                                    <span class="gz-badge gz-badge-neutral text-[9px]">Bank</span>
+                                    <span class="gz-badge gz-badge-neutral text-[9px]">GCash</span>
+                                    <span class="gz-badge gz-badge-neutral text-[9px]">Maya</span>
+                                    <span class="gz-badge gz-badge-neutral text-[9px]">Cards</span>
+                                </div>
                             </button>
-                            <button type="button" @click="paymentMethod = 'card'"
-                                    role="radio" :aria-checked="paymentMethod === 'card' ? 'true' : 'false'"
-                                    class="gz-kpi-card text-center"
-                                    :style="paymentMethod === 'card' ? 'border-color: var(--gz-pop); background: rgba(62,207,126,0.08);' : ''">
-                                <div class="icon-badge mx-auto mb-2" style="width:32px; height:32px; padding:6px;" id="icon-pay-card" aria-hidden="true"></div>
-                                <span class="text-sm font-semibold block">Card</span>
-                            </button>
+
+                            {{-- Option 2: Cash at Counter --}}
                             <button type="button" @click="paymentMethod = 'cash'"
                                     role="radio" :aria-checked="paymentMethod === 'cash' ? 'true' : 'false'"
-                                    class="gz-kpi-card text-center"
+                                    class="gz-kpi-card text-left p-3.5 cursor-pointer transition relative"
                                     :style="paymentMethod === 'cash' ? 'border-color: var(--gz-pop); background: rgba(62,207,126,0.08);' : ''">
-                                <div class="icon-badge mx-auto mb-2" style="width:32px; height:32px; padding:6px;" id="icon-pay-cash" aria-hidden="true"></div>
-                                <span class="text-sm font-semibold block">Cash at Counter</span>
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-base" style="background: rgba(18,21,15,0.08); color: var(--gz-ink);">
+                                            💵
+                                        </div>
+                                        <div>
+                                            <span class="text-sm font-bold block leading-tight">Cash at Counter</span>
+                                            <span class="text-[11px]" style="color: var(--gz-muted);">Over-the-Counter</span>
+                                        </div>
+                                    </div>
+                                    <span class="gz-badge gz-badge-neutral text-[9px]">Front Desk</span>
+                                </div>
+                                <p class="text-[10px] mt-2 pt-2 border-t leading-snug" style="border-color: var(--gz-border); color: var(--gz-muted);">
+                                    Pay in person at the front desk cashier before your scheduled session starts.
+                                </p>
                             </button>
                         </div>
 
-                        <div x-show="paymentMethod === 'gcash'" x-cloak class="mb-6">
-                            <label class="gz-label" for="gcash_number">GCash Mobile Number</label>
-                            <input type="tel" id="gcash_number" class="gz-input" placeholder="09XX XXX XXXX">
+                        {{-- PayMongo Sandbox Info Panel --}}
+                        <div x-show="paymentMethod === 'paymongo'" x-cloak class="mb-6 p-4 rounded-xl text-xs space-y-2.5" style="background: rgba(62,207,126,0.06); border: 1px solid rgba(62,207,126,0.25);">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-2.5 h-2.5 rounded-full inline-block" style="background: var(--gz-pop-dark);"></span>
+                                    <strong class="font-bold text-sm" style="color: var(--gz-pop-dark);">PayMongo Sandbox (Free Test Mode)</strong>
+                                </div>
+                                <span class="gz-badge gz-badge-success text-[10px]">₱0.00 Real Cost</span>
+                            </div>
+                            <p style="color: var(--gz-ink); line-height: 1.4;">
+                                You will be redirected to the secure <strong>PayMongo Hosted Checkout</strong> portal where you can test payments with zero real charges:
+                            </p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px]">
+                                <div class="p-2.5 rounded-lg" style="background: var(--gz-surface); border: 1px solid var(--gz-border);">
+                                    <strong class="block mb-0.5" style="color: var(--gz-ink);">📲 QR Ph (Scan-to-Pay)</strong>
+                                    <span style="color: var(--gz-muted);">Simulate instant QR Ph scanning supported by GCash, Maya, BDO, BPI, UnionBank, etc.</span>
+                                </div>
+                                <div class="p-2.5 rounded-lg" style="background: var(--gz-surface); border: 1px solid var(--gz-border);">
+                                    <strong class="block mb-0.5" style="color: var(--gz-ink);">🏦 Online Banking</strong>
+                                    <span style="color: var(--gz-muted);">Direct test online bank checkout via supported Philippine banks.</span>
+                                </div>
+                                <div class="p-2.5 rounded-lg" style="background: var(--gz-surface); border: 1px solid var(--gz-border);">
+                                    <strong class="block mb-0.5" style="color: var(--gz-ink);">👛 GCash & Maya</strong>
+                                    <span style="color: var(--gz-muted);">One-click sandbox authorization to test mobile wallet debit.</span>
+                                </div>
+                                <div class="p-2.5 rounded-lg" style="background: var(--gz-surface); border: 1px solid var(--gz-border);">
+                                    <strong class="block mb-0.5" style="color: var(--gz-ink);">💳 Cards</strong>
+                                    <span style="color: var(--gz-muted);">Test card numbers provided directly on PayMongo screen.</span>
+                                </div>
+                            </div>
                         </div>
-                        <div x-show="paymentMethod === 'card'" x-cloak class="mb-6 grid grid-cols-2 gap-4">
-                            <div class="col-span-2">
-                                <label class="gz-label" for="card_number">Card Number</label>
-                                <input type="text" id="card_number" class="gz-input" placeholder="0000 0000 0000 0000">
-                            </div>
-                            <div>
-                                <label class="gz-label" for="card_expiry">Expiry</label>
-                                <input type="text" id="card_expiry" class="gz-input" placeholder="MM/YY">
-                            </div>
-                            <div>
-                                <label class="gz-label" for="card_cvc">CVC</label>
-                                <input type="text" id="card_cvc" class="gz-input" placeholder="123">
-                            </div>
-                        </div>
-                        <div x-show="paymentMethod === 'cash'" x-cloak class="mb-6">
-                            <p class="text-sm" style="color: var(--gz-muted);">
-                                Pay in person at the KYMNET front desk when you arrive for your first session.
+
+                        {{-- Cash Info Panel --}}
+                        <div x-show="paymentMethod === 'cash'" x-cloak class="mb-6 p-4 rounded-xl text-xs" style="background: var(--gz-surface); border: 1px solid var(--gz-border);">
+                            <strong class="block font-bold text-sm mb-1">Over-the-Counter Payment</strong>
+                            <p style="color: var(--gz-muted); line-height: 1.4;">
+                                Your slots are reserved immediately. Please present your booking reference to the cashier at the KYMNET front desk before stepping onto the court.
                             </p>
                         </div>
 
@@ -512,8 +562,16 @@
                             <input type="hidden" name="payment_method" :value="paymentMethod">
                             <input type="hidden" name="event_id" :value="selectedEvent">
 
-                            <button type="submit" :disabled="!canConfirm" class="gz-btn-primary w-full justify-center">
-                                Confirm & Pay (<span x-text="'₱' + totalDue.toFixed(2)"></span>)
+                            <button type="submit" :disabled="!canConfirm" class="gz-btn-primary w-full justify-center py-3 text-sm font-bold">
+                                <template x-if="paymentMethod === 'paymongo'">
+                                    <span>Proceed to PayMongo Checkout (<span x-text="'₱' + totalDue.toFixed(2)"></span>) →</span>
+                                </template>
+                                <template x-if="paymentMethod === 'cash'">
+                                    <span>Confirm Reservation & Pay at Counter (<span x-text="'₱' + totalDue.toFixed(2)"></span>)</span>
+                                </template>
+                                <template x-if="paymentMethod !== 'paymongo' && paymentMethod !== 'cash'">
+                                    <span>Confirm & Pay (<span x-text="'₱' + totalDue.toFixed(2)"></span>)</span>
+                                </template>
                             </button>
                         </form>
                     </div>
@@ -521,28 +579,4 @@
             </div>
         </div>
     </div>
-
-    <script>
-        (function () {
-            const glyphs = {
-                'icon-pay-gcash': [
-                    "..GGGG..",".G....G.",".G.GG.G.",".G.GG.G.",
-                    ".G.GG.G.",".G....G.","..GGGG..","........"
-                ],
-                'icon-pay-card': [
-                    "GGGGGGGG","G......G","GGGGGGGG","G......G",
-                    "G.GG...G","G......G","GGGGGGGG","........"
-                ],
-                'icon-pay-cash': [
-                    "........","..GGGG..",".G....G.",".G.GG.G.",
-                    ".G.GG...",".G....G.","..GGGG..","........"
-                ]
-            };
-            Object.keys(glyphs).forEach(id => {
-                if (typeof window.renderPixelGrid === 'function') {
-                    window.renderPixelGrid(id, glyphs[id], { '.': 'transparent', 'G': '#3ECF7E' });
-                }
-            });
-        })();
-    </script>
 </x-app-layout>
