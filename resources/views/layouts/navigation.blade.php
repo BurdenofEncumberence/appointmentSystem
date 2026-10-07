@@ -26,8 +26,7 @@
                     @auth
                         @if(Auth::user()->isAdmin() || Auth::user()->hasRole('manager'))
                             {{-- Admin/Manager only sees Admin Panel navigation --}}
-                            <a href="{{ route('admin.dashboard') }}"
-                               @if(request()->routeIs('admin.dashboard')) style="color: var(--red); border-bottom: 2px solid var(--red);" @endif>
+                            <a href="{{ route('admin.dashboard') }}" class="nav-link" @if(request()->routeIs('admin.dashboard')) aria-current="page" @endif>
                                 Overview
                             </a>
                             <a href="{{ route('admin.courts.index') }}" class="nav-link" @if(request()->routeIs('admin.courts.*')) aria-current="page" @endif>
@@ -53,8 +52,7 @@
                             <a href="{{ url('/') }}" class="nav-link" @if(request()->is('/')) aria-current="page" @endif>
                                 Home
                             </a>
-                            <a href="{{ route('booking') }}"
-                               @if(request()->routeIs('booking')) style="color: var(--red); border-bottom: 2px solid var(--red);" @endif>
+                            <a href="{{ route('booking') }}" class="nav-link" @if(request()->routeIs('booking')) aria-current="page" @endif>
                                 Book Courts
                             </a>
                             <a href="{{ route('bookings.index') }}" class="nav-link" @if(request()->routeIs('bookings.index')) aria-current="page" @endif>
