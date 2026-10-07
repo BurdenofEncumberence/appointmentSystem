@@ -20,4 +20,9 @@ class Court extends Model
     {
         return $this->hasMany(Booking::class);
     }
+
+    public function openPlaySessions()
+    {
+        return $this->belongsToMany(OpenPlaySession::class, 'open_play_session_courts');
+    }
 }

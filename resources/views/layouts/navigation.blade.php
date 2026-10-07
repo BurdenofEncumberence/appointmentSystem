@@ -35,6 +35,9 @@
                             <a href="{{ route('admin.events.index') }}" class="nav-link" @if(request()->routeIs('admin.events.*')) aria-current="page" @endif>
                                 Events
                             </a>
+                            <a href="{{ route('admin.open-play.index') }}" class="nav-link" @if(request()->routeIs('admin.open-play.*')) aria-current="page" @endif>
+                                Open Play
+                            </a>
                             <a href="{{ route('admin.finance') }}" class="nav-link" @if(request()->routeIs('admin.finance')) aria-current="page" @endif>
                                 Financials
                             </a>
@@ -55,6 +58,9 @@
                             <a href="{{ route('booking') }}" class="nav-link" @if(request()->routeIs('booking')) aria-current="page" @endif>
                                 Book Courts
                             </a>
+                            <a href="{{ route('open-play.index') }}" class="nav-link" @if(request()->routeIs('open-play.*')) aria-current="page" @endif>
+                                Open Play
+                            </a>
                             <a href="{{ route('bookings.index') }}" class="nav-link" @if(request()->routeIs('bookings.index')) aria-current="page" @endif>
                                 Booking History
                             </a>
@@ -65,6 +71,9 @@
                         </a>
                         <a href="{{ route('booking') }}" class="nav-link" @if(request()->routeIs('booking')) aria-current="page" @endif>
                             Book Courts
+                        </a>
+                        <a href="{{ route('open-play.index') }}" class="nav-link" @if(request()->routeIs('open-play.*')) aria-current="page" @endif>
+                            Open Play
                         </a>
                     @endauth
                 </div>
@@ -167,6 +176,7 @@
                 <a href="{{ route('admin.dashboard') }}" class="gz-dropdown-item">Admin Overview</a>
                 <a href="{{ route('admin.courts.index') }}" class="gz-dropdown-item">Courts</a>
                 <a href="{{ route('admin.events.index') }}" class="gz-dropdown-item">Events</a>
+                <a href="{{ route('admin.open-play.index') }}" class="gz-dropdown-item">Open Play & Tournaments</a>
                 <a href="{{ route('admin.finance') }}" class="gz-dropdown-item">Financials</a>
                 <a href="{{ route('admin.customization.index') }}" class="gz-dropdown-item">Customization</a>
             @elseif(Auth::user()->hasRole('staff'))
@@ -175,6 +185,7 @@
             @else
                 <a href="{{ url('/') }}" class="gz-dropdown-item">Home</a>
                 <a href="{{ route('booking') }}" class="gz-dropdown-item">Book Courts</a>
+                <a href="{{ route('open-play.index') }}" class="gz-dropdown-item">Open Play & Tournaments</a>
                 <a href="{{ route('bookings.index') }}" class="gz-dropdown-item">Booking History</a>
             @endif
             <div class="my-1 border-t border-[color:var(--gz-border)]"></div>
@@ -186,6 +197,7 @@
         @else
             <a href="{{ url('/') }}" class="gz-dropdown-item">Home</a>
             <a href="{{ route('booking') }}" class="gz-dropdown-item">Book Courts</a>
+            <a href="{{ route('open-play.index') }}" class="gz-dropdown-item">Open Play & Tournaments</a>
             <div class="my-1 border-t border-[color:var(--gz-border)]"></div>
             <a href="{{ route('login') }}" class="gz-dropdown-item">Login</a>
             <a href="{{ route('register') }}" class="gz-dropdown-item">Register</a>

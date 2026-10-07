@@ -1,0 +1,189 @@
+<x-app-layout>
+    <x-slot name="header">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+            <div>
+                <div class="flex items-center gap-2 text-xs mb-1" style="color: var(--gz-muted);">
+                    <a href="{{ route('admin.open-play.index') }}" class="hover:underline">Open Play & Tournaments</a>
+                    <span>/</span>
+                    <span>Session Roster</span>
+                </div>
+                <h1 class="gz-font-display font-bold text-xl sm:text-2xl">{{ $session->title }}</h1>
+                <p class="text-xs mt-1" style="color: var(--gz-muted);">
+                    {{ $session->date->format('l, F j, Y') }} • {{ $session->time_window }} ({{ $session->duration_hours }} hrs)
+                </p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="{{ route('admin.open-play.edit', $session) }}" class="gz-btn-outline gz-btn-sm flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                    <span>Edit Session</span>
+                </a>
+                <a href="{{ route('admin.open-play.index') }}" class="gz-btn-outline gz-btn-sm flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    <span>All Sessions</span>
+                </a>
+            </div>
+        </div>
+    </x-slot>
+
+    {{-- Status Flash Alert --}}
+    @if (session('status'))
+        <div class="mb-4 p-4 rounded-xl text-sm border" style="background: rgba(62, 207, 126, 0.08); border-color: rgba(62, 207, 126, 0.3); color: var(--gz-ink);">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 shrink-0" style="color: var(--gz-pop-dark);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>{{ session('status') }}</span>
+            </div>
+        </div>
+    @endif
+
+    {{-- Overview KPI Grid --}}
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+        <div class="gz-kpi-card">
+            <span class="gz-kpi-label">Slots Occupied</span>
+            <div class="gz-kpi-value mt-1">
+                {{ $session->registered_slots_count }} <span class="text-sm font-normal text-muted">/ {{ $session->max_capacity }}</span>
+            </div>
+            <div class="w-full bg-gray-200 dark:bg-gray-700 h-1.5 rounded-full mt-2 overflow-hidden">
+                <div class="h-full rounded-full {{ $session->is_full ? 'bg-amber-500' : 'bg-emerald-500' }}" style="width: {{ $session->capacity_percent }}%;"></div>
+            </div>
+            <p class="text-[11px] mt-1" style="color: var(--gz-muted);">{{ $session->remaining_slots }} slot(s) available</p>
+        </div>
+
+        <div class="gz-kpi-card">
+            <span class="gz-kpi-label">Allocated Courts</span>
+            <div class="gz-kpi-value mt-1 text-base font-bold">
+                {{ $session->allocated_courts_label ?: 'None' }}
+            </div>
+            <p class="text-[11px] mt-1" style="color: var(--gz-muted);">Reserved exclusively for this event</p>
+        </div>
+
+        <div class="gz-kpi-card">
+            <span class="gz-kpi-label">Ticket Fee / Slot</span>
+            <div class="gz-kpi-value mt-1 font-mono">₱{{ number_format($session->price_per_slot, 2) }}</div>
+            <p class="text-[11px] mt-1" style="color: var(--gz-muted);">Target Skill: {{ $session->skill_level }}</p>
+        </div>
+
+        <div class="gz-kpi-card">
+            <span class="gz-kpi-label">Revenue Collected</span>
+            <div class="gz-kpi-value mt-1 font-mono">
+                ₱{{ number_format($session->registrations->where('payment_status', 'paid')->sum('total_fee'), 2) }}
+            </div>
+            <p class="text-[11px] mt-1" style="color: var(--gz-muted);">
+                Pending: ₱{{ number_format($session->registrations->where('payment_status', 'pending')->sum('total_fee'), 2) }}
+            </p>
+        </div>
+    </div>
+
+    {{-- Details Card --}}
+    @if($session->details)
+        <div class="gz-panel p-4 mb-6">
+            <h3 class="gz-font-display font-bold text-xs uppercase tracking-wider mb-1" style="color: var(--gz-muted);">
+                Format & Notes
+            </h3>
+            <p class="text-xs" style="color: var(--gz-ink);">{{ $session->details }}</p>
+        </div>
+    @endif
+
+    {{-- Player Roster Table --}}
+    <div class="gz-panel overflow-hidden">
+        <div class="p-4 border-b flex items-center justify-between" style="border-color: var(--gz-border);">
+            <div>
+                <h2 class="gz-font-display font-bold text-sm">Player Roster & Attendance</h2>
+                <p class="text-xs mt-0.5" style="color: var(--gz-muted);">
+                    List of registered players for this session. Mark attendance (Show / No Show) as players check in.
+                </p>
+            </div>
+            <span class="gz-badge gz-badge-outline text-xs">
+                {{ $session->registrations->count() }} Transaction(s)
+            </span>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="gz-table w-full text-xs">
+                <thead>
+                    <tr>
+                        <th class="text-left py-3 px-4">Player Details</th>
+                        <th class="text-center py-3 px-4">Slots</th>
+                        <th class="text-right py-3 px-4">Total Fee</th>
+                        <th class="text-center py-3 px-4">Payment</th>
+                        <th class="text-left py-3 px-4">Reference</th>
+                        <th class="text-center py-3 px-4">Attendance</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y" style="border-color: var(--gz-border);">
+                    @forelse($session->registrations as $reg)
+                        <tr class="hover:bg-black/5 dark:hover:bg-white/5 transition">
+                            <td class="py-3 px-4">
+                                <div class="font-bold text-sm" style="color: var(--gz-ink);">
+                                    {{ $reg->player_name }}
+                                </div>
+                                <div class="text-[11px]" style="color: var(--gz-muted);">
+                                    {{ $reg->player_email }}
+                                    @if($reg->player_phone)
+                                        • {{ $reg->player_phone }}
+                                    @endif
+                                </div>
+                                @if($reg->notes)
+                                    <div class="text-[10px] italic mt-0.5" style="color: var(--gz-muted);">
+                                        Note: {{ $reg->notes }}
+                                    </div>
+                                @endif
+                            </td>
+                            <td class="py-3 px-4 text-center whitespace-nowrap">
+                                <span class="font-bold text-sm">{{ $reg->slots_count }}</span>
+                                <span class="text-[11px]" style="color: var(--gz-muted);">slot(s)</span>
+                            </td>
+                            <td class="py-3 px-4 text-right whitespace-nowrap font-mono font-bold">
+                                ₱{{ number_format($reg->total_fee, 2) }}
+                            </td>
+                            <td class="py-3 px-4 text-center whitespace-nowrap">
+                                <span class="gz-badge text-[10px] uppercase font-bold
+                                    {{ $reg->payment_status === 'paid' ? 'gz-badge-success' : '' }}
+                                    {{ $reg->payment_status === 'pending' ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-400' : '' }}
+                                    {{ $reg->payment_status === 'cancelled' ? 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400' : '' }}
+                                ">
+                                    {{ $reg->payment_status }}
+                                </span>
+                                <div class="text-[10px] mt-0.5" style="color: var(--gz-muted);">
+                                    {{ ucfirst(str_replace('_', ' ', $reg->payment_method)) }}
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 whitespace-nowrap font-mono text-[11px]">
+                                {{ $reg->ref_num }}
+                            </td>
+                            <td class="py-3 px-4 text-center whitespace-nowrap">
+                                <form method="POST" action="{{ route('admin.open-play.attendance', $reg) }}" class="inline-flex items-center gap-1">
+                                    @csrf
+                                    @method('PATCH')
+                                    <select
+                                        name="attendance_status"
+                                        onchange="this.form.submit()"
+                                        class="gz-select text-[11px] py-1 px-2 font-semibold
+                                            {{ $reg->attendance_status === 'show' ? 'border-emerald-500 text-emerald-600' : '' }}
+                                            {{ $reg->attendance_status === 'no_show' ? 'border-red-500 text-red-600' : '' }}
+                                        "
+                                    >
+                                        <option value="registered" {{ $reg->attendance_status === 'registered' ? 'selected' : '' }}>Registered</option>
+                                        <option value="show" {{ $reg->attendance_status === 'show' ? 'selected' : '' }}>Show</option>
+                                        <option value="no_show" {{ $reg->attendance_status === 'no_show' ? 'selected' : '' }}>No Show</option>
+                                    </select>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center py-8" style="color: var(--gz-muted);">
+                                No players have registered for this session yet.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</x-app-layout>

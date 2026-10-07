@@ -201,10 +201,91 @@
                 @endforeach
             </div>
 
-            <a href="{{ $bookUrl }}" class="gz-btn-primary gz-btn-sm whitespace-nowrap">
-                + Book a Court
-            </a>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('open-play.index') }}" class="gz-btn-outline gz-btn-sm whitespace-nowrap">
+                    Open Play Sessions
+                </a>
+                <a href="{{ $bookUrl }}" class="gz-btn-primary gz-btn-sm whitespace-nowrap">
+                    + Book a Court
+                </a>
+            </div>
         </div>
+
+        {{-- Open Play & Tournament Tickets Section --}}
+        @if(isset($openPlayRegistrations) && $openPlayRegistrations->isNotEmpty())
+            <div class="gz-panel mb-6 overflow-hidden">
+                <div class="p-4 border-b flex items-center justify-between" style="border-color: var(--gz-border); background: var(--gz-bg);">
+                    <div class="flex items-center gap-2">
+                        <span class="gz-badge gz-badge-pop text-[10px] uppercase font-bold tracking-wider">Tickets</span>
+                        <h2 class="gz-font-display font-bold text-sm">Open Play & Tournament Registrations</h2>
+                    </div>
+                    <a href="{{ route('open-play.index') }}" class="text-xs font-semibold hover:underline" style="color: var(--gz-pop-dark);">
+                        Find More Sessions →
+                    </a>
+                </div>
+
+                <div class="divide-y" style="border-color: var(--gz-border);">
+                    @foreach($openPlayRegistrations as $reg)
+                        @php
+                            $sess = $reg->session;
+                            $sessDate = $sess ? \Illuminate\Support\Carbon::parse($sess->date) : null;
+                        @endphp
+                        <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-black/5 dark:hover:bg-white/5 transition">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="font-bold text-sm" style="color: var(--gz-ink);">
+                                        {{ $sess?->title ?? 'Open Play Session' }}
+                                    </span>
+                                    <span class="gz-badge text-[10px] uppercase font-bold">
+                                        {{ $sess ? str_replace('_', ' ', $sess->session_type) : 'Open Play' }}
+                                    </span>
+                                    <span class="gz-badge-outline text-[10px]">
+                                        {{ $reg->slots_count }} slot(s)
+                                    </span>
+                                </div>
+
+                                <div class="text-xs flex items-center gap-2 flex-wrap" style="color: var(--gz-muted);">
+                                    @if($sessDate)
+                                        <span>{{ $sessDate->format('D, M j, Y') }}</span>
+                                        <span>•</span>
+                                        <span>{{ $sess->time_window }}</span>
+                                        <span>•</span>
+                                    @endif
+                                    <span>Courts: {{ $sess?->allocated_courts_label ?: 'Dedicated Courts' }}</span>
+                                    <span>•</span>
+                                    <span class="font-mono">Ref: {{ $reg->ref_num }}</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-4 justify-between sm:justify-end">
+                                <div class="text-right">
+                                    <div class="font-mono font-bold text-sm" style="color: var(--gz-ink);">
+                                        ₱{{ number_format($reg->total_fee, 2) }}
+                                    </div>
+                                    <div class="text-[10px]" style="color: var(--gz-muted);">
+                                        {{ ucfirst(str_replace('_', ' ', $reg->payment_method)) }}
+                                    </div>
+                                </div>
+
+                                <span class="gz-badge text-[10px] uppercase font-bold
+                                    {{ $reg->payment_status === 'paid' ? 'gz-badge-success' : '' }}
+                                    {{ $reg->payment_status === 'pending' ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-400' : '' }}
+                                    {{ $reg->payment_status === 'cancelled' ? 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400' : '' }}
+                                ">
+                                    {{ $reg->payment_status }}
+                                </span>
+
+                                @if($sess)
+                                    <a href="{{ route('open-play.show', $sess) }}" class="gz-btn-outline gz-btn-sm text-xs">
+                                        View
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
 
         {{-- Search & Filter Toolbar --}}
         <div class="gz-panel mb-6" style="padding: 14px 16px;">

@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\Booking;
 use App\Models\Court;
+use App\Models\OpenPlaySession;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
@@ -162,6 +163,23 @@ class StoreBookingRequest extends FormRequest
                 if ($conflict) {
                     $courtName = Court::find($courtId)?->court_name ?? "Court {$courtId}";
                     $validator->errors()->add("slots.{$index}.time_slot", "{$courtName} is already booked for {$date} at {$timeSlot}.");
+                    continue;
+                }
+
+                $openPlayConflict = OpenPlaySession::whereDate('date', $date)
+                    ->where('session_status', '!=', 'cancelled')
+                    ->whereHas('courts', function ($q) use ($courtId) {
+                        $q->where('courts.id', $courtId);
+                    })
+                    ->where(function ($query) use ($startTime, $endTime) {
+                        $query->where('start_time', '<', $endTime)
+                              ->where('end_time', '>', $startTime);
+                    })
+                    ->first();
+
+                if ($openPlayConflict) {
+                    $courtName = Court::find($courtId)?->court_name ?? "Court {$courtId}";
+                    $validator->errors()->add("slots.{$index}.time_slot", "{$courtName} is reserved for {$openPlayConflict->title} ({$openPlayConflict->time_window}) on {$date}.");
                 }
             }
         });

@@ -5,7 +5,9 @@ use App\Http\Controllers\AdminCustomizationController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminEventController;
 use App\Http\Controllers\AdminFinanceController;
+use App\Http\Controllers\AdminOpenPlayController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\OpenPlayController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StaffTodayController;
 use App\Http\Controllers\StaffWalkInController;
@@ -24,13 +26,23 @@ Route::get('/', function () {
         ->where('end_date', '>=', now()->toDateString())
         ->orderBy('start_date')
         ->get();
+    $openPlaySessions = \App\Models\OpenPlaySession::with('courts')
+        ->where('date', '>=', now()->toDateString())
+        ->where('session_status', '!=', 'cancelled')
+        ->orderBy('date')
+        ->orderBy('start_time')
+        ->take(3)
+        ->get();
     $siteSettings = \App\Models\SiteSettings::first();
 
-    return view('welcome', compact('courts', 'events', 'siteSettings'));
+    return view('welcome', compact('courts', 'events', 'openPlaySessions', 'siteSettings'));
 })->name('welcome');
 
 Route::view('/terms', 'legal.terms')->name('terms');
 Route::view('/privacy', 'legal.privacy')->name('privacy');
+
+Route::get('/open-play', [OpenPlayController::class, 'index'])->name('open-play.index');
+Route::get('/open-play/{session}', [OpenPlayController::class, 'show'])->name('open-play.show');
 
 /*
 |--------------------------------------------------------------------------
@@ -71,6 +83,9 @@ Route::middleware(['auth', 'verified', 'role:admin,manager'])
             ->except(['show'])
             ->whereNumber('court');
         Route::resource('events', AdminEventController::class);
+        Route::resource('open-play', AdminOpenPlayController::class);
+        Route::patch('/open-play/registrations/{registration}/attendance', [AdminOpenPlayController::class, 'updateAttendance'])
+            ->name('open-play.attendance');
         Route::get('/customization', [AdminCustomizationController::class, 'index'])->name('customization.index');
         Route::patch('/customization', [AdminCustomizationController::class, 'update'])->name('customization.update');
     });
@@ -114,6 +129,14 @@ Route::middleware(['auth', 'verified', 'prevent.staff_admin_booking'])
             ->name('booking.paymongo.success');
         Route::get('/booking/paymongo/cancel', [BookingController::class, 'paymongoCancel'])
             ->name('booking.paymongo.cancel');
+
+        Route::post('/open-play/{session}/reserve', [OpenPlayController::class, 'store'])
+            ->middleware('throttle:20,1')
+            ->name('open-play.reserve');
+        Route::get('/open-play/paymongo/success', [OpenPlayController::class, 'paymongoSuccess'])
+            ->name('open-play.paymongo.success');
+        Route::get('/open-play/paymongo/cancel', [OpenPlayController::class, 'paymongoCancel'])
+            ->name('open-play.paymongo.cancel');
     });
 
 /*

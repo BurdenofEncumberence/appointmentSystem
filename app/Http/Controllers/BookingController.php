@@ -7,6 +7,7 @@ use App\Mail\BookingReceiptMail;
 use App\Models\Booking;
 use App\Models\Court;
 use App\Models\Event;
+use App\Models\OpenPlaySession;
 use App\Models\Payment;
 use App\Services\PayMongoService;
 use Illuminate\Http\Request;
@@ -55,6 +56,28 @@ class BookingController extends Controller
             $formattedSlot = Carbon::parse($booking->start_time)->format('g:i A') . ' - ' . Carbon::parse($booking->end_time)->format('g:i A');
             $dateStr = Carbon::parse($booking->date)->toDateString();
             $bookedSlots[$dateStr][$booking->court_id][] = $formattedSlot;
+        }
+
+        // Include courts allocated to active Open Play / Tournament sessions
+        $openPlaySessions = OpenPlaySession::with('courts')
+            ->where('date', '>=', now()->toDateString())
+            ->where('session_status', '!=', 'cancelled')
+            ->get();
+
+        foreach ($openPlaySessions as $session) {
+            $dateStr = Carbon::parse($session->date)->toDateString();
+            $sessionStart = Carbon::parse($session->start_time);
+            $sessionEnd = Carbon::parse($session->end_time);
+
+            $cur = $sessionStart->copy();
+            while ($cur->lt($sessionEnd)) {
+                $next = $cur->copy()->addHour();
+                $formattedSlot = $cur->format('g:i A') . ' - ' . $next->format('g:i A');
+                foreach ($session->courts as $allocatedCourt) {
+                    $bookedSlots[$dateStr][$allocatedCourt->id][] = $formattedSlot;
+                }
+                $cur = $next;
+            }
         }
 
         $events = Event::query()
@@ -407,8 +430,16 @@ class BookingController extends Controller
             ->orderByDesc('start_time')
             ->get();
 
+        $openPlayRegistrations = Auth::user()
+            ? Auth::user()->openPlayRegistrations()
+                ->with(['session.courts'])
+                ->orderByDesc('created_at')
+                ->get()
+            : collect();
+
         return view('bookings-index', [
             'bookings' => $bookings,
+            'openPlayRegistrations' => $openPlayRegistrations,
         ]);
     }
 }

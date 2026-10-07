@@ -227,4 +227,9 @@ class User extends Authenticatable implements MustVerifyEmail
         return in_array('*', $permissions[$this->role] ?? [], true)
             || in_array($permission, $permissions[$this->role] ?? [], true);
     }
+
+    public function openPlayRegistrations()
+    {
+        return $this->hasMany(OpenPlayRegistration::class);
+    }
 }

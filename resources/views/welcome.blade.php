@@ -372,6 +372,80 @@
     </section>
     @endif
 
+    @if(isset($openPlaySessions) && $openPlaySessions->isNotEmpty())
+    <!-- Open Play & Pickleball Tournaments Showcase -->
+    <section id="open-play" class="relative z-10 max-w-6xl mx-auto px-6 pb-20" aria-labelledby="openplay-heading">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--pop-dark)]">
+                    Communal Pickleball
+                </span>
+                <h2 id="openplay-heading" class="font-display text-2xl md:text-3xl font-bold mt-2">Open Play & Tournaments</h2>
+                <p class="text-sm mt-1" style="color: var(--muted);">
+                    Join communal rotation pools and tournaments! Pay only the per-player participation fee—no need to rent a full court.
+                </p>
+            </div>
+            <a href="{{ route('open-play.index') }}" class="text-sm font-bold flex items-center gap-1 hover:underline" style="color: var(--pop-dark);">
+                <span>Browse All Open Plays</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach($openPlaySessions as $session)
+                <div class="surface-card p-5 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-3">
+                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)]">
+                                {{ str_replace('_', ' ', $session->session_type) }}
+                            </span>
+                            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300">
+                                {{ $session->skill_level }}
+                            </span>
+                        </div>
+                        <h3 class="font-display font-bold text-lg mb-2">{{ $session->title }}</h3>
+                        <div class="text-xs space-y-1 mb-4" style="color: var(--muted);">
+                            <div class="font-semibold text-black dark:text-white">{{ $session->date->format('l, M j, Y') }}</div>
+                            <div>{{ $session->time_window }} ({{ $session->duration_hours }} hrs)</div>
+                            <div>Courts: {{ $session->allocated_courts_label ?: 'Dedicated Venue Courts' }}</div>
+                        </div>
+
+                        <div class="p-3 rounded-lg mb-4 bg-gray-50 dark:bg-gray-800/50 border border-[color:var(--border)]">
+                            <div class="flex items-center justify-between text-xs mb-1">
+                                <span style="color: var(--muted);">Availability:</span>
+                                @if($session->is_full)
+                                    <span class="font-bold text-red-600">Sold Out</span>
+                                @else
+                                    <span class="font-bold text-emerald-600">{{ $session->remaining_slots }} of {{ $session->max_capacity }} slots left</span>
+                                @endif
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 h-1.5 rounded-full overflow-hidden">
+                                <div class="h-full rounded-full {{ $session->is_full ? 'bg-red-500' : 'bg-emerald-500' }}" style="width: {{ $session->capacity_percent }}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-[color:var(--border)] flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] uppercase font-bold tracking-wider block" style="color: var(--muted);">Participation Fee</span>
+                            <span class="font-mono font-bold text-base">₱{{ number_format($session->price_per_slot, 2) }}</span>
+                            <span class="text-[10px]" style="color: var(--muted);">/ slot</span>
+                        </div>
+                        @if($session->is_full)
+                            <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-200 dark:bg-gray-800 text-gray-500">
+                                Sold Out
+                            </span>
+                        @else
+                            <a href="{{ route('open-play.show', $session) }}" class="btn-primary text-xs py-2 px-4">
+                                Reserve Slot
+                            </a>
+                        @endif
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </section>
+    @endif
+
     <!-- Championship Court Fleet Showcase -->
     <section id="courts" class="relative z-10 max-w-6xl mx-auto px-6 pb-24" aria-labelledby="courts-heading">
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
