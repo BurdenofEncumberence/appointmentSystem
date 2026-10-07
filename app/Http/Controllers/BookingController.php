@@ -43,6 +43,7 @@ class BookingController extends Controller
             ->map(fn (Court $court) => [
                 'id' => $court->id,
                 'name' => $court->court_name,
+                'size' => $court->size ?: 'Regular (60x60)',
                 'rate' => (float) $court->price_per_hour,
             ]);
 

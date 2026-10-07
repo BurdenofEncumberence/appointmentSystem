@@ -237,7 +237,12 @@
                         $price = $booking->court ? ($booking->court->price_per_hour * $hours) : 0;
                     @endphp
                     <tr>
-                        <td><strong>{{ $courtName }}</strong></td>
+                        <td>
+                            <strong>{{ $courtName }}</strong>
+                            @if($booking->court?->size)
+                                <br><span style="font-size: 11px; color: #565A4E;">{{ $booking->court->size }}</span>
+                            @endif
+                        </td>
                         <td>{{ \Carbon\Carbon::parse($booking->date)->format('M d, Y') }}</td>
                         <td>{{ $start->format('g:i A') }} – {{ $end->format('g:i A') }} ({{ $hours }} hr{{ $hours > 1 ? 's' : '' }})</td>
                         <td class="text-right">₱{{ number_format($price, 2) }}</td>

@@ -240,7 +240,7 @@
                                         {{ $booking->court?->court_name ?? 'Court Unassigned' }}
                                     </div>
                                     <div class="text-xs" style="color: var(--gz-muted);">
-                                        {{ $booking->court?->size ?: 'Standard Pickleball' }}
+                                        {{ $booking->court?->size ?: 'Regular (60x60)' }}
                                     </div>
                                 </td>
 

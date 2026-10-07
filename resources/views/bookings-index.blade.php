@@ -43,6 +43,7 @@
                     'startDt'       => $startDt,
                     'endDt'         => $endDt,
                     'courtName'     => $b->court->court_name ?? 'Court',
+                    'courtSize'     => $b->court?->size ?: 'Regular (60x60)',
                     'courtId'       => $b->court_id,
                     'dateLabel'     => $date->format('D, M j, Y'),
                     'timeLabel'     => $start->format('g:i A') . ' – ' . $end->format('g:i A'),
@@ -464,6 +465,11 @@
                                                         <h4 class="font-bold text-sm" style="color: var(--gz-ink);">
                                                             {{ $slot['courtName'] }}
                                                         </h4>
+                                                        @if (!empty($slot['courtSize']))
+                                                            <span class="gz-badge gz-badge-neutral text-[10px]">
+                                                                {{ $slot['courtSize'] }}
+                                                            </span>
+                                                        @endif
                                                         @if ($slot['event'])
                                                             <span class="gz-badge gz-badge-pop text-[10px]">
                                                                 {{ $slot['event']->event_title }}

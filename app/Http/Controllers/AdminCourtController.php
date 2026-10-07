@@ -58,7 +58,7 @@ class AdminCourtController extends Controller
     {
         return $request->validate([
             'court_name' => ['required', 'string', 'max:100'],
-            'size' => ['nullable', 'string', 'max:50'],
+            'size' => ['required', 'string', 'max:50'],
             'price_per_hour' => ['required', 'numeric', 'min:0', 'max:999999.99'],
             'court_status' => ['required', 'in:available,maintenance,closed'],
         ]);

@@ -144,7 +144,7 @@
                             >
                                 @foreach($courts as $court)
                                     <option value="{{ $court->id }}">
-                                        {{ $court->court_name }} · ₱{{ number_format($court->price_per_hour, 2) }}/hr
+                                        {{ $court->court_name }} ({{ $court->size ?: 'Regular (60x60)' }}) · ₱{{ number_format($court->price_per_hour, 2) }}/hr
                                     </option>
                                 @endforeach
                             </select>

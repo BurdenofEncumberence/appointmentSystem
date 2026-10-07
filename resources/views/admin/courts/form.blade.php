@@ -44,13 +44,18 @@
                     {{-- Court Size and Price Grid --}}
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
-                            <label for="size" class="gz-label">Court dimensions / type</label>
-                            <input id="size"
-                                   name="size"
-                                   type="text"
-                                   value="{{ old('size', $court->size) }}"
-                                   placeholder="e.g. Standard / Doubles"
-                                   class="gz-input">
+                            <label for="size" class="gz-label">Court dimensions / type *</label>
+                            <select id="size"
+                                    name="size"
+                                    required
+                                    class="gz-input cursor-pointer">
+                                <option value="" disabled {{ old('size', $court->size) ? '' : 'selected' }}>Select court dimensions / type</option>
+                                <option value="Regular (60x60)" @selected(old('size', $court->size) === 'Regular (60x60)')>Regular (60x60)</option>
+                                <option value="Junior (30x30)" @selected(old('size', $court->size) === 'Junior (30x30)')>Junior (30x30)</option>
+                                @if($court->size && !in_array($court->size, ['Regular (60x60)', 'Junior (30x30)']))
+                                    <option value="{{ $court->size }}" selected>{{ $court->size }} (Existing)</option>
+                                @endif
+                            </select>
                             <x-input-error :messages="$errors->get('size')" class="gz-error" />
                         </div>
 

@@ -106,8 +106,9 @@
                                             <th style="padding: 7px 10px;">Time</th>
                                             <template x-for="court in courts" :key="'head'+court.id">
                                                 <th class="text-center" style="padding: 7px 8px;">
-                                                    <span x-text="court.name"></span>
-                                                    <span class="block text-[10px] font-normal" style="color: var(--gz-muted);" x-text="'₱' + Number(court.rate).toFixed(2) + '/hr'"></span>
+                                                    <span class="font-semibold block" x-text="court.name"></span>
+                                                    <span x-show="court.size" class="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded mt-0.5" style="background: rgba(46, 125, 50, 0.12); color: #1b5e20;" x-text="court.size"></span>
+                                                    <span class="block text-[10px] font-normal mt-0.5" style="color: var(--gz-muted);" x-text="'₱' + Number(court.rate).toFixed(2) + '/hr'"></span>
                                                 </th>
                                             </template>
                                         </tr>
@@ -223,7 +224,10 @@
                             <template x-for="(slot, idx) in selectedSlots" :key="'sum-'+slot.courtId+'-'+slot.date+'-'+slot.time">
                                 <div class="py-2.5 flex items-start justify-between gap-3">
                                     <div>
-                                        <p class="font-semibold text-sm" x-text="slot.courtName"></p>
+                                        <div class="flex items-center gap-1.5 flex-wrap">
+                                            <p class="font-semibold text-sm" x-text="slot.courtName"></p>
+                                            <span x-show="slot.courtSize" class="text-[10px] font-medium px-1.5 py-0.2 rounded" style="background: rgba(46, 125, 50, 0.1); color: #1b5e20;" x-text="slot.courtSize"></span>
+                                        </div>
                                         <p class="text-xs" style="color: var(--gz-muted);" x-text="slot.date + ' · ' + slot.time"></p>
                                     </div>
                                     <div class="text-right shrink-0">
@@ -518,6 +522,7 @@
                         this.selectedSlots.push({
                             courtId: courtId,
                             courtName: court ? court.name : ("Court " + courtId),
+                            courtSize: court ? court.size : "",
                             rate: court ? Number(court.rate) : 0,
                             date: d,
                             time: time
