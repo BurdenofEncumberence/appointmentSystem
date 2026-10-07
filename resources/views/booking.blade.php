@@ -1,177 +1,5 @@
 <x-app-layout title="Reserve Courts — KYMNET">
-    <div
-        x-data='{
-            selectedDate: "{{ now()->toDateString() }}",
-            currentMonth: {{ now()->month - 1 }},
-            currentYear: {{ now()->year }},
-            todayStr: "{{ now()->toDateString() }}",
-
-            courts: @json($courts),
-            timeSlots: [
-                "6:00 AM - 7:00 AM","7:00 AM - 8:00 AM","8:00 AM - 9:00 AM","9:00 AM - 10:00 AM",
-                "10:00 AM - 11:00 AM","11:00 AM - 12:00 PM","12:00 PM - 1:00 PM","1:00 PM - 2:00 PM",
-            ],
-
-            bookedSlots: @json($bookedSlots ?? []),
-
-            // Multi-slot selection array
-            selectedSlots: [],
-
-            isBooked(time, courtId, date = null) {
-                const d = date || this.selectedDate;
-                const dayBookings = this.bookedSlots[d] || {};
-                const courtBookings = dayBookings[courtId] || [];
-                return courtBookings.includes(time);
-            },
-
-            isSelected(time, courtId, date = null) {
-                const d = date || this.selectedDate;
-                return this.selectedSlots.some(s => s.courtId === courtId && s.time === time && s.date === d);
-            },
-
-            toggleSlot(time, courtId) {
-                if (this.isBooked(time, courtId)) return;
-                const d = this.selectedDate;
-                const idx = this.selectedSlots.findIndex(s => s.courtId === courtId && s.time === time && s.date === d);
-                if (idx > -1) {
-                    this.selectedSlots.splice(idx, 1);
-                } else {
-                    const court = this.courts.find(c => c.id === courtId);
-                    this.selectedSlots.push({
-                        courtId: courtId,
-                        courtName: court ? court.name : ("Court " + courtId),
-                        rate: court ? Number(court.rate) : 0,
-                        date: d,
-                        time: time
-                    });
-                }
-            },
-
-            removeSlot(index) {
-                this.selectedSlots.splice(index, 1);
-                if (this.selectedSlots.length === 0 && this.step === 2) {
-                    this.step = 1;
-                }
-            },
-
-            clearSlots() {
-                this.selectedSlots = [];
-            },
-
-            events: @json($events ?? []),
-            selectedEvent: null,
-            get selectedEventObj() {
-                return this.events.find(e => e.id === this.selectedEvent);
-            },
-            get eventDiscountPercent() {
-                return this.selectedEventObj ? (Number(this.selectedEventObj.discount) || 0) : 0;
-            },
-            get discountAmount() {
-                return this.eventDiscountPercent > 0 ? (this.courtsSubtotal * (this.eventDiscountPercent / 100)) : 0;
-            },
-
-            // Legacy helpers
-            get selectedCourt() {
-                return this.selectedSlots.length > 0 ? this.selectedSlots[0].courtId : null;
-            },
-            get selectedTimeSlot() {
-                return this.selectedSlots.length > 0 ? this.selectedSlots[0].time : null;
-            },
-            get selectedCourtName() {
-                return this.selectedSlots.length > 0 ? this.selectedSlots[0].courtName : null;
-            },
-
-            get courtsSubtotal() {
-                return this.selectedSlots.reduce((acc, s) => acc + (Number(s.rate) || 0), 0);
-            },
-
-            serviceFee: 0,
-
-            get totalDue() {
-                if (this.selectedSlots.length === 0) return 0;
-                const sub = this.courtsSubtotal - this.discountAmount;
-                return Math.max(0, sub + this.serviceFee);
-            },
-
-            get canPay() {
-                return this.selectedSlots.length > 0;
-            },
-
-            step: 1,
-            paymentMethod: 'paymongo',
-
-            get canConfirm() {
-                return this.canPay && this.paymentMethod !== null;
-            },
-
-            pickDate(date) {
-                this.selectedDate = date;
-            },
-
-            get calendarDays() {
-                const firstDay = new Date(this.currentYear, this.currentMonth, 1).getDay();
-                const daysInMonth = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
-                const days = [];
-                for (let i = 0; i < firstDay; i++) days.push(null);
-                for (let d = 1; d <= daysInMonth; d++) days.push(d);
-                return days;
-            },
-
-            dateStringFor(day) {
-                const mm = String(this.currentMonth + 1).padStart(2, "0");
-                const dd = String(day).padStart(2, "0");
-                return `${this.currentYear}-${mm}-${dd}`;
-            },
-
-            isPast(day) {
-                return this.dateStringFor(day) < this.todayStr;
-            },
-
-            isToday(day) {
-                return this.dateStringFor(day) === this.todayStr;
-            },
-
-            pickDay(day) {
-                if (this.isPast(day)) return;
-                this.pickDate(this.dateStringFor(day));
-            },
-
-            prevMonth() {
-                if (this.currentMonth === 0) {
-                    this.currentMonth = 11;
-                    this.currentYear--;
-                } else {
-                    this.currentMonth--;
-                }
-            },
-
-            nextMonth() {
-                if (this.currentMonth === 11) {
-                    this.currentMonth = 0;
-                    this.currentYear++;
-                } else {
-                    this.currentMonth++;
-                }
-            },
-
-            get monthLabel() {
-                const names = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-                return names[this.currentMonth] + " " + this.currentYear;
-            },
-
-            goToReview() {
-                if (this.canPay) {
-                    this.step = 2;
-                    this.$nextTick(() => this.$refs.step2Heading?.focus());
-                }
-            },
-
-            goBack() {
-                this.step = 1;
-                this.$nextTick(() => this.$refs.step1Heading?.focus());
-            },
-        }'
-    >
+    <div x-data="courtBookingComponent()">
         <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
             <div>
                 <h1 class="gz-font-display font-bold text-xl">Reserve Courts</h1>
@@ -579,4 +407,177 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function courtBookingComponent() {
+            return {
+                selectedDate: @json(now()->toDateString()),
+                currentMonth: {{ now()->month - 1 }},
+                currentYear: {{ now()->year }},
+                todayStr: @json(now()->toDateString()),
+
+                courts: @json($courts),
+                timeSlots: [
+                    "6:00 AM - 7:00 AM","7:00 AM - 8:00 AM","8:00 AM - 9:00 AM","9:00 AM - 10:00 AM",
+                    "10:00 AM - 11:00 AM","11:00 AM - 12:00 PM","12:00 PM - 1:00 PM","1:00 PM - 2:00 PM",
+                ],
+
+                bookedSlots: @json($bookedSlots ?? []),
+                selectedSlots: [],
+
+                isBooked(time, courtId, date = null) {
+                    const d = date || this.selectedDate;
+                    const dayBookings = this.bookedSlots[d] || {};
+                    const courtBookings = dayBookings[courtId] || [];
+                    return courtBookings.includes(time);
+                },
+
+                isSelected(time, courtId, date = null) {
+                    const d = date || this.selectedDate;
+                    return this.selectedSlots.some(s => s.courtId === courtId && s.time === time && s.date === d);
+                },
+
+                toggleSlot(time, courtId) {
+                    if (this.isBooked(time, courtId)) return;
+                    const d = this.selectedDate;
+                    const idx = this.selectedSlots.findIndex(s => s.courtId === courtId && s.time === time && s.date === d);
+                    if (idx > -1) {
+                        this.selectedSlots.splice(idx, 1);
+                    } else {
+                        const court = this.courts.find(c => c.id === courtId);
+                        this.selectedSlots.push({
+                            courtId: courtId,
+                            courtName: court ? court.name : ("Court " + courtId),
+                            rate: court ? Number(court.rate) : 0,
+                            date: d,
+                            time: time
+                        });
+                    }
+                },
+
+                removeSlot(index) {
+                    this.selectedSlots.splice(index, 1);
+                    if (this.selectedSlots.length === 0 && this.step === 2) {
+                        this.step = 1;
+                    }
+                },
+
+                clearSlots() {
+                    this.selectedSlots = [];
+                },
+
+                events: @json($events ?? []),
+                selectedEvent: null,
+                get selectedEventObj() {
+                    return this.events.find(e => e.id === this.selectedEvent);
+                },
+                get eventDiscountPercent() {
+                    return this.selectedEventObj ? (Number(this.selectedEventObj.discount) || 0) : 0;
+                },
+                get discountAmount() {
+                    return this.eventDiscountPercent > 0 ? (this.courtsSubtotal * (this.eventDiscountPercent / 100)) : 0;
+                },
+
+                get selectedCourt() {
+                    return this.selectedSlots.length > 0 ? this.selectedSlots[0].courtId : null;
+                },
+                get selectedTimeSlot() {
+                    return this.selectedSlots.length > 0 ? this.selectedSlots[0].time : null;
+                },
+                get selectedCourtName() {
+                    return this.selectedSlots.length > 0 ? this.selectedSlots[0].courtName : null;
+                },
+
+                get courtsSubtotal() {
+                    return this.selectedSlots.reduce((acc, s) => acc + (Number(s.rate) || 0), 0);
+                },
+
+                serviceFee: 0,
+
+                get totalDue() {
+                    if (this.selectedSlots.length === 0) return 0;
+                    const sub = this.courtsSubtotal - this.discountAmount;
+                    return Math.max(0, sub + this.serviceFee);
+                },
+
+                get canPay() {
+                    return this.selectedSlots.length > 0;
+                },
+
+                step: 1,
+                paymentMethod: 'paymongo',
+
+                get canConfirm() {
+                    return this.canPay && this.paymentMethod !== null;
+                },
+
+                pickDate(date) {
+                    this.selectedDate = date;
+                },
+
+                get calendarDays() {
+                    const firstDay = new Date(this.currentYear, this.currentMonth, 1).getDay();
+                    const daysInMonth = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
+                    const days = [];
+                    for (let i = 0; i < firstDay; i++) days.push(null);
+                    for (let d = 1; d <= daysInMonth; d++) days.push(d);
+                    return days;
+                },
+
+                dateStringFor(day) {
+                    const mm = String(this.currentMonth + 1).padStart(2, "0");
+                    const dd = String(day).padStart(2, "0");
+                    return `${this.currentYear}-${mm}-${dd}`;
+                },
+
+                isPast(day) {
+                    return this.dateStringFor(day) < this.todayStr;
+                },
+
+                isToday(day) {
+                    return this.dateStringFor(day) === this.todayStr;
+                },
+
+                pickDay(day) {
+                    if (this.isPast(day)) return;
+                    this.pickDate(this.dateStringFor(day));
+                },
+
+                prevMonth() {
+                    if (this.currentMonth === 0) {
+                        this.currentMonth = 11;
+                        this.currentYear--;
+                    } else {
+                        this.currentMonth--;
+                    }
+                },
+
+                nextMonth() {
+                    if (this.currentMonth === 11) {
+                        this.currentMonth = 0;
+                        this.currentYear++;
+                    } else {
+                        this.currentMonth++;
+                    }
+                },
+
+                get monthLabel() {
+                    const names = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+                    return names[this.currentMonth] + " " + this.currentYear;
+                },
+
+                goToReview() {
+                    if (this.canPay) {
+                        this.step = 2;
+                        this.$nextTick(() => this.$refs.step2Heading?.focus());
+                    }
+                },
+
+                goBack() {
+                    this.step = 1;
+                    this.$nextTick(() => this.$refs.step1Heading?.focus());
+                },
+            };
+        }
+    </script>
 </x-app-layout>
