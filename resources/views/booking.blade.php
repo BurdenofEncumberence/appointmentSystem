@@ -52,9 +52,9 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
                     {{-- Calendar on Left Column --}}
-                    <div class="lg:col-span-4">
+                    <div class="lg:col-span-4 self-start">
                         <div class="gz-kpi-card" style="padding: 12px;">
                             <div class="flex items-center justify-between mb-2">
                                 <button type="button" @click="prevMonth()" class="gz-btn-outline gz-btn-sm" style="padding: 5px 10px;" aria-label="Previous month">‹</button>
@@ -98,7 +98,7 @@
                     {{-- Court Availability Table --}}
                     <div class="lg:col-span-8">
                         <div class="gz-panel overflow-hidden">
-                            <div style="max-height: 380px; overflow-y: auto; overflow-x: auto;">
+                            <div style="max-height: 290px; overflow-y: auto; overflow-x: auto;">
                                 <table class="gz-table" style="font-size: 12px;">
                                     <caption class="sr-only">Court availability by time slot. Click to select multiple.</caption>
                                     <thead style="position: sticky; top: 0; z-index: 2; background: var(--gz-surface);">
@@ -169,51 +169,43 @@
                     </div>
                 </div>
 
-                {{-- Selected Slots Tray (Chips & Summary) --}}
-                <div x-show="selectedSlots.length > 0" x-cloak class="mt-4 pt-4 border-t" style="border-color: var(--gz-border);">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-semibold" style="color: var(--gz-ink);">
-                            Selected Sessions in Cart (<span x-text="selectedSlots.length"></span>):
-                        </span>
-                        <span class="text-xs" style="color: var(--gz-muted);">
-                            Court Subtotal: <strong class="text-sm font-bold" style="color: var(--gz-pop-dark);" x-text="'₱' + courtsSubtotal.toFixed(2)"></strong>
-                        </span>
-                    </div>
-
-                    <div class="flex flex-wrap items-center gap-2 max-h-32 overflow-y-auto p-1">
-                        <template x-for="(slot, idx) in selectedSlots" :key="slot.courtId + '-' + slot.date + '-' + slot.time">
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold"
-                                  style="background: rgba(62,207,126,0.12); border: 1px solid var(--gz-pop); color: var(--gz-ink);">
-                                <span x-text="slot.courtName"></span>
-                                <span class="font-normal" style="color: var(--gz-muted);" x-text="'· ' + slot.date"></span>
-                                <span class="font-normal" style="color: var(--gz-muted);" x-text="'· ' + slot.time"></span>
-                                <span class="font-bold ml-1" style="color: var(--gz-pop-dark);" x-text="'₱' + Number(slot.rate).toFixed(2)"></span>
-                                <button type="button" @click="removeSlot(idx)" class="ml-1 text-xs opacity-60 hover:opacity-100 hover:text-red-600 font-bold" title="Remove session">
-                                    ✕
-                                </button>
-                            </span>
-                        </template>
-                    </div>
-                </div>
             </section>
 
-            {{-- Checkout Bar --}}
-            <section class="gz-panel flex flex-col sm:flex-row items-center justify-between gap-3" style="padding: 14px 16px;">
-                <div>
-                    <p class="gz-font-display font-bold text-sm mb-0.5">Booking Cart Summary</p>
-                    <p class="text-xs" style="color: var(--gz-muted);" x-show="canPay">
-                        <span x-text="selectedSlots.length + (selectedSlots.length === 1 ? ' session' : ' sessions')"></span> across your chosen court(s).
-                        Subtotal: <span class="font-semibold" style="color: var(--gz-ink);" x-text="'₱' + courtsSubtotal.toFixed(2)"></span> ·
-                        Est. Total (incl. service fee): <span class="font-bold" style="color: var(--gz-pop-dark);" x-text="'₱' + totalDue.toFixed(2)"></span>
-                    </p>
-                    <p class="text-xs" style="color: var(--gz-muted);" x-show="!canPay">
-                        Select one or more open court time slots above to continue.
-                    </p>
+            {{-- Checkout Bar with Selected Sessions Tray --}}
+            <section class="gz-panel flex flex-col gap-3" style="padding: 14px 16px;">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div>
+                        <p class="gz-font-display font-bold text-sm mb-0.5">Booking Cart Summary</p>
+                        <p class="text-xs" style="color: var(--gz-muted);" x-show="canPay">
+                            <span x-text="selectedSlots.length + (selectedSlots.length === 1 ? ' session' : ' sessions')"></span> across your chosen court(s).
+                            Subtotal: <span class="font-semibold" style="color: var(--gz-ink);" x-text="'₱' + courtsSubtotal.toFixed(2)"></span> ·
+                            Est. Total (incl. service fee): <span class="font-bold" style="color: var(--gz-pop-dark);" x-text="'₱' + totalDue.toFixed(2)"></span>
+                        </p>
+                        <p class="text-xs" style="color: var(--gz-muted);" x-show="!canPay">
+                            Select one or more open court time slots above to continue.
+                        </p>
+                    </div>
+
+                    <button type="button" @click="goToReview()" :disabled="!canPay" class="gz-btn-primary gz-btn-sm whitespace-nowrap">
+                        Review & Pay (<span x-text="selectedSlots.length"></span>) →
+                    </button>
                 </div>
 
-                <button type="button" @click="goToReview()" :disabled="!canPay" class="gz-btn-primary gz-btn-sm whitespace-nowrap">
-                    Review & Pay (<span x-text="selectedSlots.length"></span>) →
-                </button>
+                {{-- Selected Slots Chips in Cart Bar --}}
+                <div x-show="selectedSlots.length > 0" x-cloak class="pt-2.5 border-t flex flex-wrap items-center gap-2" style="border-color: var(--gz-border);">
+                    <template x-for="(slot, idx) in selectedSlots" :key="slot.courtId + '-' + slot.date + '-' + slot.time">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold"
+                              style="background: rgba(62,207,126,0.12); border: 1px solid var(--gz-pop); color: var(--gz-ink);">
+                            <span x-text="slot.courtName"></span>
+                            <span class="font-normal" style="color: var(--gz-muted);" x-text="'· ' + slot.date"></span>
+                            <span class="font-normal" style="color: var(--gz-muted);" x-text="'· ' + slot.time"></span>
+                            <span class="font-bold ml-1" style="color: var(--gz-pop-dark);" x-text="'₱' + Number(slot.rate).toFixed(2)"></span>
+                            <button type="button" @click="removeSlot(idx)" class="ml-1 text-xs opacity-60 hover:opacity-100 hover:text-red-600 font-bold" title="Remove session">
+                                ✕
+                            </button>
+                        </span>
+                    </template>
+                </div>
             </section>
         </div>
 
