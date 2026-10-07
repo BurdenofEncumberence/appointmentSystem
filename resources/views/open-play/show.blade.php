@@ -290,7 +290,7 @@
                                                 >
                                                 <div>
                                                     <span class="block text-xs font-bold" style="color: var(--gz-ink);">
-                                                        Pay Online via PayMongo (Instant Confirmation)
+                                                        Pay Online
                                                     </span>
                                                     <span class="block text-[11px]" style="color: var(--gz-muted);">
                                                         QR Ph, GCash, Maya, Debit/Credit Card, Online Banking
@@ -338,7 +338,7 @@
                                         class="gz-btn-primary w-full justify-center py-3 text-sm font-bold mt-2"
                                     >
                                         <span x-show="paymentMethod === 'paymongo'">
-                                            Pay via PayMongo (<span x-text="'₱' + (slotsCount * pricePerSlot).toFixed(2)"></span>) →
+                                            Pay Online (<span x-text="'₱' + (slotsCount * pricePerSlot).toFixed(2)"></span>) →
                                         </span>
                                         <span x-show="paymentMethod === 'cash'" x-cloak>
                                             Confirm & Pay at Counter (<span x-text="'₱' + (slotsCount * pricePerSlot).toFixed(2)"></span>)

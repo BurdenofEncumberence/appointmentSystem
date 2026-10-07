@@ -300,7 +300,7 @@
                                         </div>
                                         <div>
                                             <span class="text-sm font-bold block leading-tight">Pay Online</span>
-                                            <span class="text-[11px]" style="color: var(--gz-muted);">PayMongo Portal</span>
+                                            <span class="text-[11px]" style="color: var(--gz-muted);">Instant Confirmation</span>
                                         </div>
                                     </div>
                                     <span class="gz-badge gz-badge-success text-[9px]">Sandbox Test</span>
@@ -337,17 +337,17 @@
                             </button>
                         </div>
 
-                        {{-- PayMongo Sandbox Info Panel --}}
+                        {{-- Online Payment Sandbox Info Panel --}}
                         <div x-show="paymentMethod === 'paymongo'" x-cloak class="mb-6 p-4 rounded-xl text-xs space-y-2.5" style="background: rgba(62,207,126,0.06); border: 1px solid rgba(62,207,126,0.25);">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-1.5">
                                     <span class="w-2.5 h-2.5 rounded-full inline-block" style="background: var(--gz-pop-dark);"></span>
-                                    <strong class="font-bold text-sm" style="color: var(--gz-pop-dark);">PayMongo Sandbox (Free Test Mode)</strong>
+                                    <strong class="font-bold text-sm" style="color: var(--gz-pop-dark);">Online Payment Sandbox (Free Test Mode)</strong>
                                 </div>
                                 <span class="gz-badge gz-badge-success text-[10px]">₱0.00 Real Cost</span>
                             </div>
                             <p style="color: var(--gz-ink); line-height: 1.4;">
-                                You will be redirected to the secure <strong>PayMongo Hosted Checkout</strong> portal where you can test payments with zero real charges:
+                                You will be redirected to the secure <strong>Online Checkout</strong> portal where you can test payments with zero real charges:
                             </p>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px]">
                                 <div class="p-2.5 rounded-lg" style="background: var(--gz-surface); border: 1px solid var(--gz-border);">
@@ -364,7 +364,7 @@
                                 </div>
                                 <div class="p-2.5 rounded-lg" style="background: var(--gz-surface); border: 1px solid var(--gz-border);">
                                     <strong class="block mb-0.5" style="color: var(--gz-ink);">Cards</strong>
-                                    <span style="color: var(--gz-muted);">Test card numbers provided directly on PayMongo screen.</span>
+                                    <span style="color: var(--gz-muted);">Test card numbers provided directly on checkout screen.</span>
                                 </div>
                             </div>
                         </div>
@@ -392,7 +392,7 @@
 
                             <button type="submit" :disabled="!canConfirm" class="gz-btn-primary w-full justify-center py-3 text-sm font-bold">
                                 <template x-if="paymentMethod === 'paymongo'">
-                                    <span>Proceed to PayMongo Checkout (<span x-text="'₱' + totalDue.toFixed(2)"></span>) →</span>
+                                    <span>Pay Online (<span x-text="'₱' + totalDue.toFixed(2)"></span>) →</span>
                                 </template>
                                 <template x-if="paymentMethod === 'cash'">
                                     <span>Confirm Reservation & Pay at Counter (<span x-text="'₱' + totalDue.toFixed(2)"></span>)</span>

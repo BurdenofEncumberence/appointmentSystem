@@ -76,8 +76,8 @@
             // Payment method and status labeling
             $rawMethod = $firstPayment?->payment_method ?? 'online';
             $methodLabel = match (true) {
-                str_starts_with($rawMethod, 'paymongo_') => 'PayMongo (' . strtoupper(str_replace('paymongo_', '', $rawMethod)) . ')',
-                $rawMethod === 'paymongo'                => 'PayMongo Online',
+                str_starts_with($rawMethod, 'paymongo_') => 'Pay Online (' . strtoupper(str_replace('paymongo_', '', $rawMethod)) . ')',
+                $rawMethod === 'paymongo'                => 'Pay Online',
                 $rawMethod === 'cash'                    => 'Cash at Counter',
                 $rawMethod === 'gcash'                   => 'GCash',
                 $rawMethod === 'card'                    => 'Card',
@@ -263,7 +263,7 @@
                                         ₱{{ number_format($reg->total_fee, 2) }}
                                     </div>
                                     <div class="text-[10px]" style="color: var(--gz-muted);">
-                                        {{ ucfirst(str_replace('_', ' ', $reg->payment_method)) }}
+                                        {{ $reg->payment_method === 'paymongo' ? 'Pay Online' : ($reg->payment_method === 'cash' ? 'Cash at Counter' : ucfirst(str_replace('_', ' ', $reg->payment_method))) }}
                                     </div>
                                 </div>
 
