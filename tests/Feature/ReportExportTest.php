@@ -75,6 +75,44 @@ test('manager can export overall, financial, and utilization reports across all 
     }
 });
 
+test('admin can export overall, financial, and utilization reports in PDF format', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $types = ['overall', 'financial', 'utilization'];
+
+    foreach ($types as $type) {
+        $response = $this->actingAs($admin)->get(route('admin.reports.export', [
+            'type' => $type,
+            'period' => 'this_month',
+            'format' => 'pdf',
+        ]));
+
+        $response->assertOk();
+        $response->assertHeader('Content-Type', 'application/pdf');
+        $disposition = $response->headers->get('Content-Disposition');
+        expect($disposition)->toContain("{$type}-report-this_month");
+        expect($disposition)->toContain('.pdf');
+    }
+});
+
+test('manager can export overall, financial, and utilization reports in PDF format', function () {
+    $manager = User::factory()->create(['role' => 'manager']);
+    $types = ['overall', 'financial', 'utilization'];
+
+    foreach ($types as $type) {
+        $response = $this->actingAs($manager)->get(route('admin.reports.export', [
+            'type' => $type,
+            'period' => 'this_month',
+            'format' => 'pdf',
+        ]));
+
+        $response->assertOk();
+        $response->assertHeader('Content-Type', 'application/pdf');
+        $disposition = $response->headers->get('Content-Disposition');
+        expect($disposition)->toContain("{$type}-report-this_month");
+        expect($disposition)->toContain('.pdf');
+    }
+});
+
 test('players and staff are forbidden from exporting reports', function () {
     $player = User::factory()->create(['role' => 'player']);
     $staff = User::factory()->create(['role' => 'staff']);
@@ -98,4 +136,8 @@ test('exporting with invalid parameters returns validation error', function () {
     $this->actingAs($admin)
         ->get(route('admin.reports.export', ['type' => 'overall', 'period' => 'invalid_period']))
         ->assertSessionHasErrors('period');
+
+    $this->actingAs($admin)
+        ->get(route('admin.reports.export', ['type' => 'overall', 'period' => 'this_month', 'format' => 'invalid_format']))
+        ->assertSessionHasErrors('format');
 });

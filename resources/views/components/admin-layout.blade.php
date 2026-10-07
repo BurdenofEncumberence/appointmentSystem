@@ -24,8 +24,8 @@
     <x-loading-screen />
 
     <div
-        x-data="{ sidebarOpen: false, exportModalOpen: false, exportType: 'overall', exportPeriod: 'this_month' }"
-        @open-export-modal.window="exportModalOpen = true; if ($event.detail?.type) exportType = $event.detail.type; if ($event.detail?.period) exportPeriod = $event.detail.period;"
+        x-data="{ sidebarOpen: false, exportModalOpen: false, exportType: 'overall', exportPeriod: 'this_month', exportFormat: 'csv' }"
+        @open-export-modal.window="exportModalOpen = true; if ($event.detail?.type) exportType = $event.detail.type; if ($event.detail?.period) exportPeriod = $event.detail.period; if ($event.detail?.format) exportFormat = $event.detail.format;"
         class="min-h-screen flex flex-col lg:flex-row"
         style="background: var(--gz-bg);"
     >
@@ -410,9 +410,29 @@
                             </div>
                         </div>
 
+                        {{-- Format Selection (CSV or PDF) --}}
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--gz-muted);">
+                                File Format
+                            </label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer transition text-xs font-semibold"
+                                       :class="exportFormat === 'csv' ? 'border-[color:var(--gz-pop-dark)] bg-[color:var(--gz-pop)]/10' : 'border-[color:var(--gz-border)] hover:bg-black/5 dark:hover:bg-white/5'">
+                                    <input type="radio" name="format" value="csv" x-model="exportFormat">
+                                    <span>CSV Spreadsheet (.csv)</span>
+                                </label>
+
+                                <label class="flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer transition text-xs font-semibold"
+                                       :class="exportFormat === 'pdf' ? 'border-[color:var(--gz-pop-dark)] bg-[color:var(--gz-pop)]/10' : 'border-[color:var(--gz-border)] hover:bg-black/5 dark:hover:bg-white/5'">
+                                    <input type="radio" name="format" value="pdf" x-model="exportFormat">
+                                    <span>PDF Document (.pdf)</span>
+                                </label>
+                            </div>
+                        </div>
+
                         {{-- Footer Notes & Actions --}}
                         <div class="pt-4 border-t flex items-center justify-between gap-3" style="border-color: var(--gz-border);">
-                            <span class="text-[11px] font-mono" style="color: var(--gz-muted);">Format: CSV (Excel Compatible)</span>
+                            <span class="text-[11px] font-mono" style="color: var(--gz-muted);" x-text="exportFormat === 'pdf' ? 'Format: Portable Document Format (.pdf)' : 'Format: CSV (Excel Compatible)'"></span>
                             <div class="flex items-center gap-2">
                                 <button
                                     type="button"
@@ -429,7 +449,7 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                                     </svg>
-                                    <span>Download CSV</span>
+                                    <span x-text="exportFormat === 'pdf' ? 'Download PDF' : 'Download CSV'"></span>
                                 </button>
                             </div>
                         </div>

@@ -7,6 +7,8 @@ use App\Models\Court;
 use App\Models\Payment;
 use App\Models\SiteSettings;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -477,5 +479,173 @@ class ReportExportService
 
         arsort($frequencies);
         return array_key_first($frequencies);
+    }
+
+    /**
+     * Export Overall Operations Report in PDF format.
+     */
+    public function exportOverallPdf(string $period, User $user): Response
+    {
+        $range = $this->resolveDateRange($period);
+        $startDate = $range['start']->toDateString();
+        $endDate = $range['end']->toDateString();
+
+        $bookings = Booking::with(['court', 'user', 'payments'])
+            ->whereBetween('date', [$startDate, $endDate])
+            ->orderBy('date')
+            ->orderBy('start_time')
+            ->get();
+
+        $payments = Payment::whereBetween('date', [$startDate, $endDate])->get();
+        $paidPayments = $payments->where('payment_status', 'paid');
+
+        $totalRevenue = (float) $paidPayments->sum('amount');
+        $onlineRevenue = (float) $paidPayments->where('payment_method', 'paymongo')->sum('amount');
+        $cashRevenue = (float) $paidPayments->where('payment_method', 'cash')->sum('amount');
+
+        $activeBookings = $bookings->where('booking_status', '!=', 'cancelled');
+        $bookedHours = (float) $activeBookings->sum(fn ($b) => $this->calculateBookingHours($b));
+
+        $availableCourtsCount = max(Court::where('court_status', 'available')->count(), 1);
+        $capacityHours = $availableCourtsCount * self::DAILY_OPERATING_HOURS * $range['days'];
+        $utilizationRate = $capacityHours > 0 ? min(round(($bookedHours / $capacityHours) * 100, 1), 100.0) : 0.0;
+
+        $siteName = SiteSettings::first()->system_name ?? 'KYMNET';
+        $filename = 'overall-report-' . $range['period_key'] . '-' . date('Y-m-d') . '.pdf';
+
+        $pdf = Pdf::loadView('reports.pdf.overall', [
+            'siteName' => $siteName,
+            'range' => $range,
+            'user' => $user,
+            'bookings' => $bookings,
+            'totalRevenue' => $totalRevenue,
+            'onlineRevenue' => $onlineRevenue,
+            'cashRevenue' => $cashRevenue,
+            'bookedHours' => $bookedHours,
+            'capacityHours' => $capacityHours,
+            'utilizationRate' => $utilizationRate,
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->download($filename);
+    }
+
+    /**
+     * Export Financial and Revenue Audit Report in PDF format.
+     */
+    public function exportFinancialPdf(string $period, User $user): Response
+    {
+        $range = $this->resolveDateRange($period);
+        $startDate = $range['start']->toDateString();
+        $endDate = $range['end']->toDateString();
+
+        $payments = Payment::with(['booking.court', 'booking.user'])
+            ->whereBetween('date', [$startDate, $endDate])
+            ->orderBy('date')
+            ->orderBy('created_at')
+            ->get();
+
+        $paidPayments = $payments->where('payment_status', 'paid');
+        $totalPaidAmount = (float) $paidPayments->sum('amount');
+        $paidCount = $paidPayments->count();
+        $pendingPayments = $payments->where('payment_status', 'pending');
+        $pendingAmount = (float) $pendingPayments->sum('amount');
+
+        $onlinePaid = $paidPayments->filter(fn ($p) => ($p->booking->booking_type ?? '') === 'online');
+        $walkInPaid = $paidPayments->filter(fn ($p) => ($p->booking->booking_type ?? '') === 'walk_in');
+
+        $methodBreakdown = $paidPayments->groupBy('payment_method')->map(function ($group) use ($totalPaidAmount) {
+            $sum = (float) $group->sum('amount');
+            return [
+                'total' => $sum,
+                'count' => $group->count(),
+                'percent' => $totalPaidAmount > 0 ? round(($sum / $totalPaidAmount) * 100, 1) : 0.0,
+            ];
+        });
+
+        $siteName = SiteSettings::first()->system_name ?? 'KYMNET';
+        $filename = 'financial-report-' . $range['period_key'] . '-' . date('Y-m-d') . '.pdf';
+
+        $pdf = Pdf::loadView('reports.pdf.financial', [
+            'siteName' => $siteName,
+            'range' => $range,
+            'user' => $user,
+            'payments' => $payments,
+            'totalPaidAmount' => $totalPaidAmount,
+            'paidCount' => $paidCount,
+            'pendingAmount' => $pendingAmount,
+            'onlinePaid' => $onlinePaid,
+            'walkInPaid' => $walkInPaid,
+            'methodBreakdown' => $methodBreakdown,
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->download($filename);
+    }
+
+    /**
+     * Export Court Capacity and Utilization Report in PDF format.
+     */
+    public function exportUtilizationPdf(string $period, User $user): Response
+    {
+        $range = $this->resolveDateRange($period);
+        $startDate = $range['start']->toDateString();
+        $endDate = $range['end']->toDateString();
+
+        $courts = Court::with(['bookings' => function ($q) use ($startDate, $endDate) {
+            $q->where('booking_status', '!=', 'cancelled')
+                ->whereBetween('date', [$startDate, $endDate])
+                ->with('payments');
+        }])->orderBy('court_name')->get();
+
+        $days = $range['days'];
+        $courtCapacity = self::DAILY_OPERATING_HOURS * $days;
+        $totalCourts = $courts->count();
+        $availableCourts = $courts->where('court_status', 'available')->count();
+        $totalFacilityCapacity = max($availableCourts, 1) * $courtCapacity;
+
+        $courtStats = $courts->map(function (Court $court) use ($courtCapacity) {
+            $bookings = $court->bookings;
+            $bookedHours = (float) $bookings->sum(fn ($b) => $this->calculateBookingHours($b));
+            $rate = $courtCapacity > 0 ? min(round(($bookedHours / $courtCapacity) * 100, 1), 100.0) : 0.0;
+            $revenue = (float) $bookings->flatMap->payments->where('payment_status', 'paid')->sum('amount');
+            $revPach = $courtCapacity > 0 ? round($revenue / $courtCapacity, 2) : 0.0;
+            $peakSlot = $this->determinePeakSlot($bookings);
+
+            return [
+                'court' => $court,
+                'capacity_hours' => $courtCapacity,
+                'booked_hours' => $bookedHours,
+                'utilization_rate' => $rate,
+                'sessions_count' => $bookings->count(),
+                'revenue' => $revenue,
+                'rev_pach' => $revPach,
+                'peak_slot' => $peakSlot,
+            ];
+        });
+
+        $totalFacilityBookedHours = (float) $courtStats->sum('booked_hours');
+        $facilityUtilizationRate = $totalFacilityCapacity > 0
+            ? min(round(($totalFacilityBookedHours / $totalFacilityCapacity) * 100, 1), 100.0)
+            : 0.0;
+        $totalFacilityRevenue = (float) $courtStats->sum('revenue');
+
+        $siteName = SiteSettings::first()->system_name ?? 'KYMNET';
+        $filename = 'utilization-report-' . $range['period_key'] . '-' . date('Y-m-d') . '.pdf';
+
+        $pdf = Pdf::loadView('reports.pdf.utilization', [
+            'siteName' => $siteName,
+            'range' => $range,
+            'user' => $user,
+            'courts' => $courts,
+            'courtStats' => $courtStats,
+            'days' => $days,
+            'totalCourts' => $totalCourts,
+            'availableCourts' => $availableCourts,
+            'totalFacilityCapacity' => $totalFacilityCapacity,
+            'totalFacilityBookedHours' => $totalFacilityBookedHours,
+            'facilityUtilizationRate' => $facilityUtilizationRate,
+            'totalFacilityRevenue' => $totalFacilityRevenue,
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download($filename);
     }
 }
