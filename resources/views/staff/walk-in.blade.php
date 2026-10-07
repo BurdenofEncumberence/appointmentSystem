@@ -49,6 +49,7 @@
 
                 courts: @json($courts),
                 bookedSlots: @json($bookedSlots),
+                specialSlots: @json($specialSlots ?? []),
                 recentPlayers: @json($recentPlayers),
 
                 get currentCourt() {
@@ -59,9 +60,28 @@
                     return this.currentCourt ? Number(this.currentCourt.price_per_hour) : 0;
                 },
 
+                getSpecialSlot(slot) {
+                    const courtSpecial = this.specialSlots[this.selectedCourtId] || {};
+                    return courtSpecial[slot] || null;
+                },
+
                 isSlotBooked(slot) {
                     const courtBookings = this.bookedSlots[this.selectedCourtId] || [];
                     return courtBookings.includes(slot);
+                },
+
+                getSlotLabel(slot) {
+                    const special = this.getSpecialSlot(slot);
+                    if (special) {
+                        return special.type === 'tournament' ? 'Tournament' : 'Open Play';
+                    }
+                    if (this.isSlotBooked(slot)) {
+                        return 'Booked';
+                    }
+                    if (this.selectedSlot === slot) {
+                        return 'Selected';
+                    }
+                    return 'Open';
                 },
 
                 selectPlayer(event) {
@@ -154,7 +174,9 @@
                                 @click="if (!isSlotBooked('{{ $slot }}')) { selectedSlot = '{{ $slot }}'; }"
                                 :disabled="isSlotBooked('{{ $slot }}')"
                                 :class="{
-                                    'opacity-40 cursor-not-allowed bg-gray-200 line-through text-gray-500': isSlotBooked('{{ $slot }}'),
+                                    'opacity-80 cursor-not-allowed bg-emerald-50 border-emerald-300 text-emerald-800 font-semibold': getSpecialSlot('{{ $slot }}') && getSpecialSlot('{{ $slot }}').type !== 'tournament',
+                                    'opacity-80 cursor-not-allowed bg-amber-50 border-amber-300 text-amber-800 font-semibold': getSpecialSlot('{{ $slot }}') && getSpecialSlot('{{ $slot }}').type === 'tournament',
+                                    'opacity-40 cursor-not-allowed bg-gray-200 line-through text-gray-500': isSlotBooked('{{ $slot }}') && !getSpecialSlot('{{ $slot }}'),
                                     'border-2 border-[color:var(--red)] ring-2 ring-[color:var(--red)]/20 font-bold bg-white text-[color:var(--red)]': selectedSlot === '{{ $slot }}' && !isSlotBooked('{{ $slot }}'),
                                     'bg-[color:var(--gz-surface)] hover:border-[color:var(--gz-ink)] text-[color:var(--gz-ink)]': selectedSlot !== '{{ $slot }}' && !isSlotBooked('{{ $slot }}')
                                 }"
@@ -162,7 +184,7 @@
                                 style="border-color: var(--gz-border);"
                             >
                                 <span class="font-mono font-medium">{{ $slot }}</span>
-                                <span class="text-[10px] mt-0.5" x-text="isSlotBooked('{{ $slot }}') ? 'Unavailable' : (selectedSlot === '{{ $slot }}' ? 'Selected' : 'Open')"></span>
+                                <span class="text-[10px] mt-0.5" x-text="getSlotLabel('{{ $slot }}')"></span>
                             </button>
                         @endforeach
                     </div>

@@ -64,6 +64,7 @@ class BookingController extends Controller
             ->where('session_status', '!=', 'cancelled')
             ->get();
 
+        $specialSlots = [];
         foreach ($openPlaySessions as $session) {
             $dateStr = Carbon::parse($session->date)->toDateString();
             $sessionStart = Carbon::parse($session->start_time);
@@ -75,6 +76,11 @@ class BookingController extends Controller
                 $formattedSlot = $cur->format('g:i A') . ' - ' . $next->format('g:i A');
                 foreach ($session->courts as $allocatedCourt) {
                     $bookedSlots[$dateStr][$allocatedCourt->id][] = $formattedSlot;
+                    $specialSlots[$dateStr][$allocatedCourt->id][$formattedSlot] = [
+                        'type' => $session->session_type,
+                        'title' => $session->title,
+                        'id' => $session->id,
+                    ];
                 }
                 $cur = $next;
             }
@@ -95,6 +101,7 @@ class BookingController extends Controller
         return view('booking', [
             'courts' => $courts,
             'bookedSlots' => $bookedSlots,
+            'specialSlots' => $specialSlots,
             'events' => $events,
         ]);
     }

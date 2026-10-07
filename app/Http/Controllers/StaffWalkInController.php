@@ -66,6 +66,32 @@ class StaffWalkInController extends Controller
             $bookedSlots[$b->court_id][] = $slotStr;
         }
 
+        // Include courts allocated to active Open Play / Tournament sessions
+        $openPlaySessions = \App\Models\OpenPlaySession::with('courts')
+            ->whereDate('date', $selectedDate)
+            ->where('session_status', '!=', 'cancelled')
+            ->get();
+
+        $specialSlots = [];
+        foreach ($openPlaySessions as $session) {
+            $sessionStart = Carbon::parse($session->start_time);
+            $sessionEnd = Carbon::parse($session->end_time);
+
+            $cur = $sessionStart->copy();
+            while ($cur->lt($sessionEnd)) {
+                $next = $cur->copy()->addHour();
+                $slotStr = $cur->format('g:i A') . ' - ' . $next->format('g:i A');
+                foreach ($session->courts as $allocatedCourt) {
+                    $bookedSlots[$allocatedCourt->id][] = $slotStr;
+                    $specialSlots[$allocatedCourt->id][$slotStr] = [
+                        'type' => $session->session_type,
+                        'title' => $session->title,
+                    ];
+                }
+                $cur = $next;
+            }
+        }
+
         // Recent registered players for quick selection
         $recentPlayers = User::where('role', 'player')
             ->latest()
@@ -77,6 +103,7 @@ class StaffWalkInController extends Controller
             'timeSlots' => $this->standardTimeSlots,
             'selectedDate' => $selectedDate,
             'bookedSlots' => $bookedSlots,
+            'specialSlots' => $specialSlots,
             'recentPlayers' => $recentPlayers,
         ]);
     }

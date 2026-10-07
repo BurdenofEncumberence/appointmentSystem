@@ -413,3 +413,53 @@ test('cancelled registrations release capacity immediately for other players', f
     // All 4 slots are released back into the pool
     expect($session->fresh()->remaining_slots)->toBe(4);
 });
+
+test('court booking schedule marks open play and tournament slots distinctively and passes specialSlots', function () {
+    $player = User::factory()->create(['role' => 'player', 'email_verified_at' => now()]);
+
+    $date = today()->addDays(2)->toDateString();
+
+    $openPlay = OpenPlaySession::create([
+        'title' => 'Friday Night Social',
+        'session_type' => 'open_play',
+        'date' => $date,
+        'start_time' => '18:00',
+        'end_time' => '21:00',
+        'max_capacity' => 12,
+        'skill_level' => 'Intermediate 3.5+',
+        'price_per_slot' => 180.00,
+        'session_status' => 'scheduled',
+    ]);
+    $openPlay->courts()->attach([$this->court1->id]);
+
+    $tournament = OpenPlaySession::create([
+        'title' => 'Championship Cup',
+        'session_type' => 'tournament',
+        'date' => $date,
+        'start_time' => '08:00',
+        'end_time' => '11:00',
+        'max_capacity' => 16,
+        'skill_level' => 'Advanced 4.0+',
+        'price_per_slot' => 350.00,
+        'session_status' => 'scheduled',
+    ]);
+    $tournament->courts()->attach([$this->court2->id]);
+
+    $response = $this->actingAs($player)->get(route('booking'));
+
+    $response->assertOk();
+    $response->assertViewHas('specialSlots');
+    $specialSlots = $response->viewData('specialSlots');
+
+    // Court 1 has open play slots
+    expect(isset($specialSlots[$date][$this->court1->id]['6:00 PM - 7:00 PM']))->toBeTrue();
+    expect($specialSlots[$date][$this->court1->id]['6:00 PM - 7:00 PM']['type'])->toBe('open_play');
+
+    // Court 2 has tournament slots
+    expect(isset($specialSlots[$date][$this->court2->id]['8:00 AM - 9:00 AM']))->toBeTrue();
+    expect($specialSlots[$date][$this->court2->id]['8:00 AM - 9:00 AM']['type'])->toBe('tournament');
+
+    // View includes legend and text
+    $response->assertSee('Open Play');
+    $response->assertSee('Tournament');
+});

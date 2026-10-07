@@ -98,7 +98,7 @@
                     {{-- Court Availability Table --}}
                     <div class="lg:col-span-8">
                         <div class="gz-panel overflow-hidden">
-                            <div style="max-height: 280px; overflow-y: auto; overflow-x: auto;">
+                            <div style="max-height: 380px; overflow-y: auto; overflow-x: auto;">
                                 <table class="gz-table" style="font-size: 12px;">
                                     <caption class="sr-only">Court availability by time slot. Click to select multiple.</caption>
                                     <thead style="position: sticky; top: 0; z-index: 2; background: var(--gz-surface);">
@@ -123,16 +123,11 @@
                                                             @click="toggleSlot(time, court.id)"
                                                             :disabled="isBooked(time, court.id)"
                                                             :aria-pressed="isSelected(time, court.id) ? 'true' : 'false'"
+                                                            :title="getSlotTitle(time, court.id)"
                                                             class="w-full text-[11px] font-semibold rounded-lg transition"
                                                             style="height: 28px;"
-                                                            :style="
-                                                                isBooked(time, court.id)
-                                                                    ? 'height: 28px; background: var(--gz-bg); color: var(--gz-muted); cursor: not-allowed; border: 1px solid var(--gz-border);'
-                                                                    : (isSelected(time, court.id)
-                                                                        ? 'height: 28px; background: var(--gz-pop); color: var(--gz-ink); font-weight: 700; cursor: pointer;'
-                                                                        : 'height: 28px; background: var(--gz-surface); border: 1px solid var(--gz-border); cursor: pointer;')
-                                                            "
-                                                            x-text="isBooked(time, court.id) ? 'Booked' : (isSelected(time, court.id) ? 'Selected' : 'Open')"
+                                                            :style="getSlotStyle(time, court.id)"
+                                                            x-text="getSlotLabel(time, court.id)"
                                                         ></button>
                                                     </td>
                                                 </template>
@@ -140,6 +135,35 @@
                                         </template>
                                     </tbody>
                                 </table>
+                            </div>
+
+                            {{-- Schedule Legend & Info --}}
+                            <div class="p-3 border-t flex flex-wrap items-center justify-between gap-3 text-[11px]" style="border-color: var(--gz-border); background: var(--gz-bg);">
+                                <div class="flex items-center gap-3 flex-wrap">
+                                    <span class="inline-flex items-center gap-1.5">
+                                        <span class="w-2.5 h-2.5 rounded border" style="background: var(--gz-surface); border-color: var(--gz-border);"></span>
+                                        <span style="color: var(--gz-muted);">Open</span>
+                                    </span>
+                                    <span class="inline-flex items-center gap-1.5">
+                                        <span class="w-2.5 h-2.5 rounded" style="background: var(--gz-pop);"></span>
+                                        <span style="color: var(--gz-muted);">Selected</span>
+                                    </span>
+                                    <span class="inline-flex items-center gap-1.5">
+                                        <span class="w-2.5 h-2.5 rounded border" style="background: var(--gz-bg); border-color: var(--gz-border);"></span>
+                                        <span style="color: var(--gz-muted);">Booked</span>
+                                    </span>
+                                    <span class="inline-flex items-center gap-1.5">
+                                        <span class="w-2.5 h-2.5 rounded border" style="background: rgba(62, 207, 126, 0.2); border-color: rgba(62, 207, 126, 0.6);"></span>
+                                        <span class="font-semibold" style="color: #166534;">Open Play</span>
+                                    </span>
+                                    <span class="inline-flex items-center gap-1.5">
+                                        <span class="w-2.5 h-2.5 rounded border" style="background: rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.6);"></span>
+                                        <span class="font-semibold" style="color: #B45309;">Tournament</span>
+                                    </span>
+                                </div>
+                                <a href="{{ route('open-play.index') }}" class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 hover:underline">
+                                    Join Open Play & Tournaments →
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -418,12 +442,22 @@
 
                 courts: @json($courts),
                 timeSlots: [
-                    "6:00 AM - 7:00 AM","7:00 AM - 8:00 AM","8:00 AM - 9:00 AM","9:00 AM - 10:00 AM",
-                    "10:00 AM - 11:00 AM","11:00 AM - 12:00 PM","12:00 PM - 1:00 PM","1:00 PM - 2:00 PM",
+                    "6:00 AM - 7:00 AM", "7:00 AM - 8:00 AM", "8:00 AM - 9:00 AM", "9:00 AM - 10:00 AM",
+                    "10:00 AM - 11:00 AM", "11:00 AM - 12:00 PM", "12:00 PM - 1:00 PM", "1:00 PM - 2:00 PM",
+                    "2:00 PM - 3:00 PM", "3:00 PM - 4:00 PM", "4:00 PM - 5:00 PM", "5:00 PM - 6:00 PM",
+                    "6:00 PM - 7:00 PM", "7:00 PM - 8:00 PM", "8:00 PM - 9:00 PM", "9:00 PM - 10:00 PM",
                 ],
 
                 bookedSlots: @json($bookedSlots ?? []),
+                specialSlots: @json($specialSlots ?? []),
                 selectedSlots: [],
+
+                getSpecialSlot(time, courtId, date = null) {
+                    const d = date || this.selectedDate;
+                    const daySpecial = this.specialSlots[d] || {};
+                    const courtSpecial = daySpecial[courtId] || {};
+                    return courtSpecial[time] || null;
+                },
 
                 isBooked(time, courtId, date = null) {
                     const d = date || this.selectedDate;
@@ -435,6 +469,63 @@
                 isSelected(time, courtId, date = null) {
                     const d = date || this.selectedDate;
                     return this.selectedSlots.some(s => s.courtId === courtId && s.time === time && s.date === d);
+                },
+
+                getSlotStatus(time, courtId, date = null) {
+                    const special = this.getSpecialSlot(time, courtId, date);
+                    if (special) {
+                        return special.type === 'tournament' ? 'tournament' : 'open_play';
+                    }
+                    if (this.isBooked(time, courtId, date)) {
+                        return 'booked';
+                    }
+                    if (this.isSelected(time, courtId, date)) {
+                        return 'selected';
+                    }
+                    return 'open';
+                },
+
+                getSlotLabel(time, courtId, date = null) {
+                    const special = this.getSpecialSlot(time, courtId, date);
+                    if (special) {
+                        return special.type === 'tournament' ? 'Tournament' : 'Open Play';
+                    }
+                    if (this.isBooked(time, courtId, date)) {
+                        return 'Booked';
+                    }
+                    if (this.isSelected(time, courtId, date)) {
+                        return 'Selected';
+                    }
+                    return 'Open';
+                },
+
+                getSlotTitle(time, courtId, date = null) {
+                    const special = this.getSpecialSlot(time, courtId, date);
+                    if (special) {
+                        const typeLabel = special.type === 'tournament' ? 'Tournament' : 'Open Play';
+                        return typeLabel + ': ' + (special.title || 'Reserved Session') + ' (Occupied)';
+                    }
+                    if (this.isBooked(time, courtId, date)) {
+                        return 'Already booked for private reservation';
+                    }
+                    return 'Available for booking - click to select';
+                },
+
+                getSlotStyle(time, courtId, date = null) {
+                    const status = this.getSlotStatus(time, courtId, date);
+                    if (status === 'tournament') {
+                        return 'height: 28px; background: rgba(245, 158, 11, 0.16); color: #B45309; border: 1.5px solid rgba(245, 158, 11, 0.55); font-weight: 700; cursor: not-allowed;';
+                    }
+                    if (status === 'open_play') {
+                        return 'height: 28px; background: rgba(62, 207, 126, 0.16); color: #166534; border: 1.5px solid rgba(62, 207, 126, 0.55); font-weight: 700; cursor: not-allowed;';
+                    }
+                    if (status === 'booked') {
+                        return 'height: 28px; background: var(--gz-bg); color: var(--gz-muted); cursor: not-allowed; border: 1px solid var(--gz-border); opacity: 0.65;';
+                    }
+                    if (status === 'selected') {
+                        return 'height: 28px; background: var(--gz-pop); color: var(--gz-ink); font-weight: 700; cursor: pointer;';
+                    }
+                    return 'height: 28px; background: var(--gz-surface); border: 1px solid var(--gz-border); cursor: pointer; color: var(--gz-ink);';
                 },
 
                 toggleSlot(time, courtId) {
