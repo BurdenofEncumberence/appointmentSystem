@@ -50,9 +50,9 @@
                                     required
                                     class="gz-input cursor-pointer">
                                 <option value="" disabled {{ old('size', $court->size) ? '' : 'selected' }}>Select court dimensions / type</option>
-                                <option value="Regular (60x60)" @selected(old('size', $court->size) === 'Regular (60x60)')>Regular (60x60)</option>
-                                <option value="Junior (30x30)" @selected(old('size', $court->size) === 'Junior (30x30)')>Junior (30x30)</option>
-                                @if($court->size && !in_array($court->size, ['Regular (60x60)', 'Junior (30x30)']))
+                                <option value="Regular (13.41m x 6.10m)" @selected(str_contains(strtolower(old('size', $court->size ?? '')), 'regular') || str_contains(old('size', $court->size ?? ''), '13.41'))>Regular (13.41m x 6.10m)</option>
+                                <option value="Junior (10m x 4.5m)" @selected(str_contains(strtolower(old('size', $court->size ?? '')), 'junior') || str_contains(old('size', $court->size ?? ''), '10m'))>Junior (10m x 4.5m)</option>
+                                @if($court->size && !str_contains(strtolower($court->size), 'regular') && !str_contains(strtolower($court->size), 'junior'))
                                     <option value="{{ $court->size }}" selected>{{ $court->size }} (Existing)</option>
                                 @endif
                             </select>

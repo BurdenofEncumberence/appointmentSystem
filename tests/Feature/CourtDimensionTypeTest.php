@@ -4,7 +4,7 @@ use App\Models\Booking;
 use App\Models\Court;
 use App\Models\User;
 
-test('court form renders fixed dropdown options for Regular (60x60) and Junior (30x30)', function () {
+test('court form renders fixed dropdown options for Regular (13.41m x 6.10m) and Junior (10m x 4.5m)', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
     $response = $this->actingAs($admin)->get(route('admin.courts.create'));
@@ -12,16 +12,16 @@ test('court form renders fixed dropdown options for Regular (60x60) and Junior (
     $response->assertStatus(200);
     $response->assertSee('id="size"', false);
     $response->assertSee('name="size"', false);
-    $response->assertSee('Regular (60x60)');
-    $response->assertSee('Junior (30x30)');
+    $response->assertSee('Regular (13.41m x 6.10m)');
+    $response->assertSee('Junior (10m x 4.5m)');
 });
 
-test('admin can create a court with Regular (60x60) or Junior (30x30) dimensions', function () {
+test('admin can create a court with Regular (13.41m x 6.10m) or Junior (10m x 4.5m) dimensions', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
     $responseRegular = $this->actingAs($admin)->post(route('admin.courts.store'), [
         'court_name' => 'Center Court Alpha',
-        'size' => 'Regular (60x60)',
+        'size' => 'Regular (13.41m x 6.10m)',
         'price_per_hour' => 550.00,
         'court_status' => 'available',
     ]);
@@ -29,12 +29,12 @@ test('admin can create a court with Regular (60x60) or Junior (30x30) dimensions
     $responseRegular->assertRedirect(route('admin.courts.index'));
     $this->assertDatabaseHas('courts', [
         'court_name' => 'Center Court Alpha',
-        'size' => 'Regular (60x60)',
+        'size' => 'Regular (13.41m x 6.10m)',
     ]);
 
     $responseJunior = $this->actingAs($admin)->post(route('admin.courts.store'), [
         'court_name' => 'Junior Training Arena',
-        'size' => 'Junior (30x30)',
+        'size' => 'Junior (10m x 4.5m)',
         'price_per_hour' => 400.00,
         'court_status' => 'available',
     ]);
@@ -42,7 +42,7 @@ test('admin can create a court with Regular (60x60) or Junior (30x30) dimensions
     $responseJunior->assertRedirect(route('admin.courts.index'));
     $this->assertDatabaseHas('courts', [
         'court_name' => 'Junior Training Arena',
-        'size' => 'Junior (30x30)',
+        'size' => 'Junior (10m x 4.5m)',
     ]);
 });
 
@@ -64,14 +64,14 @@ test('players see court dimensions on booking schedule and summary', function ()
 
     Court::create([
         'court_name' => 'Main Stadium Court',
-        'size' => 'Regular (60x60)',
+        'size' => 'Regular (13.41m x 6.10m)',
         'price_per_hour' => 600.00,
         'court_status' => 'available',
     ]);
 
     Court::create([
         'court_name' => 'Academy Junior Court',
-        'size' => 'Junior (30x30)',
+        'size' => 'Junior (10m x 4.5m)',
         'price_per_hour' => 350.00,
         'court_status' => 'available',
     ]);
@@ -81,14 +81,14 @@ test('players see court dimensions on booking schedule and summary', function ()
     $response->assertStatus(200);
     $response->assertSee('Main Stadium Court');
     $response->assertSee('Academy Junior Court');
-    $response->assertSee('Regular (60x60)');
-    $response->assertSee('Junior (30x30)');
+    $response->assertSee('Regular (13.41m x 6.10m)');
+    $response->assertSee('Junior (10m x 4.5m)');
 });
 
 test('players see court dimensions on public welcome page and booking history', function () {
     $court = Court::create([
         'court_name' => 'Pro Championship Court',
-        'size' => 'Regular (60x60)',
+        'size' => 'Regular (13.41m x 6.10m)',
         'price_per_hour' => 700.00,
         'court_status' => 'available',
     ]);
@@ -97,7 +97,7 @@ test('players see court dimensions on public welcome page and booking history', 
     $publicResponse = $this->get('/');
     $publicResponse->assertStatus(200);
     $publicResponse->assertSee('Pro Championship Court');
-    $publicResponse->assertSee('Regular (60x60)');
+    $publicResponse->assertSee('Regular (13.41m x 6.10m)');
 
     // Player booking history
     $player = User::factory()->create(['role' => 'player']);
@@ -114,5 +114,5 @@ test('players see court dimensions on public welcome page and booking history', 
     $historyResponse = $this->actingAs($player)->get(route('bookings.index'));
     $historyResponse->assertStatus(200);
     $historyResponse->assertSee('Pro Championship Court');
-    $historyResponse->assertSee('Regular (60x60)');
+    $historyResponse->assertSee('Regular (13.41m x 6.10m)');
 });

@@ -477,7 +477,7 @@
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <span class="text-xs font-bold uppercase px-2 py-0.5 rounded-full" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
-                                {{ $court->size ?: 'Regular (60x60)' }}
+                                {{ $court->size ?: 'Regular (13.41m x 6.10m)' }}
                             </span>
                             <span class="text-xs font-semibold flex items-center gap-1.5" style="color: var(--pop-dark);">
                                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -499,9 +499,9 @@
                         <h3 class="font-display font-bold text-xl mb-1">{{ $court->court_name }}</h3>
                         <p class="text-xs mb-4" style="color: var(--muted);">
                             @if(str_contains(strtolower($court->size ?? ''), 'junior'))
-                                Junior training dimensions (30x30) perimeter layout with high-durability acrylic cushioning.
+                                Junior training dimensions (10m × 4.5m) layout with high-durability acrylic cushioning.
                             @else
-                                Regulation full dimensions (60x60) perimeter layout with high-durability acrylic cushioning.
+                                USA Pickleball regulation dimensions (13.41m × 6.10m) layout with high-durability acrylic cushioning.
                             @endif
                         </p>
 

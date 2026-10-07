@@ -43,7 +43,7 @@
                     'startDt'       => $startDt,
                     'endDt'         => $endDt,
                     'courtName'     => $b->court->court_name ?? 'Court',
-                    'courtSize'     => $b->court?->size ?: 'Regular (60x60)',
+                    'courtSize'     => $b->court?->size ?: 'Regular (13.41m x 6.10m)',
                     'courtId'       => $b->court_id,
                     'dateLabel'     => $date->format('D, M j, Y'),
                     'timeLabel'     => $start->format('g:i A') . ' – ' . $end->format('g:i A'),

@@ -154,7 +154,7 @@ class CourtUtilizationService
                 'id' => $court->id,
                 'court_name' => $court->court_name,
                 'court_status' => $court->court_status,
-                'size' => $court->size ?: 'Regular (60x60)',
+                'size' => $court->size ?: 'Regular (13.41m x 6.10m)',
                 'price_per_hour' => (float) $court->price_per_hour,
                 'today_booked_hours' => $todayBookedHours,
                 'today_capacity_hours' => $courtDailyCapacity,
