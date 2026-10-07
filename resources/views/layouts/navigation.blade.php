@@ -25,24 +25,8 @@
                 <div class="flex gap-6 text-sm font-semibold" style="color: var(--gz-muted);">
                     @auth
                         @if(Auth::user()->isAdmin() || Auth::user()->hasRole('manager'))
-                            {{-- Admin/Manager only sees Admin Panel navigation --}}
-                            <a href="{{ route('admin.dashboard') }}" class="nav-link" @if(request()->routeIs('admin.dashboard')) aria-current="page" @endif>
-                                Overview
-                            </a>
-                            <a href="{{ route('admin.courts.index') }}" class="nav-link" @if(request()->routeIs('admin.courts.*')) aria-current="page" @endif>
-                                Courts
-                            </a>
-                            <a href="{{ route('admin.events.index') }}" class="nav-link" @if(request()->routeIs('admin.events.*')) aria-current="page" @endif>
-                                Events
-                            </a>
-                            <a href="{{ route('admin.open-play.index') }}" class="nav-link" @if(request()->routeIs('admin.open-play.*')) aria-current="page" @endif>
-                                Open Play
-                            </a>
-                            <a href="{{ route('admin.finance') }}" class="nav-link" @if(request()->routeIs('admin.finance')) aria-current="page" @endif>
-                                Financials
-                            </a>
-                            <a href="{{ route('admin.customization.index') }}" class="nav-link" @if(request()->routeIs('admin.customization.*')) aria-current="page" @endif>
-                                Customization
+                            <a href="{{ route('admin.dashboard') }}" class="nav-link" @if(request()->routeIs('admin.*')) aria-current="page" @endif>
+                                Admin Dashboard
                             </a>
                         @elseif(Auth::user()->hasRole('staff'))
                             <a href="{{ route('staff.today') }}" class="nav-link" @if(request()->routeIs('staff.today')) aria-current="page" @endif>
@@ -173,12 +157,7 @@
                 </span>
             </div>
             @if(Auth::user()->isAdmin() || Auth::user()->hasRole('manager'))
-                <a href="{{ route('admin.dashboard') }}" class="gz-dropdown-item">Admin Overview</a>
-                <a href="{{ route('admin.courts.index') }}" class="gz-dropdown-item">Courts</a>
-                <a href="{{ route('admin.events.index') }}" class="gz-dropdown-item">Events</a>
-                <a href="{{ route('admin.open-play.index') }}" class="gz-dropdown-item">Open Play & Tournaments</a>
-                <a href="{{ route('admin.finance') }}" class="gz-dropdown-item">Financials</a>
-                <a href="{{ route('admin.customization.index') }}" class="gz-dropdown-item">Customization</a>
+                <a href="{{ route('admin.dashboard') }}" class="gz-dropdown-item font-bold">Admin Dashboard</a>
             @elseif(Auth::user()->hasRole('staff'))
                 <a href="{{ route('staff.today') }}" class="gz-dropdown-item">Today's Schedule</a>
                 <a href="{{ route('staff.walkin.create') }}" class="gz-dropdown-item">Walk-In Booking</a>

@@ -203,44 +203,6 @@
                             </a>
                         </nav>
                     </div>
-
-                    {{-- Section: Shortcuts --}}
-                    <div>
-                        <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider" style="color: var(--gz-muted);">
-                            Navigation
-                        </div>
-
-                        <nav class="space-y-1">
-                            {{-- View Public Storefront --}}
-                            <a
-                                href="{{ url('/') }}"
-                                class="flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition hover:bg-black/5 dark:hover:bg-white/5"
-                                style="color: var(--gz-muted);"
-                            >
-                                <div class="flex items-center gap-3">
-                                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                                    </svg>
-                                    <span>Public Homepage</span>
-                                </div>
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                                </svg>
-                            </a>
-
-                            {{-- Profile Settings --}}
-                            <a
-                                href="{{ route('profile.edit') }}"
-                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition hover:bg-black/5 dark:hover:bg-white/5"
-                                style="{{ request()->routeIs('profile.*') ? 'background: var(--gz-pop); color: var(--gz-ink); font-weight: 700;' : 'color: var(--gz-muted);' }}"
-                            >
-                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                </svg>
-                                <span>Profile & Security</span>
-                            </a>
-                        </nav>
-                    </div>
                 </div>
             </div>
 
