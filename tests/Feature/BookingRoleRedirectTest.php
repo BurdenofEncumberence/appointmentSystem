@@ -157,25 +157,23 @@ test('player logging in is redirected to homepage', function () {
     $response->assertRedirect(route('welcome'));
 });
 
-test('welcome page reserve court link adapts to role', function () {
-    // Guest
+test('welcome page redirects admin and staff away to their dashboards', function () {
+    // Guest can access welcome page
     $this->get('/')
         ->assertOk()
         ->assertSee(route('booking'));
 
-    // Admin
+    // Admin is redirected to admin dashboard
     $admin = User::factory()->create(['role' => 'admin']);
     $this->actingAs($admin)
         ->get('/')
-        ->assertOk()
-        ->assertSee(route('admin.dashboard'));
+        ->assertRedirect(route('admin.dashboard'));
 
-    // Staff
+    // Staff is redirected to staff today
     $staff = User::factory()->create(['role' => 'staff']);
     $this->actingAs($staff)
         ->get('/')
-        ->assertOk()
-        ->assertSee(route('staff.today'));
+        ->assertRedirect(route('staff.today'));
 });
 
 test('player accessing dashboard route is redirected to homepage', function () {

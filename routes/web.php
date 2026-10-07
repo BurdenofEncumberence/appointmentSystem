@@ -20,6 +20,17 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
+    /** @var \App\Models\User|null $user */
+    $user = Auth::user();
+
+    if ($user?->isAdmin() || $user?->hasRole('manager')) {
+        return redirect()->route('admin.dashboard');
+    }
+
+    if ($user?->hasRole('staff')) {
+        return redirect()->route('staff.today');
+    }
+
     $courts = \App\Models\Court::where('court_status', 'available')->get();
     $events = \App\Models\Event::query()
         ->where('start_date', '<=', now()->addDays(30)->toDateString())
