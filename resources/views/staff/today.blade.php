@@ -20,7 +20,7 @@
                 + New Walk-In
             </a>
             <button onclick="window.print()" class="gz-btn-outline gz-btn-sm">
-                🖨 Print run-sheet
+                Print run-sheet
             </button>
             <a href="{{ route('staff.today') }}" class="gz-btn-outline gz-btn-sm">
                 ↺ Refresh
@@ -31,7 +31,7 @@
     {{-- Feedback Alerts --}}
     @if(session('status'))
         <div class="gz-status mb-6" role="status" aria-live="polite">
-            ✓ {{ session('status') }}
+            {{ session('status') }}
         </div>
     @endif
 
@@ -203,11 +203,11 @@
                                     </div>
                                     <div class="mt-1">
                                         @if($isLiveNow)
-                                            <span class="gz-badge gz-badge-success">● Live on court</span>
+                                            <span class="gz-badge gz-badge-success">Live on court</span>
                                         @elseif($isPast)
-                                            <span class="gz-badge gz-badge-neutral">✓ Finished</span>
+                                            <span class="gz-badge gz-badge-neutral">Finished</span>
                                         @else
-                                            <span class="gz-badge gz-badge-warning">▲ Upcoming</span>
+                                            <span class="gz-badge gz-badge-warning">Upcoming</span>
                                         @endif
                                     </div>
                                 </td>
@@ -247,11 +247,11 @@
                                 {{-- Attendance Status Badge --}}
                                 <td>
                                     @if($isShow)
-                                        <span class="gz-badge gz-badge-success">✓ Show (Present)</span>
+                                        <span class="gz-badge gz-badge-success">Show (Present)</span>
                                     @elseif($isNoShow)
-                                        <span class="gz-badge gz-badge-danger">✕ No-show (Absent)</span>
+                                        <span class="gz-badge gz-badge-danger">No-show (Absent)</span>
                                     @else
-                                        <span class="gz-badge gz-badge-warning">⏱ Awaiting arrival</span>
+                                        <span class="gz-badge gz-badge-warning">Awaiting arrival</span>
                                     @endif
                                 </td>
 
@@ -259,7 +259,7 @@
                                 <td class="text-right print:hidden">
                                     @php
                                         $isBookingToday = \Carbon\Carbon::parse($booking->date)->isSameDay(now());
-                                    @endphp
+                                     @endphp
                                     @if($isBookingToday)
                                         <div class="flex items-center justify-end gap-2 flex-wrap">
                                             {{-- Mark as SHOW --}}
@@ -269,7 +269,7 @@
                                                     @method('PATCH')
                                                     <input type="hidden" name="attendance_status" value="show">
                                                     <button type="submit" class="gz-btn-success gz-btn-sm" title="Mark Customer as Present">
-                                                        ✓ Show
+                                                        Show
                                                     </button>
                                                 </form>
                                             @endif
@@ -281,7 +281,7 @@
                                                     @method('PATCH')
                                                     <input type="hidden" name="attendance_status" value="no_show">
                                                     <button type="submit" class="gz-btn-danger gz-btn-sm" title="Mark Customer as No-Show">
-                                                        ✕ No-show
+                                                        No-show
                                                     </button>
                                                 </form>
                                             @endif

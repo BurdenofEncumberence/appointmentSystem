@@ -21,12 +21,12 @@
     {{-- Session Feedback Messages --}}
     @if(session('status'))
         <div class="gz-status mb-6">
-            ✓ {{ session('status') }}
+            {{ session('status') }}
         </div>
     @endif
     @if(session('error'))
         <div class="mb-6 text-sm font-semibold p-3" style="background: var(--gz-danger-bg); border: 1px solid rgba(196, 69, 58, 0.35); color: var(--gz-danger);">
-            ⚠ {{ session('error') }}
+            {{ session('error') }}
         </div>
     @endif
 

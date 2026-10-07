@@ -339,7 +339,7 @@
                         <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->event_title }}" class="w-full h-40 object-cover rounded-lg mb-4">
                     @else
                         <div class="w-full h-40 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 rounded-lg mb-4 flex items-center justify-center">
-                            <span class="text-4xl">🎉</span>
+                            <svg class="w-10 h-10 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                         </div>
                     @endif
                     
@@ -471,7 +471,7 @@
         <div class="mt-8 p-5 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-lg shrink-0">
-                    ⚡
+                    <svg class="w-5 h-5 text-emerald-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                 </div>
                 <div>
                     <h4 class="font-bold text-sm">Organizing a mini tournament or squad friendly?</h4>

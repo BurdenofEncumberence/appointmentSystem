@@ -24,7 +24,7 @@
     @if ($errors->any())
         <div class="mb-6 p-4 border" style="background: rgba(179,38,30,0.08); border-color: var(--red);" role="alert">
             <div class="flex items-center gap-2 mb-2 font-bold text-sm" style="color: var(--red);">
-                <span>⚠ Please fix the following errors:</span>
+                <span>Please fix the following errors:</span>
             </div>
             <ul class="text-xs list-disc list-inside space-y-1" style="color: var(--gz-ink);">
                 @foreach ($errors->all() as $error)
@@ -162,7 +162,7 @@
                                 style="border-color: var(--gz-border);"
                             >
                                 <span class="font-mono font-medium">{{ $slot }}</span>
-                                <span class="text-[10px] mt-0.5" x-text="isSlotBooked('{{ $slot }}') ? 'Unavailable' : (selectedSlot === '{{ $slot }}' ? '✓ Selected' : 'Open')"></span>
+                                <span class="text-[10px] mt-0.5" x-text="isSlotBooked('{{ $slot }}') ? 'Unavailable' : (selectedSlot === '{{ $slot }}' ? 'Selected' : 'Open')"></span>
                             </button>
                         @endforeach
                     </div>
@@ -303,19 +303,19 @@
                         <div class="grid grid-cols-2 gap-2 mt-1">
                             <label class="flex items-center gap-2 p-2 border cursor-pointer text-xs" style="border-color: var(--gz-border);">
                                 <input type="radio" name="payment_method" value="cash" x-model="selectedPaymentMethod">
-                                <span class="font-bold">💵 Cash</span>
+                                <span class="font-bold">Cash</span>
                             </label>
                             <label class="flex items-center gap-2 p-2 border cursor-pointer text-xs" style="border-color: var(--gz-border);">
                                 <input type="radio" name="payment_method" value="gcash" x-model="selectedPaymentMethod">
-                                <span class="font-bold">📱 GCash</span>
+                                <span class="font-bold">GCash</span>
                             </label>
                             <label class="flex items-center gap-2 p-2 border cursor-pointer text-xs" style="border-color: var(--gz-border);">
                                 <input type="radio" name="payment_method" value="maya" x-model="selectedPaymentMethod">
-                                <span class="font-bold">💳 Maya</span>
+                                <span class="font-bold">Maya</span>
                             </label>
                             <label class="flex items-center gap-2 p-2 border cursor-pointer text-xs" style="border-color: var(--gz-border);">
                                 <input type="radio" name="payment_method" value="card" x-model="selectedPaymentMethod">
-                                <span class="font-bold">💳 Debit / Card</span>
+                                <span class="font-bold">Debit / Card</span>
                             </label>
                         </div>
                     </div>
@@ -341,14 +341,14 @@
                             <label class="flex items-start gap-2 p-2 border cursor-pointer text-xs" style="border-color: var(--gz-border);">
                                 <input type="radio" name="attendance_status" value="show" x-model="attendanceStatus" class="mt-0.5">
                                 <div>
-                                    <span class="font-bold" style="color: var(--gz-pop-dark);">✓ SHOW (Present Now)</span>
+                                    <span class="font-bold" style="color: var(--gz-pop-dark);">SHOW (Present Now)</span>
                                     <p class="text-[10px]" style="color: var(--gz-muted);">Customer is here at the counter, ready to play immediately.</p>
                                 </div>
                             </label>
                             <label class="flex items-start gap-2 p-2 border cursor-pointer text-xs" style="border-color: var(--gz-border);">
                                 <input type="radio" name="attendance_status" value="confirmed" x-model="attendanceStatus" class="mt-0.5">
                                 <div>
-                                    <span class="font-bold text-[color:var(--gz-ink)]">⏳ SCHEDULED (Later)</span>
+                                    <span class="font-bold text-[color:var(--gz-ink)]">SCHEDULED (Later)</span>
                                     <p class="text-[10px]" style="color: var(--gz-muted);">Reserved ahead of time; awaiting arrival later today.</p>
                                 </div>
                             </label>
@@ -362,7 +362,7 @@
                         class="gz-btn-primary w-full py-3 text-sm justify-center flex items-center gap-2"
                         :class="{'opacity-50 cursor-not-allowed': !selectedSlot}"
                     >
-                        <span>✓ Confirm Walk-In Reservation</span>
+                        <span>Confirm Walk-In Reservation</span>
                     </button>
                     <p x-show="!selectedSlot" class="text-xs text-center mt-2 text-red-600 font-semibold">
                         Please choose an open time slot above.
@@ -372,7 +372,7 @@
                 {{-- Helpful Counter Instructions Card --}}
                 <div class="gz-panel gz-panel-body text-xs space-y-2" style="background: var(--gz-bg); color: var(--gz-muted);">
                     <div class="font-bold text-xs flex items-center gap-1.5" style="color: var(--gz-ink);">
-                        <span>ℹ</span> Front Desk Instructions
+                        Front Desk Instructions
                     </div>
                     <ul class="list-disc list-inside space-y-1">
                         <li>Walk-ins are booked as 1-hour sessions at standard court pricing.</li>

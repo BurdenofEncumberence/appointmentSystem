@@ -100,7 +100,7 @@
             <div class="flex items-start justify-between">
                 <div>
                     <div class="flex items-center gap-2 mb-1">
-                        <span class="gz-badge gz-badge-neutral text-xs">🌐 Web Portal</span>
+                        <span class="gz-badge gz-badge-neutral text-xs">Web Portal</span>
                         <span class="text-xs" style="color: var(--gz-muted);">Self-Service</span>
                     </div>
                     <h3 class="gz-font-display font-bold text-base">Online Reservations</h3>
@@ -133,7 +133,7 @@
             <div class="flex items-start justify-between">
                 <div>
                     <div class="flex items-center gap-2 mb-1">
-                        <span class="gz-badge text-xs" style="background: rgba(179,38,30,0.12); color: var(--red); border: 1px solid var(--red);">🚶 Front Desk</span>
+                        <span class="gz-badge text-xs" style="background: rgba(179,38,30,0.12); color: var(--red); border: 1px solid var(--red);">Front Desk</span>
                         <span class="text-xs" style="color: var(--gz-muted);">On-the-spot</span>
                     </div>
                     <h3 class="gz-font-display font-bold text-base">Walk-In Reservations</h3>
@@ -167,7 +167,7 @@
             <div class="gz-kpi-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-base" style="background: rgba(62, 207, 126, 0.15); color: var(--gz-pop-dark);">
-                        📅
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     </div>
                     <div>
                         <div class="gz-eyebrow">Tournaments & Promotions</div>
@@ -221,9 +221,9 @@
                                     </td>
                                     <td>
                                         @if($booking->isWalkIn())
-                                            <span class="gz-badge text-[10px]" style="background: rgba(179,38,30,0.12); color: var(--red); border: 1px solid var(--red);">🚶 Walk-In</span>
+                                            <span class="gz-badge text-[10px]" style="background: rgba(179,38,30,0.12); color: var(--red); border: 1px solid var(--red);">Walk-In</span>
                                         @else
-                                            <span class="gz-badge gz-badge-neutral text-[10px]">🌐 Online</span>
+                                            <span class="gz-badge gz-badge-neutral text-[10px]">Online</span>
                                         @endif
                                     </td>
                                     <td class="font-semibold text-sm">
@@ -339,9 +339,9 @@
                                 <td class="text-sm font-semibold">{{ $payment->booking?->user?->name ?? 'Guest User' }}</td>
                                 <td>
                                     @if($payment->booking?->isWalkIn())
-                                        <span class="gz-badge text-[10px]" style="background: rgba(179,38,30,0.12); color: var(--red); border: 1px solid var(--red);">🚶 Walk-In</span>
+                                        <span class="gz-badge text-[10px]" style="background: rgba(179,38,30,0.12); color: var(--red); border: 1px solid var(--red);">Walk-In</span>
                                     @else
-                                        <span class="gz-badge gz-badge-neutral text-[10px]">🌐 Online</span>
+                                        <span class="gz-badge gz-badge-neutral text-[10px]">Online</span>
                                     @endif
                                 </td>
                                 <td class="text-sm" style="color: var(--gz-muted);">

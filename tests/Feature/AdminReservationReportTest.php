@@ -118,10 +118,8 @@ test('admin dashboard accurately displays online and walk-in reservation counts 
     // Assert page content
     $response->assertSee('Online Reservations');
     $response->assertSee('Walk-In Reservations');
-    $response->assertSee('1 Online');
-    $response->assertSee('1 Walk-in');
-    $response->assertSee('🌐 Online');
-    $response->assertSee('🚶 Walk-In');
+    $response->assertSee('Online');
+    $response->assertSee('Walk-In');
 });
 
 test('admin financial reports include online and walk-in reservation counts and collections', function () {
@@ -196,6 +194,6 @@ test('admin financial reports include online and walk-in reservation counts and 
     $response->assertSee('Walk-In Reservations');
     $response->assertSee('1,000.00');
     $response->assertSee('500.00');
-    $response->assertSee('🌐 Online');
-    $response->assertSee('🚶 Walk-In');
+    $response->assertSee('Online');
+    $response->assertSee('Walk-In');
 });

@@ -72,7 +72,7 @@
             <div class="flex items-center justify-between mb-3">
                 <div class="flex items-center gap-2">
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center text-base" style="background: rgba(62, 207, 126, 0.15); color: var(--gz-pop-dark);">
-                        🌐
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                     </div>
                     <div>
                         <div class="gz-eyebrow">Online Channel</div>
@@ -98,7 +98,7 @@
             <div class="flex items-center justify-between mb-3">
                 <div class="flex items-center gap-2">
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center text-base" style="background: rgba(179,38,30,0.12); color: var(--red);">
-                        🚶
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                     </div>
                     <div>
                         <div class="gz-eyebrow" style="color: var(--red);">On-Site Desk</div>
@@ -249,9 +249,9 @@
                                 </td>
                                 <td>
                                     @if($payment->booking?->isWalkIn())
-                                        <span class="gz-badge text-[10px]" style="background: rgba(179,38,30,0.12); color: var(--red); border: 1px solid var(--red);">🚶 Walk-In</span>
+                                        <span class="gz-badge text-[10px]" style="background: rgba(179,38,30,0.12); color: var(--red); border: 1px solid var(--red);">Walk-In</span>
                                     @else
-                                        <span class="gz-badge gz-badge-neutral text-[10px]">🌐 Online</span>
+                                        <span class="gz-badge gz-badge-neutral text-[10px]">Online</span>
                                     @endif
                                 </td>
                                 <td class="text-sm font-medium capitalize">{{ $payment->payment_method ?: 'Standard' }}</td>

@@ -132,7 +132,7 @@
                                                                         ? 'height: 28px; background: var(--gz-pop); color: var(--gz-ink); font-weight: 700; cursor: pointer;'
                                                                         : 'height: 28px; background: var(--gz-surface); border: 1px solid var(--gz-border); cursor: pointer;')
                                                             "
-                                                            x-text="isBooked(time, court.id) ? 'Booked' : (isSelected(time, court.id) ? '✓ Selected' : 'Open')"
+                                                            x-text="isBooked(time, court.id) ? 'Booked' : (isSelected(time, court.id) ? 'Selected' : 'Open')"
                                                         ></button>
                                                     </td>
                                                 </template>
@@ -295,8 +295,8 @@
                                     :style="paymentMethod === 'paymongo' ? 'border-color: var(--gz-pop); background: rgba(62,207,126,0.08);' : ''">
                                 <div class="flex items-center justify-between mb-2">
                                     <div class="flex items-center gap-2">
-                                        <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-base" style="background: rgba(62,207,126,0.2); color: var(--gz-pop-dark);">
-                                            ⚡
+                                        <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0" style="background: rgba(62,207,126,0.2); color: var(--gz-pop-dark);">
+                                            PAY
                                         </div>
                                         <div>
                                             <span class="text-sm font-bold block leading-tight">Pay Online</span>
@@ -321,8 +321,8 @@
                                     :style="paymentMethod === 'cash' ? 'border-color: var(--gz-pop); background: rgba(62,207,126,0.08);' : ''">
                                 <div class="flex items-center justify-between mb-2">
                                     <div class="flex items-center gap-2">
-                                        <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-base" style="background: rgba(18,21,15,0.08); color: var(--gz-ink);">
-                                            💵
+                                        <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0" style="background: rgba(18,21,15,0.08); color: var(--gz-ink);">
+                                            DESK
                                         </div>
                                         <div>
                                             <span class="text-sm font-bold block leading-tight">Cash at Counter</span>
@@ -351,19 +351,19 @@
                             </p>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px]">
                                 <div class="p-2.5 rounded-lg" style="background: var(--gz-surface); border: 1px solid var(--gz-border);">
-                                    <strong class="block mb-0.5" style="color: var(--gz-ink);">📲 QR Ph (Scan-to-Pay)</strong>
+                                    <strong class="block mb-0.5" style="color: var(--gz-ink);">QR Ph (Scan-to-Pay)</strong>
                                     <span style="color: var(--gz-muted);">Simulate instant QR Ph scanning supported by GCash, Maya, BDO, BPI, UnionBank, etc.</span>
                                 </div>
                                 <div class="p-2.5 rounded-lg" style="background: var(--gz-surface); border: 1px solid var(--gz-border);">
-                                    <strong class="block mb-0.5" style="color: var(--gz-ink);">🏦 Online Banking</strong>
+                                    <strong class="block mb-0.5" style="color: var(--gz-ink);">Online Banking</strong>
                                     <span style="color: var(--gz-muted);">Direct test online bank checkout via supported Philippine banks.</span>
                                 </div>
                                 <div class="p-2.5 rounded-lg" style="background: var(--gz-surface); border: 1px solid var(--gz-border);">
-                                    <strong class="block mb-0.5" style="color: var(--gz-ink);">👛 GCash & Maya</strong>
+                                    <strong class="block mb-0.5" style="color: var(--gz-ink);">GCash & Maya</strong>
                                     <span style="color: var(--gz-muted);">One-click sandbox authorization to test mobile wallet debit.</span>
                                 </div>
                                 <div class="p-2.5 rounded-lg" style="background: var(--gz-surface); border: 1px solid var(--gz-border);">
-                                    <strong class="block mb-0.5" style="color: var(--gz-ink);">💳 Cards</strong>
+                                    <strong class="block mb-0.5" style="color: var(--gz-ink);">Cards</strong>
                                     <span style="color: var(--gz-muted);">Test card numbers provided directly on PayMongo screen.</span>
                                 </div>
                             </div>

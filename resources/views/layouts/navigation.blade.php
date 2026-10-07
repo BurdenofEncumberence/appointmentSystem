@@ -56,7 +56,7 @@
                                 Book Courts
                             </a>
                             <a href="{{ route('bookings.index') }}" class="nav-link" @if(request()->routeIs('bookings.index')) aria-current="page" @endif>
-                                Courts Booked
+                                Booking History
                             </a>
                         @endif
                     @else
@@ -175,7 +175,7 @@
             @else
                 <a href="{{ url('/') }}" class="gz-dropdown-item">Home</a>
                 <a href="{{ route('booking') }}" class="gz-dropdown-item">Book Courts</a>
-                <a href="{{ route('bookings.index') }}" class="gz-dropdown-item">Courts Booked</a>
+                <a href="{{ route('bookings.index') }}" class="gz-dropdown-item">Booking History</a>
             @endif
             <div class="my-1 border-t border-[color:var(--gz-border)]"></div>
             <a href="{{ route('profile.edit') }}" class="gz-dropdown-item">Profile Settings</a>

@@ -20,7 +20,7 @@
     @if (!empty($devOtp))
         <div class="mb-5 p-3.5 rounded-xl border border-dashed border-[color:var(--gz-pop)] bg-[color:var(--gz-pop)]/10 text-xs font-mono flex items-center justify-between">
             <div>
-                <span class="font-bold text-[color:var(--gz-ink)]">⚡ Local Test Code:</span>
+                <span class="font-bold text-[color:var(--gz-ink)]">Local Test Code:</span>
                 <span class="text-sm font-black tracking-widest text-[color:var(--gz-ink)] ml-2">{{ $devOtp }}</span>
             </div>
             <span class="text-[10px] text-[color:var(--gz-muted)] uppercase tracking-wider">dev-only</span>
