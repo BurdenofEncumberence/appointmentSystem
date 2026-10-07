@@ -109,6 +109,10 @@ Route::middleware(['auth', 'verified', 'role:staff'])
         Route::post('/walk-in', [StaffWalkInController::class, 'store'])
             ->middleware('throttle:30,1')
             ->name('walkin.store');
+        Route::get('/walk-in/paymongo/success', [StaffWalkInController::class, 'paymongoSuccess'])
+            ->name('walkin.paymongo.success');
+        Route::get('/walk-in/paymongo/cancel', [StaffWalkInController::class, 'paymongoCancel'])
+            ->name('walkin.paymongo.cancel');
     });
 
 /*

@@ -1,9 +1,13 @@
 <?php
 
+use App\Mail\BookingReceiptMail;
 use App\Models\Booking;
 use App\Models\Court;
 use App\Models\Payment;
 use App\Models\User;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 
 test('staff can view the walk-in booking creation form', function () {
     $staff = User::factory()->create(['role' => 'staff']);
@@ -159,4 +163,184 @@ test('staff cannot book a slot that is already booked', function () {
 
     $response->assertRedirect(route('staff.walkin.create'));
     $response->assertSessionHasErrors(['time_slot']);
+});
+
+test('staff can create a walk-in booking with paymongo payment method and is redirected to checkout url', function () {
+    Config::set('services.paymongo.secret_key', 'sk_test_fake_secret_key');
+    Config::set('services.paymongo.public_key', 'pk_test_fake_public_key');
+
+    $staff = User::factory()->create(['role' => 'staff']);
+    $court = Court::create([
+        'court_name' => 'Court PayMongo WalkIn',
+        'price_per_hour' => 500,
+        'court_status' => 'available',
+    ]);
+
+    Http::fake([
+        'https://api.paymongo.com/v1/checkout_sessions' => Http::response([
+            'data' => [
+                'id' => 'cs_test_walkin_session_123',
+                'type' => 'checkout_session',
+                'attributes' => [
+                    'checkout_url' => 'https://checkout.paymongo.com/cs_test_walkin_session_123',
+                    'status' => 'active',
+                ],
+            ],
+        ], 200),
+    ]);
+
+    $response = $this->actingAs($staff)->post(route('staff.walkin.store'), [
+        'first_name' => 'Mario',
+        'last_name' => 'Rossi',
+        'email' => 'mario.rossi@example.com',
+        'phone' => '09171112233',
+        'date' => today()->toDateString(),
+        'court_id' => $court->id,
+        'time_slot' => '10:00 AM - 11:00 AM',
+        'payment_method' => 'paymongo',
+        'attendance_status' => 'show',
+    ]);
+
+    $response->assertRedirect('https://checkout.paymongo.com/cs_test_walkin_session_123');
+
+    $booking = Booking::where('court_id', $court->id)->first();
+    expect($booking)->not->toBeNull();
+    expect($booking->booking_status)->toBe('pending');
+    expect($booking->isWalkIn())->toBeTrue();
+
+    $payment = Payment::where('booking_id', $booking->id)->first();
+    expect($payment)->not->toBeNull();
+    expect($payment->payment_method)->toBe('paymongo');
+    expect($payment->payment_status)->toBe('pending');
+    expect($payment->checkout_session_id)->toBe('cs_test_walkin_session_123');
+    expect((float) $payment->amount)->toBe(500.00);
+});
+
+test('staff walk-in paymongo success callback confirms booking and payment and sends receipt email', function () {
+    Config::set('services.paymongo.secret_key', 'sk_test_fake_secret_key');
+    Config::set('services.paymongo.public_key', 'pk_test_fake_public_key');
+    Mail::fake();
+
+    $staff = User::factory()->create(['role' => 'staff']);
+    $player = User::factory()->create([
+        'role' => 'player',
+        'email' => 'walkin.player@example.com',
+        'name' => 'Walkin Customer',
+    ]);
+
+    $court = Court::create([
+        'court_name' => 'Court 4',
+        'price_per_hour' => 500,
+        'court_status' => 'available',
+    ]);
+
+    $booking = Booking::create([
+        'user_id' => $player->id,
+        'court_id' => $court->id,
+        'date' => today()->toDateString(),
+        'start_time' => '14:00:00',
+        'end_time' => '15:00:00',
+        'booking_status' => 'pending',
+        'booking_type' => 'walk_in',
+    ]);
+
+    $payment = Payment::create([
+        'booking_id' => $booking->id,
+        'payment_method' => 'paymongo',
+        'payment_status' => 'pending',
+        'amount' => 500.00,
+        'ref_num' => 'WALK-TEST1234',
+        'checkout_session_id' => 'cs_test_success_789',
+        'date' => today()->toDateString(),
+        'time' => '14:00:00',
+    ]);
+
+    Http::fake([
+        'https://api.paymongo.com/v1/checkout_sessions/cs_test_success_789' => Http::response([
+            'data' => [
+                'id' => 'cs_test_success_789',
+                'type' => 'checkout_session',
+                'attributes' => [
+                    'status' => 'paid',
+                    'payments' => [
+                        [
+                            'id' => 'pay_walkin_pm_987654',
+                            'attributes' => [
+                                'status' => 'paid',
+                                'amount' => 50000,
+                                'source' => [
+                                    'type' => 'qrph',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], 200),
+    ]);
+
+    $response = $this->actingAs($staff)->get(route('staff.walkin.paymongo.success', [
+        'session_id' => 'cs_test_success_789',
+        'ref' => 'WALK-TEST1234',
+    ]));
+
+    $response->assertRedirect(route('staff.today'));
+    $response->assertSessionHas('status');
+
+    $booking->refresh();
+    expect($booking->booking_status)->toBe('show');
+
+    $payment->refresh();
+    expect($payment->payment_status)->toBe('paid');
+    expect($payment->paymongo_payment_id)->toBe('pay_walkin_pm_987654');
+    expect($payment->payment_method)->toBe('paymongo_qrph');
+
+    Mail::assertSent(BookingReceiptMail::class, function ($mail) {
+        return $mail->hasTo('walkin.player@example.com');
+    });
+});
+
+test('staff walk-in paymongo cancel callback releases pending booking slot', function () {
+    $staff = User::factory()->create(['role' => 'staff']);
+    $player = User::factory()->create(['role' => 'player']);
+    $court = Court::create([
+        'court_name' => 'Court 5',
+        'price_per_hour' => 500,
+        'court_status' => 'available',
+    ]);
+
+    $booking = Booking::create([
+        'user_id' => $player->id,
+        'court_id' => $court->id,
+        'date' => today()->toDateString(),
+        'start_time' => '16:00:00',
+        'end_time' => '17:00:00',
+        'booking_status' => 'pending',
+        'booking_type' => 'walk_in',
+    ]);
+
+    $payment = Payment::create([
+        'booking_id' => $booking->id,
+        'payment_method' => 'paymongo',
+        'payment_status' => 'pending',
+        'amount' => 500.00,
+        'ref_num' => 'WALK-CANCEL123',
+        'checkout_session_id' => 'cs_test_cancel_999',
+        'date' => today()->toDateString(),
+        'time' => '16:00:00',
+    ]);
+
+    $response = $this->actingAs($staff)->get(route('staff.walkin.paymongo.cancel', [
+        'session_id' => 'cs_test_cancel_999',
+        'ref' => 'WALK-CANCEL123',
+    ]));
+
+    $response->assertRedirect(route('staff.walkin.create'));
+    $response->assertSessionHas('status');
+
+    $booking->refresh();
+    $payment->refresh();
+
+    expect($booking->booking_status)->toBe('cancelled');
+    expect($payment->payment_status)->toBe('failed');
 });

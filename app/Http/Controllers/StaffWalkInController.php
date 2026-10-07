@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Models\Court;
 use App\Models\Payment;
 use App\Models\User;
+use App\Services\PayMongoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -111,7 +112,7 @@ class StaffWalkInController extends Controller
     /**
      * Process and store a walk-in customer booking.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, PayMongoService $payMongoService): RedirectResponse
     {
         $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
@@ -122,7 +123,7 @@ class StaffWalkInController extends Controller
             'date' => ['required', 'date', 'after_or_equal:today'],
             'court_id' => ['required', 'integer', 'exists:courts,id'],
             'time_slot' => ['required', 'string'],
-            'payment_method' => ['required', 'in:cash,gcash,maya,card,counter'],
+            'payment_method' => ['required', 'in:cash,paymongo,gcash,maya,card,counter'],
             'attendance_status' => ['required', 'in:show,confirmed'],
             'ref_num' => ['nullable', 'string', 'max:100'],
         ]);
@@ -193,6 +194,101 @@ class StaffWalkInController extends Controller
         $hours = max(1, $start->diffInMinutes($end) / 60);
         $amount = round($court->price_per_hour * $hours, 2);
 
+        // PayMongo Online Gateway handling
+        if ($validated['payment_method'] === 'paymongo') {
+            if (! $payMongoService->isConfigured()) {
+                return back()->withInput()->withErrors([
+                    'payment_method' => 'PayMongo gateway secret key is not configured in the system environment.',
+                ]);
+            }
+
+            $lineItems = [
+                [
+                    'name' => "{$court->court_name} Walk-In Booking",
+                    'description' => "{$validated['date']} ({$validated['time_slot']})",
+                    'amount' => (int) round($amount * 100),
+                    'currency' => 'PHP',
+                    'quantity' => 1,
+                ],
+            ];
+
+            $successUrl = route('staff.walkin.paymongo.success') . '?session_id={CHECKOUT_SESSION_ID}&ref=' . $paymentRef;
+            $cancelUrl = route('staff.walkin.paymongo.cancel') . '?session_id={CHECKOUT_SESSION_ID}&ref=' . $paymentRef;
+
+            try {
+                $checkout = $payMongoService->createCheckoutSession($lineItems, [
+                    'description' => "KYMNET Walk-In ({$paymentRef})",
+                    'reference_number' => $paymentRef,
+                    'success_url' => $successUrl,
+                    'cancel_url' => $cancelUrl,
+                    'customer' => [
+                        'name' => $fullName,
+                        'email' => ($user && ! str_ends_with($user->email, '@kymnet.local')) ? $user->email : null,
+                        'phone' => $validated['phone'] ?? null,
+                    ],
+                    'payment_method_types' => [
+                        'qrph',
+                        'dob',
+                        'paymaya',
+                        'gcash',
+                        'card',
+                    ],
+                ]);
+            } catch (\Throwable $e) {
+                report($e);
+                return back()->withInput()->withErrors([
+                    'payment_method' => 'Unable to connect to PayMongo checkout: ' . $e->getMessage(),
+                ]);
+            }
+
+            $sessionId = $checkout['id'] ?? null;
+            $checkoutUrl = $checkout['checkout_url'] ?? null;
+
+            if (! $sessionId || ! $checkoutUrl) {
+                return back()->withInput()->withErrors([
+                    'payment_method' => 'Invalid response from PayMongo checkout portal.',
+                ]);
+            }
+
+            DB::transaction(function () use (
+                $user,
+                $court,
+                $validated,
+                $startTime,
+                $endTime,
+                $amount,
+                $paymentRef,
+                $sessionId
+            ) {
+                $booking = Booking::create([
+                    'user_id' => $user->id,
+                    'court_id' => $court->id,
+                    'event_id' => null,
+                    'date' => $validated['date'],
+                    'start_time' => $startTime,
+                    'end_time' => $endTime,
+                    'booking_status' => 'pending',
+                    'booking_type' => 'walk_in',
+                ]);
+
+                Payment::create([
+                    'booking_id' => $booking->id,
+                    'payment_method' => 'paymongo',
+                    'payment_status' => 'pending',
+                    'amount' => $amount,
+                    'ref_num' => $paymentRef,
+                    'checkout_session_id' => $sessionId,
+                    'date' => now()->toDateString(),
+                    'time' => now()->format('H:i:s'),
+                ]);
+            });
+
+            session(['walkin_attendance_' . $paymentRef => $validated['attendance_status']]);
+
+            return redirect()->away($checkoutUrl);
+        }
+
+        // Standard counter payments (cash, manual gcash/maya/card)
         $createdBooking = null;
 
         DB::transaction(function () use (
@@ -250,6 +346,129 @@ class StaffWalkInController extends Controller
         return redirect()->route('staff.today')->with(
             'status',
             "Walk-in booking confirmed for {$fullName} at {$court->court_name} ({$validated['time_slot']}). Attendance: {$statusText}. Payment: ₱" . number_format($amount, 2) . " via {$methodLabel} [{$paymentRef}]."
+        );
+    }
+
+    /**
+     * Handle return from PayMongo hosted checkout on successful walk-in payment.
+     */
+    public function paymongoSuccess(Request $request, PayMongoService $payMongoService): RedirectResponse
+    {
+        $sessionId = $request->query('session_id');
+        $refNum = $request->query('ref');
+
+        if (! $sessionId && ! $refNum) {
+            return redirect()->route('staff.today')
+                ->with('status', 'No payment confirmation details provided.');
+        }
+
+        try {
+            $sessionData = $sessionId ? $payMongoService->getCheckoutSession($sessionId) : [];
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->route('staff.today')
+                ->with('status', 'Unable to verify checkout status with PayMongo: ' . $e->getMessage());
+        }
+
+        $isPaid = $sessionData ? $payMongoService->isSessionPaid($sessionData) : false;
+
+        $payment = Payment::where(function ($q) use ($sessionId, $refNum) {
+            if ($sessionId) {
+                $q->where('checkout_session_id', $sessionId);
+            }
+            if ($refNum) {
+                $q->orWhere('ref_num', $refNum);
+            }
+        })->first();
+
+        if (! $payment) {
+            return redirect()->route('staff.today')
+                ->with('status', 'Payment received, but no matching walk-in booking record was found.');
+        }
+
+        $booking = $payment->booking;
+
+        if ($isPaid) {
+            $details = $payMongoService->extractPaymentDetails($sessionData);
+            $paymongoPaymentId = $details['payment_id'] ?? null;
+            $sourceType = $details['source_type'] ?? 'online';
+
+            $attendanceStatus = session()->pull('walkin_attendance_' . ($refNum ?? $payment->ref_num), 'show');
+
+            DB::transaction(function () use ($payment, $booking, $sessionId, $paymongoPaymentId, $sourceType, $attendanceStatus) {
+                $payment->update([
+                    'payment_status' => 'paid',
+                    'checkout_session_id' => $sessionId,
+                    'paymongo_payment_id' => $paymongoPaymentId,
+                    'payment_method' => 'paymongo_' . $sourceType,
+                ]);
+
+                if ($booking) {
+                    $booking->update([
+                        'booking_status' => $attendanceStatus,
+                    ]);
+                }
+            });
+
+            // Dispatch receipt email if user has a valid real email
+            if ($booking && $booking->user && $booking->user->email && ! str_ends_with($booking->user->email, '@kymnet.local')) {
+                try {
+                    $booking->load('court');
+                    $methodLabel = 'PayMongo (' . strtoupper(str_replace('_', ' ', $sourceType)) . ')';
+                    Mail::to($booking->user->email)->send(new BookingReceiptMail(
+                        user: $booking->user,
+                        bookings: [$booking],
+                        refNum: $payment->ref_num,
+                        paymentMethod: $methodLabel,
+                        discountPercent: 0,
+                        event: null,
+                    ));
+                } catch (\Throwable $e) {
+                    report($e);
+                }
+            }
+
+            $methodLabel = strtoupper(str_replace('_', ' ', $sourceType));
+            $statusText = $booking && $booking->booking_status === 'show' ? 'SHOW (Present)' : 'SCHEDULED';
+
+            return redirect()->route('staff.today')->with(
+                'status',
+                "Walk-in booking confirmed via PayMongo ({$methodLabel}) for {$booking?->user?->name}! Attendance: {$statusText}. Ref: {$payment->ref_num}."
+            );
+        }
+
+        return redirect()->route('staff.today')->with(
+            'status',
+            "Payment for walk-in booking [{$payment->ref_num}] is pending confirmation."
+        );
+    }
+
+    /**
+     * Handle return when staff or customer cancels PayMongo checkout.
+     */
+    public function paymongoCancel(Request $request): RedirectResponse
+    {
+        $sessionId = $request->query('session_id');
+        $refNum = $request->query('ref');
+
+        $payment = Payment::query()
+            ->when($sessionId, fn ($q) => $q->where('checkout_session_id', $sessionId))
+            ->when($refNum && ! $sessionId, fn ($q) => $q->where('ref_num', $refNum))
+            ->first();
+
+        if ($payment && $payment->payment_status === 'pending') {
+            $booking = $payment->booking;
+            DB::transaction(function () use ($payment, $booking) {
+                $payment->update(['payment_status' => 'failed']);
+                if ($booking && $booking->booking_status === 'pending') {
+                    $booking->update(['booking_status' => 'cancelled']);
+                }
+            });
+        }
+
+        return redirect()->route('staff.walkin.create')->with(
+            'status',
+            'PayMongo checkout session was cancelled. The reserved slot has been released.'
         );
     }
 

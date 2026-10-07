@@ -322,24 +322,60 @@
                     {{-- Payment Method Selection --}}
                     <div class="mb-4">
                         <label class="gz-label">Payment Method Collected</label>
-                        <div class="grid grid-cols-2 gap-2 mt-1">
-                            <label class="flex items-center gap-2 p-2 border cursor-pointer text-xs" style="border-color: var(--gz-border);">
-                                <input type="radio" name="payment_method" value="cash" x-model="selectedPaymentMethod">
-                                <span class="font-bold">Cash</span>
+                        <div class="space-y-2 mt-1">
+                            {{-- Option 1: PayMongo Online Gateway --}}
+                            <label class="flex items-start gap-2.5 p-2.5 border cursor-pointer text-xs rounded transition"
+                                   :style="selectedPaymentMethod === 'paymongo' ? 'border-color: var(--gz-pop-dark); background: rgba(62,207,126,0.08);' : 'border-color: var(--gz-border);'">
+                                <input type="radio" name="payment_method" value="paymongo" x-model="selectedPaymentMethod" class="mt-0.5">
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-bold" style="color: var(--gz-pop-dark);">Pay Online (PayMongo)</span>
+                                        <span class="gz-badge gz-badge-success text-[9px]">Online Gateway</span>
+                                    </div>
+                                    <span class="text-[10px] block mt-0.5" style="color: var(--gz-muted);">QR Ph · GCash · Maya · Debit/Credit Card · Online Banking</span>
+                                </div>
                             </label>
-                            <label class="flex items-center gap-2 p-2 border cursor-pointer text-xs" style="border-color: var(--gz-border);">
-                                <input type="radio" name="payment_method" value="gcash" x-model="selectedPaymentMethod">
-                                <span class="font-bold">GCash</span>
+
+                            {{-- Option 2: Cash --}}
+                            <label class="flex items-start gap-2.5 p-2.5 border cursor-pointer text-xs rounded transition"
+                                   :style="selectedPaymentMethod === 'cash' ? 'border-color: var(--gz-pop-dark); background: rgba(62,207,126,0.08);' : 'border-color: var(--gz-border);'">
+                                <input type="radio" name="payment_method" value="cash" x-model="selectedPaymentMethod" class="mt-0.5">
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-bold text-[color:var(--gz-ink)]">Cash</span>
+                                        <span class="gz-badge gz-badge-neutral text-[9px]">Front Desk</span>
+                                    </div>
+                                    <span class="text-[10px] block mt-0.5" style="color: var(--gz-muted);">Physical cash collected and verified at the counter</span>
+                                </div>
                             </label>
-                            <label class="flex items-center gap-2 p-2 border cursor-pointer text-xs" style="border-color: var(--gz-border);">
-                                <input type="radio" name="payment_method" value="maya" x-model="selectedPaymentMethod">
-                                <span class="font-bold">Maya</span>
-                            </label>
-                            <label class="flex items-center gap-2 p-2 border cursor-pointer text-xs" style="border-color: var(--gz-border);">
-                                <input type="radio" name="payment_method" value="card" x-model="selectedPaymentMethod">
-                                <span class="font-bold">Debit / Card</span>
-                            </label>
+
+                            {{-- Other manual counter options in grid --}}
+                            <div class="grid grid-cols-3 gap-1.5 pt-1">
+                                <label class="flex items-center gap-1.5 p-2 border cursor-pointer text-xs rounded" style="border-color: var(--gz-border);">
+                                    <input type="radio" name="payment_method" value="gcash" x-model="selectedPaymentMethod">
+                                    <span class="font-medium text-[11px]">GCash (Manual)</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 p-2 border cursor-pointer text-xs rounded" style="border-color: var(--gz-border);">
+                                    <input type="radio" name="payment_method" value="maya" x-model="selectedPaymentMethod">
+                                    <span class="font-medium text-[11px]">Maya (Manual)</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 p-2 border cursor-pointer text-xs rounded" style="border-color: var(--gz-border);">
+                                    <input type="radio" name="payment_method" value="card" x-model="selectedPaymentMethod">
+                                    <span class="font-medium text-[11px]">POS Card</span>
+                                </label>
+                            </div>
                         </div>
+                    </div>
+
+                    {{-- PayMongo Info Helper Box --}}
+                    <div x-show="selectedPaymentMethod === 'paymongo'" x-cloak class="p-3 border rounded text-xs space-y-1 mb-4" style="background: rgba(62,207,126,0.06); border-color: rgba(62,207,126,0.3);">
+                        <div class="flex items-center gap-1.5 font-bold" style="color: var(--gz-pop-dark);">
+                            <span class="w-2 h-2 rounded-full inline-block" style="background: var(--gz-pop-dark);"></span>
+                            PayMongo Hosted Checkout
+                        </div>
+                        <p style="color: var(--gz-ink); line-height: 1.4;">
+                            Upon submitting, you will be redirected to the secure PayMongo payment page. The customer can scan the QR Ph code on their smartphone or pay directly via e-wallet/cards.
+                        </p>
                     </div>
 
                     {{-- Payment Receipt Reference --}}
@@ -351,7 +387,7 @@
                             name="ref_num"
                             value="{{ old('ref_num') }}"
                             class="gz-input font-mono text-xs"
-                            placeholder="e.g. CASH-10294 or GCash Ref"
+                            placeholder="e.g. CASH-10294 or leave empty for auto Ref"
                         >
                         <p class="text-[11px] mt-1" style="color: var(--gz-muted);">Leave empty to auto-generate a walk-in receipt number.</p>
                     </div>
@@ -384,7 +420,12 @@
                         class="gz-btn-primary w-full py-3 text-sm justify-center flex items-center gap-2"
                         :class="{'opacity-50 cursor-not-allowed': !selectedSlot}"
                     >
-                        <span>Confirm Walk-In Reservation</span>
+                        <template x-if="selectedPaymentMethod === 'paymongo'">
+                            <span>Pay Online via PayMongo (<span x-text="'₱' + courtRate.toFixed(2)"></span>) →</span>
+                        </template>
+                        <template x-if="selectedPaymentMethod !== 'paymongo'">
+                            <span>Confirm Walk-In Reservation (<span x-text="'₱' + courtRate.toFixed(2)"></span>)</span>
+                        </template>
                     </button>
                     <p x-show="!selectedSlot" class="text-xs text-center mt-2 text-red-600 font-semibold">
                         Please choose an open time slot above.
@@ -398,7 +439,8 @@
                     </div>
                     <ul class="list-disc list-inside space-y-1">
                         <li>Walk-ins are booked as 1-hour sessions at standard court pricing.</li>
-                        <li>Payments are marked as <strong>PAID</strong> immediately upon submission.</li>
+                        <li>For <strong>Pay Online (PayMongo)</strong>, completing checkout automatically confirms and marks payment as paid.</li>
+                        <li>Cash and manual counter payments are recorded as <strong>PAID</strong> immediately upon submission.</li>
                         <li>The reservation will appear instantly on the daily run-sheet under today's schedule.</li>
                     </ul>
                 </div>
