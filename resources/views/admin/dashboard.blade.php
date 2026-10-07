@@ -28,8 +28,8 @@
         </div>
     </div>
 
-    {{-- 3 KPI Metric Cards --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+    {{-- 4 KPI Metric Cards --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {{-- Metric 1: Month Revenue --}}
         <div class="gz-kpi-card">
             <div class="flex items-center justify-between mb-3">
@@ -89,6 +89,26 @@
             <p class="text-xs mt-2" style="color: var(--gz-muted);">
                 <span class="font-bold text-[color:var(--gz-ink)]">{{ $todayOnlineCount }} Online</span> · 
                 <span class="font-bold text-[color:var(--red)]">{{ $todayWalkInCount }} Walk-in</span>
+            </p>
+        </div>
+
+        {{-- Metric 4: Fleet Court Utilization --}}
+        <div class="gz-kpi-card">
+            <div class="flex items-center justify-between mb-3">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: rgba(62, 207, 126, 0.15); color: var(--gz-pop-dark);">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                </div>
+                <span class="gz-badge gz-badge-success">MTD LOAD</span>
+            </div>
+            <div class="gz-eyebrow mb-1">Court utilization</div>
+            <div class="gz-kpi-value" style="color: var(--gz-pop-dark); font-size: 24px;">
+                {{ number_format($utilization['month_utilization_rate'], 1) }}%
+            </div>
+            <p class="text-xs mt-2" style="color: var(--gz-muted);">
+                <span class="font-bold text-[color:var(--gz-ink)]">{{ number_format($utilization['today_utilization_rate'], 1) }}% today</span> · 
+                <span>{{ $utilization['month_booked_hours'] }}h booked</span>
             </p>
         </div>
     </div>
@@ -181,6 +201,141 @@
         </div>
     @endif
 
+    {{-- Court Utilization & Capacity Analytics Report --}}
+    <div class="gz-panel mb-8">
+        <div class="gz-panel-header flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="gz-eyebrow">Fleet load & capacity analytics</span>
+                    <span class="gz-badge gz-badge-success">Live metrics</span>
+                </div>
+                <h2 class="gz-font-display font-bold text-base">Court Utilization Metrics</h2>
+                <p class="text-xs" style="color: var(--gz-muted);">
+                    Based on standard {{ $utilization['operating_hours_per_day'] }}-hour operating schedule (6:00 AM – 10:00 PM) across {{ $utilization['total_courts_count'] }} courts
+                </p>
+            </div>
+            <div class="flex items-center gap-3 text-xs">
+                <span class="gz-badge gz-badge-neutral font-mono">
+                    Facility load: {{ number_format($utilization['month_utilization_rate'], 1) }}%
+                </span>
+                @if(Auth::user()->hasPermission('view_finances'))
+                    <a href="{{ route('admin.finance') }}" class="gz-link text-xs">View revenue yield →</a>
+                @endif
+            </div>
+        </div>
+
+        {{-- Facility Utilization Highlights Bar --}}
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 p-4 border-b text-xs" style="border-color: var(--gz-border); background: var(--gz-surface);">
+            <div>
+                <span class="text-[11px] block" style="color: var(--gz-muted);">Today's Utilization</span>
+                <span class="text-base font-bold text-[color:var(--gz-ink)]">
+                    {{ number_format($utilization['today_utilization_rate'], 1) }}%
+                </span>
+                <span class="block text-[10px]" style="color: var(--gz-muted);">{{ $utilization['today_booked_hours'] }}h / {{ $utilization['today_capacity_hours'] }}h capacity</span>
+            </div>
+            <div>
+                <span class="text-[11px] block" style="color: var(--gz-muted);">Month Booked Hours</span>
+                <span class="text-base font-bold" style="color: var(--gz-pop-dark);">
+                    {{ number_format($utilization['month_booked_hours'], 1) }} hrs
+                </span>
+                <span class="block text-[10px]" style="color: var(--gz-muted);">of {{ number_format($utilization['month_capacity_hours']) }}h total capacity</span>
+            </div>
+            <div>
+                <span class="text-[11px] block" style="color: var(--gz-muted);">Busiest Court</span>
+                <span class="text-base font-bold text-[color:var(--gz-ink)]">
+                    {{ $utilization['busiest_court_name'] }}
+                </span>
+                <span class="block text-[10px]" style="color: var(--gz-pop-dark);">{{ number_format($utilization['busiest_court_rate'], 1) }}% load</span>
+            </div>
+            <div>
+                <span class="text-[11px] block" style="color: var(--gz-muted);">Peak Booking Hour</span>
+                <span class="text-base font-bold text-[color:var(--gz-ink)]">
+                    {{ $utilization['peak_time_slot'] }}
+                </span>
+                <span class="block text-[10px]" style="color: var(--gz-muted);">Most requested slot</span>
+            </div>
+        </div>
+
+        {{-- Court Fleet Utilization Cards --}}
+        <div class="gz-panel-body">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                @forelse($courtUtilization as $courtItem)
+                    <div class="gz-kpi-card flex flex-col justify-between" style="border-left: 3px solid {{ $courtItem['is_available'] ? 'var(--gz-pop)' : 'var(--gz-border)' }};">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-bold text-sm text-[color:var(--gz-ink)]">
+                                    {{ $courtItem['court_name'] }}
+                                </h3>
+                                @if($courtItem['court_status'] === 'available')
+                                    <span class="gz-badge gz-badge-success text-[10px]">Available</span>
+                                @elseif($courtItem['court_status'] === 'maintenance')
+                                    <span class="gz-badge gz-badge-warning text-[10px]">Maintenance</span>
+                                @else
+                                    <span class="gz-badge gz-badge-danger text-[10px]">Closed</span>
+                                @endif
+                            </div>
+
+                            <div class="flex items-center justify-between text-xs mb-3" style="color: var(--gz-muted);">
+                                <span>{{ $courtItem['size'] }}</span>
+                                <span class="font-semibold text-[color:var(--gz-ink)]">₱{{ number_format($courtItem['price_per_hour'], 2) }}/hr</span>
+                            </div>
+
+                            {{-- Utilization Meter --}}
+                            <div class="mb-3">
+                                <div class="flex items-center justify-between text-xs mb-1.5">
+                                    <span class="font-medium" style="color: var(--gz-muted);">Monthly Utilization</span>
+                                    <span class="font-bold" style="color: var(--gz-pop-dark);">
+                                        {{ number_format($courtItem['month_utilization_rate'], 1) }}%
+                                    </span>
+                                </div>
+                                <div class="gz-meter-track">
+                                    <div class="gz-meter-fill" style="width: {{ min(max($courtItem['month_utilization_rate'], 2), 100) }}%;"></div>
+                                </div>
+                            </div>
+
+                            {{-- Detailed Metrics List --}}
+                            <div class="space-y-1.5 pt-2 border-t text-xs" style="border-color: var(--gz-border);">
+                                <div class="flex items-center justify-between">
+                                    <span style="color: var(--gz-muted);">Today's Load:</span>
+                                    <span class="font-semibold text-[color:var(--gz-ink)]">
+                                        {{ number_format($courtItem['today_utilization_rate'], 1) }}% ({{ $courtItem['today_booked_hours'] }}h / 16h)
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span style="color: var(--gz-muted);">Month Reserved:</span>
+                                    <span class="font-semibold text-[color:var(--gz-ink)]">
+                                        {{ $courtItem['month_booked_hours'] }}h / {{ $courtItem['month_capacity_hours'] }}h
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span style="color: var(--gz-muted);">Sessions:</span>
+                                    <span class="font-semibold text-[color:var(--gz-ink)]">
+                                        {{ $courtItem['month_bookings_count'] }} this mo · {{ $courtItem['total_bookings_count'] }} total
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span style="color: var(--gz-muted);">Peak Slot:</span>
+                                    <span class="font-semibold text-[color:var(--gz-ink)]">
+                                        {{ $courtItem['peak_time_slot'] }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t flex items-center justify-between text-xs" style="border-color: var(--gz-border);">
+                            <span style="color: var(--gz-muted);">Revenue Generated:</span>
+                            <span class="font-bold font-mono" style="color: var(--gz-pop-dark);">
+                                ₱{{ number_format($courtItem['revenue_generated'], 2) }}
+                            </span>
+                        </div>
+                    </div>
+                @empty
+                    <p class="text-sm text-center py-6" style="color: var(--gz-muted);">No courts available to compute utilization.</p>
+                @endforelse
+            </div>
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <div class="lg:col-span-2 gz-panel">
             <div class="gz-panel-header">
@@ -267,13 +422,13 @@
                 </div>
 
                 <div class="gz-panel-body space-y-4">
-                    @forelse($courts as $court)
+                    @forelse($courtUtilization as $courtItem)
                         <div class="gz-kpi-card">
                             <div class="flex items-center justify-between mb-1.5">
-                                <span class="text-sm font-semibold">{{ $court->court_name }}</span>
-                                @if($court->court_status === 'available')
+                                <span class="text-sm font-semibold">{{ $courtItem['court_name'] }}</span>
+                                @if($courtItem['court_status'] === 'available')
                                     <span class="gz-badge gz-badge-success">Online</span>
-                                @elseif($court->court_status === 'maintenance')
+                                @elseif($courtItem['court_status'] === 'maintenance')
                                     <span class="gz-badge gz-badge-warning">Maint</span>
                                 @else
                                     <span class="gz-badge gz-badge-danger">Closed</span>
@@ -281,12 +436,12 @@
                             </div>
 
                             <div class="flex items-center justify-between text-xs mb-2" style="color: var(--gz-muted);">
-                                <span>{{ $court->size ?: 'Standard Pickleball' }}</span>
-                                <span class="font-semibold">₱{{ number_format($court->price_per_hour, 2) }}/hr</span>
+                                <span>{{ $courtItem['size'] }}</span>
+                                <span class="font-bold" style="color: var(--gz-pop-dark);">{{ number_format($courtItem['month_utilization_rate'], 1) }}% load ({{ $courtItem['month_booked_hours'] }}h)</span>
                             </div>
 
                             <div class="gz-meter-track">
-                                <div class="gz-meter-fill" style="width: {{ $court->court_status === 'available' ? '100' : ($court->court_status === 'maintenance' ? '35' : '0') }}%; {{ $court->court_status !== 'available' && $court->court_status !== 'maintenance' ? 'background: var(--gz-danger);' : '' }} {{ $court->court_status === 'maintenance' ? 'background: var(--gz-warning);' : '' }}"></div>
+                                <div class="gz-meter-fill" style="width: {{ min(max($courtItem['month_utilization_rate'], $courtItem['is_available'] ? 4 : 0), 100) }}%; {{ !$courtItem['is_available'] && $courtItem['court_status'] !== 'maintenance' ? 'background: var(--gz-danger);' : '' }} {{ $courtItem['court_status'] === 'maintenance' ? 'background: var(--gz-warning);' : '' }}"></div>
                             </div>
                         </div>
                     @empty

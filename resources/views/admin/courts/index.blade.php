@@ -33,7 +33,7 @@
     @endif
 
     {{-- KPI Metric Summary --}}
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div class="gz-kpi-card">
             <div class="flex items-center justify-between mb-3">
                 <span class="gz-eyebrow">Total courts</span>
@@ -66,6 +66,17 @@
             </div>
             <p class="text-xs mt-2" style="color: var(--gz-muted);">Offline / repair</p>
         </div>
+
+        <div class="gz-kpi-card">
+            <div class="flex items-center justify-between mb-3">
+                <span class="gz-eyebrow">Fleet Utilization</span>
+                <span class="gz-badge gz-badge-success">MTD Load</span>
+            </div>
+            <div class="gz-kpi-value" style="color: var(--gz-pop-dark);">
+                {{ number_format($utilization['month_utilization_rate'] ?? 0, 1) }}%
+            </div>
+            <p class="text-xs mt-2" style="color: var(--gz-muted);">{{ number_format($utilization['month_booked_hours'] ?? 0, 1) }}h booked this month</p>
+        </div>
     </div>
 
     {{-- Courts Inventory Table --}}
@@ -92,12 +103,16 @@
                             <th>Dimensions</th>
                             <th>Rate / hour</th>
                             <th>Total bookings</th>
+                            <th>Utilization (MTD)</th>
                             <th>Status</th>
                             <th class="text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($courts as $court)
+                            @php
+                                $cUtil = collect($courtUtilization ?? [])->firstWhere('id', $court->id);
+                            @endphp
                             <tr>
                                 <td>
                                     <div class="flex items-center gap-2.5">
@@ -115,6 +130,19 @@
                                 </td>
                                 <td class="text-sm">
                                     {{ $court->bookings_count }}
+                                </td>
+                                <td style="min-width: 140px;">
+                                    @if($cUtil)
+                                        <div class="flex items-center justify-between text-xs mb-1">
+                                            <span class="font-bold" style="color: var(--gz-pop-dark);">{{ number_format($cUtil['month_utilization_rate'], 1) }}%</span>
+                                            <span class="text-[10px]" style="color: var(--gz-muted);">{{ number_format($cUtil['month_booked_hours'], 1) }}h</span>
+                                        </div>
+                                        <div class="gz-meter-track">
+                                            <div class="gz-meter-fill" style="width: {{ min(max($cUtil['month_utilization_rate'], 2), 100) }}%;"></div>
+                                        </div>
+                                    @else
+                                        <span class="text-xs" style="color: var(--gz-muted);">0.0%</span>
+                                    @endif
                                 </td>
                                 <td>
                                     @if($court->court_status === 'available')

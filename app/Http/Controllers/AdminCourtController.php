@@ -3,16 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Court;
+use App\Services\CourtUtilizationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class AdminCourtController extends Controller
 {
-    public function index(): View
+    public function index(CourtUtilizationService $utilizationService): View
     {
         return view('admin.courts.index', [
             'courts' => Court::withCount('bookings')->orderBy('court_name')->get(),
+            'utilization' => $utilizationService->getFacilityMetrics(),
+            'courtUtilization' => $utilizationService->getCourtBreakdown(),
         ]);
     }
 

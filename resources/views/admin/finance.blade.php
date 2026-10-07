@@ -211,6 +211,129 @@
         </div>
     </div>
 
+    {{-- Court Utilization & Revenue Yield Analysis --}}
+    <div class="gz-panel mb-8">
+        <div class="gz-panel-header flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="gz-eyebrow">Asset performance & revenue yield</span>
+                    <span class="gz-badge gz-badge-success">Operational audit</span>
+                </div>
+                <h2 class="gz-font-display font-bold text-base">Court Utilization & Revenue Yield Analysis</h2>
+                <p class="text-xs" style="color: var(--gz-muted);">
+                    Evaluation of booked court capacity against operational revenue yield (RevPACH - Revenue per Available Court Hour)
+                </p>
+            </div>
+            <div class="flex items-center gap-3 text-xs">
+                <span class="gz-badge gz-badge-neutral font-mono">
+                    Facility Load: {{ number_format($utilization['month_utilization_rate'], 1) }}%
+                </span>
+            </div>
+        </div>
+
+        {{-- Facility KPI Summary --}}
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 p-4 border-b text-xs" style="border-color: var(--gz-border); background: var(--gz-surface);">
+            <div>
+                <span class="text-[11px] block" style="color: var(--gz-muted);">Facility MTD Utilization</span>
+                <span class="text-base font-bold text-[color:var(--gz-ink)]">
+                    {{ number_format($utilization['month_utilization_rate'], 1) }}%
+                </span>
+                <span class="block text-[10px]" style="color: var(--gz-muted);">{{ number_format($utilization['month_booked_hours'], 1) }}h booked this month</span>
+            </div>
+            <div>
+                <span class="text-[11px] block" style="color: var(--gz-muted);">Monthly Operating Capacity</span>
+                <span class="text-base font-bold text-[color:var(--gz-ink)]">
+                    {{ number_format($utilization['month_capacity_hours']) }} hrs
+                </span>
+                <span class="block text-[10px]" style="color: var(--gz-muted);">{{ $utilization['available_courts_count'] }} courts × 16h/day</span>
+            </div>
+            <div>
+                <span class="text-[11px] block" style="color: var(--gz-muted);">Most Productive Court</span>
+                <span class="text-base font-bold" style="color: var(--gz-pop-dark);">
+                    {{ $utilization['busiest_court_name'] }}
+                </span>
+                <span class="block text-[10px]" style="color: var(--gz-muted);">{{ number_format($utilization['busiest_court_rate'], 1) }}% load ({{ $utilization['busiest_court_hours'] }}h)</span>
+            </div>
+            <div>
+                <span class="text-[11px] block" style="color: var(--gz-muted);">Peak Booking Window</span>
+                <span class="text-base font-bold text-[color:var(--gz-ink)]">
+                    {{ $utilization['peak_time_slot'] }}
+                </span>
+                <span class="block text-[10px]" style="color: var(--gz-muted);">Highest occupancy rate</span>
+            </div>
+        </div>
+
+        <div class="gz-panel-body overflow-x-auto">
+            <table class="gz-table">
+                <thead>
+                    <tr>
+                        <th>Court</th>
+                        <th>Status</th>
+                        <th>Rate / hr</th>
+                        <th>Booked Hours (MTD)</th>
+                        <th>Utilization Load</th>
+                        <th>Month Collections</th>
+                        <th>RevPACH (Yield/hr)</th>
+                        <th class="text-right">Total Revenue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($courtUtilization as $cItem)
+                        <tr>
+                            <td>
+                                <div class="font-semibold text-sm">{{ $cItem['court_name'] }}</div>
+                                <div class="text-xs" style="color: var(--gz-muted);">{{ $cItem['size'] }}</div>
+                            </td>
+                            <td>
+                                @if($cItem['court_status'] === 'available')
+                                    <span class="gz-badge gz-badge-success text-[10px]">Available</span>
+                                @elseif($cItem['court_status'] === 'maintenance')
+                                    <span class="gz-badge gz-badge-warning text-[10px]">Maintenance</span>
+                                @else
+                                    <span class="gz-badge gz-badge-danger text-[10px]">Closed</span>
+                                @endif
+                            </td>
+                            <td class="font-mono text-sm">
+                                ₱{{ number_format($cItem['price_per_hour'], 2) }}
+                            </td>
+                            <td>
+                                <span class="font-bold text-sm text-[color:var(--gz-ink)]">{{ number_format($cItem['month_booked_hours'], 1) }}h</span>
+                                <span class="text-xs opacity-70 block" style="color: var(--gz-muted);">of {{ $cItem['month_capacity_hours'] }}h capacity</span>
+                            </td>
+                            <td style="min-width: 140px;">
+                                <div class="flex items-center justify-between text-xs mb-1">
+                                    <span class="font-bold" style="color: var(--gz-pop-dark);">{{ number_format($cItem['month_utilization_rate'], 1) }}%</span>
+                                    <span class="text-[10px]" style="color: var(--gz-muted);">{{ $cItem['month_bookings_count'] }} bookings</span>
+                                </div>
+                                <div class="gz-meter-track">
+                                    <div class="gz-meter-fill" style="width: {{ min(max($cItem['month_utilization_rate'], 2), 100) }}%;"></div>
+                                </div>
+                            </td>
+                            <td class="font-mono text-sm font-semibold" style="color: var(--gz-pop-dark);">
+                                ₱{{ number_format($cItem['month_revenue'], 2) }}
+                            </td>
+                            <td>
+                                <div class="font-mono text-xs font-bold text-[color:var(--gz-ink)]">
+                                    ₱{{ number_format($cItem['rev_pach'], 2) }}/h
+                                </div>
+                                <span class="text-[10px]" style="color: var(--gz-muted);">capacity yield</span>
+                            </td>
+                            <td class="text-right font-mono text-sm font-bold text-[color:var(--gz-ink)]">
+                                ₱{{ number_format($cItem['revenue_generated'], 2) }}
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="text-center py-6 text-sm" style="color: var(--gz-muted);">
+                                No court utilization records available.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <div class="gz-panel">
         <div class="gz-panel-header">
             <div>

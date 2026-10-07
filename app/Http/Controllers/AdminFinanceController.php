@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Payment;
+use App\Services\CourtUtilizationService;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
 class AdminFinanceController extends Controller
 {
-    public function index(): View
+    public function index(CourtUtilizationService $utilizationService): View
     {
         $paidPayments = Payment::where('payment_status', 'paid');
         $monthStart = now()->startOfMonth();
@@ -58,6 +59,8 @@ class AdminFinanceController extends Controller
             'walkInPaidTransactions' => $walkInPaidTransactions,
             'payments' => Payment::with('booking.user')->latest('date')->latest('created_at')->paginate(10),
             'today' => Carbon::today(),
+            'utilization' => $utilizationService->getFacilityMetrics(),
+            'courtUtilization' => $utilizationService->getCourtBreakdown(),
         ]);
     }
 }

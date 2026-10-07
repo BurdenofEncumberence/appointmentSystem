@@ -6,12 +6,13 @@ use App\Models\Booking;
 use App\Models\Court;
 use App\Models\Event;
 use App\Models\Payment;
+use App\Services\CourtUtilizationService;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
 class AdminDashboardController extends Controller
 {
-    public function index(): View
+    public function index(CourtUtilizationService $utilizationService): View
     {
         $monthStart = now()->startOfMonth();
         $monthEnd = now()->endOfMonth();
@@ -84,6 +85,8 @@ class AdminDashboardController extends Controller
             'eventsCount' => Event::count(),
             'recentPayments' => $recentPayments,
             'today' => Carbon::today(),
+            'utilization' => $utilizationService->getFacilityMetrics(),
+            'courtUtilization' => $utilizationService->getCourtBreakdown(),
         ]);
     }
 }
