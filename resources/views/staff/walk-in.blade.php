@@ -351,16 +351,6 @@
                         </div>
                     </div>
 
-                    {{-- PayMongo Info Helper Box --}}
-                    <div x-show="selectedPaymentMethod === 'paymongo'" x-cloak class="p-3 border rounded text-xs space-y-1 mb-4" style="background: rgba(62,207,126,0.06); border-color: rgba(62,207,126,0.3);">
-                        <div class="flex items-center gap-1.5 font-bold" style="color: var(--gz-pop-dark);">
-                            <span class="w-2 h-2 rounded-full inline-block" style="background: var(--gz-pop-dark);"></span>
-                            PayMongo Hosted Checkout
-                        </div>
-                        <p style="color: var(--gz-ink); line-height: 1.4;">
-                            Upon submitting, you will be redirected to the secure PayMongo payment page. The customer can scan the QR Ph code on their smartphone or pay directly via e-wallet/cards.
-                        </p>
-                    </div>
 
 
                     {{-- Arrival / Attendance Status --}}
