@@ -23,7 +23,12 @@
     <div class="grain"></div>
     <x-loading-screen />
 
-    <div x-data="{ sidebarOpen: false }" class="min-h-screen flex flex-col lg:flex-row" style="background: var(--gz-bg);">
+    <div
+        x-data="{ sidebarOpen: false, exportModalOpen: false, exportType: 'overall', exportPeriod: 'this_month' }"
+        @open-export-modal.window="exportModalOpen = true; if ($event.detail?.type) exportType = $event.detail.type; if ($event.detail?.period) exportPeriod = $event.detail.period;"
+        class="min-h-screen flex flex-col lg:flex-row"
+        style="background: var(--gz-bg);"
+    >
         {{-- Mobile Top Bar --}}
         <header class="lg:hidden sticky top-0 z-40 border-b flex items-center justify-between px-4 py-3 shrink-0"
                 style="background: var(--gz-surface); border-color: var(--gz-border);">
@@ -201,6 +206,19 @@
                                 </svg>
                                 <span>Customization</span>
                             </a>
+
+                            {{-- Export Reports --}}
+                            <button
+                                type="button"
+                                @click="exportModalOpen = true"
+                                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition text-left hover:bg-black/5 dark:hover:bg-white/5"
+                                style="color: var(--gz-muted);"
+                            >
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <span>Export Reports</span>
+                            </button>
                         </nav>
                     </div>
                 </div>
@@ -266,6 +284,158 @@
                     </span>
                 </div>
             </footer>
+        </div>
+
+        {{-- Reports Export Modal --}}
+        <div
+            x-show="exportModalOpen"
+            x-cloak
+            class="fixed inset-0 z-50 overflow-y-auto"
+            aria-labelledby="export-modal-title"
+            role="dialog"
+            aria-modal="true"
+        >
+            {{-- Backdrop --}}
+            <div
+                x-show="exportModalOpen"
+                x-transition:enter="ease-out duration-200"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="ease-in duration-150"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="fixed inset-0 bg-black/60 transition-opacity"
+                @click="exportModalOpen = false"
+                aria-hidden="true"
+            ></div>
+
+            {{-- Modal Panel --}}
+            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                <div
+                    x-show="exportModalOpen"
+                    x-transition:enter="ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave="ease-in duration-150"
+                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    @keydown.escape.window="exportModalOpen = false"
+                    class="relative transform overflow-hidden rounded-2xl border text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg p-6"
+                    style="background: var(--gz-surface); border-color: var(--gz-border); color: var(--gz-ink);"
+                >
+                    <div class="flex items-center justify-between pb-4 border-b" style="border-color: var(--gz-border);">
+                        <div>
+                            <span class="gz-eyebrow" style="color: var(--gz-pop-dark);">Data Export & Audit</span>
+                            <h3 id="export-modal-title" class="gz-font-display font-bold text-lg mt-0.5">
+                                Export System Reports
+                            </h3>
+                        </div>
+                        <button
+                            type="button"
+                            @click="exportModalOpen = false"
+                            class="p-1.5 rounded-lg text-gray-400 hover:text-black dark:hover:text-white"
+                            aria-label="Close export modal"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <form method="GET" action="{{ route('admin.reports.export') }}" class="mt-5 space-y-5">
+                        {{-- Report Type Selection --}}
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--gz-muted);">
+                                Report Category
+                            </label>
+                            <div class="grid grid-cols-1 gap-2.5">
+                                <label class="flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition"
+                                       :class="exportType === 'overall' ? 'border-[color:var(--gz-pop-dark)] bg-[color:var(--gz-pop)]/10' : 'border-[color:var(--gz-border)] hover:bg-black/5 dark:hover:bg-white/5'">
+                                    <input type="radio" name="type" value="overall" x-model="exportType" class="mt-0.5">
+                                    <div class="text-xs">
+                                        <p class="font-bold">Overall Operations Report</p>
+                                        <p class="text-[11px] mt-0.5" style="color: var(--gz-muted);">Facility bookings, revenue totals, utilization rates, and activity logs.</p>
+                                    </div>
+                                </label>
+
+                                <label class="flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition"
+                                       :class="exportType === 'financial' ? 'border-[color:var(--gz-pop-dark)] bg-[color:var(--gz-pop)]/10' : 'border-[color:var(--gz-border)] hover:bg-black/5 dark:hover:bg-white/5'">
+                                    <input type="radio" name="type" value="financial" x-model="exportType" class="mt-0.5">
+                                    <div class="text-xs">
+                                        <p class="font-bold">Financial Audit Report</p>
+                                        <p class="text-[11px] mt-0.5" style="color: var(--gz-muted);">Collections breakdown, online vs walk-in splits, payment methods, and ledger.</p>
+                                    </div>
+                                </label>
+
+                                <label class="flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition"
+                                       :class="exportType === 'utilization' ? 'border-[color:var(--gz-pop-dark)] bg-[color:var(--gz-pop)]/10' : 'border-[color:var(--gz-border)] hover:bg-black/5 dark:hover:bg-white/5'">
+                                    <input type="radio" name="type" value="utilization" x-model="exportType" class="mt-0.5">
+                                    <div class="text-xs">
+                                        <p class="font-bold">Court Utilization Report</p>
+                                        <p class="text-[11px] mt-0.5" style="color: var(--gz-muted);">Court capacities, actual hours played, utilization load rates, and RevPACH yields.</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        {{-- Timeframe Selection --}}
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--gz-muted);">
+                                Reporting Timeframe
+                            </label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer transition text-xs font-semibold"
+                                       :class="exportPeriod === 'this_day' ? 'border-[color:var(--gz-pop-dark)] bg-[color:var(--gz-pop)]/10' : 'border-[color:var(--gz-border)] hover:bg-black/5 dark:hover:bg-white/5'">
+                                    <input type="radio" name="period" value="this_day" x-model="exportPeriod">
+                                    <span>This Day (Today)</span>
+                                </label>
+
+                                <label class="flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer transition text-xs font-semibold"
+                                       :class="exportPeriod === 'this_month' ? 'border-[color:var(--gz-pop-dark)] bg-[color:var(--gz-pop)]/10' : 'border-[color:var(--gz-border)] hover:bg-black/5 dark:hover:bg-white/5'">
+                                    <input type="radio" name="period" value="this_month" x-model="exportPeriod">
+                                    <span>This Month</span>
+                                </label>
+
+                                <label class="flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer transition text-xs font-semibold"
+                                       :class="exportPeriod === 'last_month' ? 'border-[color:var(--gz-pop-dark)] bg-[color:var(--gz-pop)]/10' : 'border-[color:var(--gz-border)] hover:bg-black/5 dark:hover:bg-white/5'">
+                                    <input type="radio" name="period" value="last_month" x-model="exportPeriod">
+                                    <span>Last Month</span>
+                                </label>
+
+                                <label class="flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer transition text-xs font-semibold"
+                                       :class="exportPeriod === 'this_year' ? 'border-[color:var(--gz-pop-dark)] bg-[color:var(--gz-pop)]/10' : 'border-[color:var(--gz-border)] hover:bg-black/5 dark:hover:bg-white/5'">
+                                    <input type="radio" name="period" value="this_year" x-model="exportPeriod">
+                                    <span>This Year</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        {{-- Footer Notes & Actions --}}
+                        <div class="pt-4 border-t flex items-center justify-between gap-3" style="border-color: var(--gz-border);">
+                            <span class="text-[11px] font-mono" style="color: var(--gz-muted);">Format: CSV (Excel Compatible)</span>
+                            <div class="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    @click="exportModalOpen = false"
+                                    class="gz-btn-outline gz-btn-sm"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    @click="setTimeout(() => { exportModalOpen = false; }, 800)"
+                                    class="gz-btn-primary gz-btn-sm flex items-center gap-2"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                    <span>Download CSV</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </body>

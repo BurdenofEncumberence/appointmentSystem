@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminEventController;
 use App\Http\Controllers\AdminFinanceController;
 use App\Http\Controllers\AdminOpenPlayController;
+use App\Http\Controllers\AdminReportController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\OpenPlayController;
 use App\Http\Controllers\ProfileController;
@@ -97,6 +98,7 @@ Route::middleware(['auth', 'verified', 'role:admin,manager'])
         Route::resource('open-play', AdminOpenPlayController::class);
         Route::patch('/open-play/registrations/{registration}/attendance', [AdminOpenPlayController::class, 'updateAttendance'])
             ->name('open-play.attendance');
+        Route::get('/reports/export', [AdminReportController::class, 'export'])->name('reports.export');
         Route::get('/customization', [AdminCustomizationController::class, 'index'])->name('customization.index');
         Route::patch('/customization', [AdminCustomizationController::class, 'update'])->name('customization.update');
     });
