@@ -57,6 +57,8 @@ class AdminOpenPlayController extends Controller
      */
     public function create(): View
     {
+        abort_unless(Auth::user()?->isManager(), 403, 'Only managers are authorized to create Open Play and Tournament sessions.');
+
         $courts = Court::where('court_status', 'available')
             ->orderBy('court_name')
             ->get();
@@ -83,6 +85,8 @@ class AdminOpenPlayController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        abort_unless(Auth::user()?->isManager(), 403, 'Only managers are authorized to create Open Play and Tournament sessions.');
+
         $data = $this->validatedData($request);
 
         $session = OpenPlaySession::create([
@@ -122,6 +126,8 @@ class AdminOpenPlayController extends Controller
      */
     public function edit(OpenPlaySession $open_play): View
     {
+        abort_unless(Auth::user()?->isManager(), 403, 'Only managers are authorized to manage Open Play and Tournament sessions.');
+
         $courts = Court::orderBy('court_name')->get();
         $allocatedCourtIds = $open_play->courts->pluck('id')->all();
 
@@ -137,6 +143,8 @@ class AdminOpenPlayController extends Controller
      */
     public function update(Request $request, OpenPlaySession $open_play): RedirectResponse
     {
+        abort_unless(Auth::user()?->isManager(), 403, 'Only managers are authorized to manage Open Play and Tournament sessions.');
+
         $data = $this->validatedData($request);
 
         $open_play->update([
@@ -155,7 +163,7 @@ class AdminOpenPlayController extends Controller
         $open_play->courts()->sync($data['allocated_courts']);
 
         return redirect()->route('admin.open-play.show', $open_play)
-            ->with('status', "Session '{$open_play->title}' updated successfully.");
+             ->with('status', "Session '{$open_play->title}' updated successfully.");
     }
 
     /**
@@ -163,6 +171,8 @@ class AdminOpenPlayController extends Controller
      */
     public function destroy(OpenPlaySession $open_play): RedirectResponse
     {
+        abort_unless(Auth::user()?->isManager(), 403, 'Only managers are authorized to manage Open Play and Tournament sessions.');
+
         if ($open_play->activeRegistrations()->exists()) {
             // Cancel session instead of hard deleting to preserve audit history
             $open_play->update(['session_status' => 'cancelled']);

@@ -219,7 +219,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $permissions = [
             'admin' => ['view_admin_dashboard', 'manage_courts', 'view_finances', 'manage_walk_in'],
-            'manager' => ['view_admin_dashboard', 'manage_courts', 'view_finances', 'manage_walk_in'],
+            'manager' => ['view_admin_dashboard', 'manage_courts', 'view_finances', 'manage_walk_in', 'manage_open_play', 'create_open_play'],
             'staff' => ['view_today_bookings', 'manage_booking_status', 'manage_walk_in'],
             'player' => [],
         ];

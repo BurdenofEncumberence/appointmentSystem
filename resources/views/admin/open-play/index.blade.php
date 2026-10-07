@@ -7,14 +7,16 @@
                     Manage communal open play sessions and tournament brackets with per-slot player capacity and court allocations.
                 </p>
             </div>
-            <div class="flex items-center gap-3">
-                <a href="{{ route('admin.open-play.create') }}" class="gz-btn-primary flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    <span>Create Session</span>
-                </a>
-            </div>
+            @if(Auth::user()->isManager())
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('admin.open-play.create') }}" class="gz-btn-primary flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        <span>Create Session</span>
+                    </a>
+                </div>
+            @endif
         </div>
     </x-slot>
 
@@ -165,16 +167,18 @@
                                     <a href="{{ route('admin.open-play.show', $session) }}" class="gz-btn-outline gz-btn-sm" title="View Roster">
                                         Roster
                                     </a>
-                                    <a href="{{ route('admin.open-play.edit', $session) }}" class="gz-btn-outline gz-btn-sm" title="Edit Session">
-                                        Edit
-                                    </a>
-                                    <form method="POST" action="{{ route('admin.open-play.destroy', $session) }}" onsubmit="return confirm('Are you sure you want to delete or cancel this session?');" class="inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="gz-btn-outline gz-btn-sm text-red-600 hover:text-red-700" title="Delete or Cancel">
-                                            Cancel
-                                        </button>
-                                    </form>
+                                    @if(Auth::user()->isManager())
+                                        <a href="{{ route('admin.open-play.edit', $session) }}" class="gz-btn-outline gz-btn-sm" title="Edit Session">
+                                            Edit
+                                        </a>
+                                        <form method="POST" action="{{ route('admin.open-play.destroy', $session) }}" onsubmit="return confirm('Are you sure you want to delete or cancel this session?');" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="gz-btn-outline gz-btn-sm text-red-600 hover:text-red-700" title="Delete or Cancel">
+                                                Cancel
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -182,7 +186,13 @@
                         <tr>
                             <td colspan="8" class="text-center py-10" style="color: var(--gz-muted);">
                                 <p class="text-sm font-semibold">No Open Play or Tournament sessions found.</p>
-                                <p class="text-xs mt-1">Click "Create Session" above to configure your first communal pickleball event.</p>
+                                <p class="text-xs mt-1">
+                                    @if(Auth::user()->isManager())
+                                        Click "Create Session" above to configure your first communal pickleball event.
+                                    @else
+                                        Waiting for a manager to configure communal sessions.
+                                    @endif
+                                </p>
                             </td>
                         </tr>
                     @endforelse

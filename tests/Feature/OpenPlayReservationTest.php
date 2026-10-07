@@ -27,12 +27,12 @@ beforeEach(function () {
     ]);
 });
 
-test('admin can create open play session with allocated courts, capacity, and participation fee', function () {
-    $admin = User::factory()->create(['role' => 'admin']);
+test('manager can create open play session with allocated courts, capacity, and participation fee', function () {
+    $manager = User::factory()->create(['role' => 'manager']);
 
     $sessionDate = today()->addDays(3)->toDateString();
 
-    $response = $this->actingAs($admin)->post(route('admin.open-play.store'), [
+    $response = $this->actingAs($manager)->post(route('admin.open-play.store'), [
         'title' => 'Friday Night Open Play (Intermediate 3.5+)',
         'session_type' => 'open_play',
         'date' => $sessionDate,
@@ -56,10 +56,33 @@ test('admin can create open play session with allocated courts, capacity, and pa
     expect($session->is_full)->toBeFalse();
 });
 
-test('admin cannot create open play session without allocated courts or max capacity', function () {
+test('admin cannot create open play session and is forbidden', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
+    $sessionDate = today()->addDays(3)->toDateString();
+
+    $this->actingAs($admin)->get(route('admin.open-play.create'))
+        ->assertForbidden();
+
     $response = $this->actingAs($admin)->post(route('admin.open-play.store'), [
+        'title' => 'Admin Attempt Session',
+        'session_type' => 'open_play',
+        'date' => $sessionDate,
+        'start_time' => '18:00',
+        'end_time' => '21:00',
+        'allocated_courts' => [$this->court1->id],
+        'max_capacity' => 8,
+        'skill_level' => 'All Levels',
+        'price_per_slot' => 100.00,
+    ]);
+
+    $response->assertForbidden();
+});
+
+test('manager cannot create open play session without allocated courts or max capacity', function () {
+    $manager = User::factory()->create(['role' => 'manager']);
+
+    $response = $this->actingAs($manager)->post(route('admin.open-play.store'), [
         'title' => 'Incomplete Session',
         'session_type' => 'open_play',
         'date' => today()->addDays(2)->toDateString(),
