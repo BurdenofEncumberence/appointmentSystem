@@ -362,19 +362,6 @@
                         </p>
                     </div>
 
-                    {{-- Payment Receipt Reference --}}
-                    <div class="mb-4">
-                        <label for="ref_num" class="gz-label">Receipt / Reference # <span class="text-xs font-normal opacity-70">(optional)</span></label>
-                        <input
-                            id="ref_num"
-                            type="text"
-                            name="ref_num"
-                            value="{{ old('ref_num') }}"
-                            class="gz-input font-mono text-xs"
-                            placeholder="e.g. CASH-10294 or leave empty for auto Ref"
-                        >
-                        <p class="text-[11px] mt-1" style="color: var(--gz-muted);">Leave empty to auto-generate a walk-in receipt number.</p>
-                    </div>
 
                     {{-- Arrival / Attendance Status --}}
                     <div class="mb-6">
