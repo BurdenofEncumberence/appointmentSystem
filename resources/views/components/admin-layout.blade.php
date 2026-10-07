@@ -2,6 +2,9 @@
 
 @php
     $siteSettings = \App\Models\SiteSettings::first();
+    $currentUser = Auth::user();
+    $shortName = $currentUser->first_name 
+        ?: (\Illuminate\Support\Str::of($currentUser->name ?? 'Admin')->before(' ')->value() ?: 'Admin');
 @endphp
 
 <!DOCTYPE html>
@@ -20,16 +23,287 @@
     <div class="grain"></div>
     <x-loading-screen />
 
-    <div class="min-h-screen">
-        {{-- Consistent top navbar --}}
-        <div style="background: var(--gz-bg); position: sticky; top: 0; z-index: 50;">
-            @include('layouts.navigation', ['siteSettings' => $siteSettings])
-        </div>
+    <div x-data="{ sidebarOpen: false }" class="min-h-screen flex flex-col lg:flex-row" style="background: var(--gz-bg);">
+        {{-- Mobile Top Bar --}}
+        <header class="lg:hidden sticky top-0 z-40 border-b flex items-center justify-between px-4 py-3 shrink-0"
+                style="background: var(--gz-surface); border-color: var(--gz-border);">
+            <div class="flex items-center gap-3">
+                <button
+                    type="button"
+                    @click="sidebarOpen = true"
+                    class="gz-btn-outline gz-btn-sm p-2 flex items-center justify-center rounded-lg"
+                    aria-label="Open sidebar navigation"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
 
-        <div class="gz-container relative" style="z-index: 1; padding-top: 24px;">
-            <main>
+                <div class="flex items-center gap-2">
+                    @if($siteSettings && $siteSettings->logo)
+                        <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="{{ $siteSettings->system_name ?? 'Logo' }}" class="h-7 w-7 object-contain">
+                    @else
+                        <div class="w-6 h-6 rounded flex items-center justify-center font-bold text-xs" style="background: var(--gz-pop); color: var(--gz-ink);">
+                            K
+                        </div>
+                    @endif
+                    <span class="gz-font-display font-bold text-sm tracking-tight" style="color: var(--gz-ink);">
+                        {{ $siteSettings->system_name ?? 'KYMNET' }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <span class="gz-badge-outline text-[10px] uppercase font-mono font-bold px-2 py-0.5">
+                    {{ $currentUser->isAdmin() ? 'ADMIN' : 'MANAGER' }}
+                </span>
+                <span class="text-xs font-bold" style="color: var(--gz-ink);">{{ $shortName }}</span>
+            </div>
+        </header>
+
+        {{-- Mobile Sidebar Backdrop --}}
+        <div
+            x-show="sidebarOpen"
+            x-cloak
+            x-transition:enter="transition-opacity ease-linear duration-200"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition-opacity ease-linear duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            @click="sidebarOpen = false"
+            class="fixed inset-0 z-40 bg-black/50 lg:hidden"
+            aria-hidden="true"
+        ></div>
+
+        {{-- Left Sidebar --}}
+        <aside
+            class="fixed inset-y-0 left-0 z-50 w-64 xl:w-72 flex flex-col justify-between border-r transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:h-screen lg:shrink-0"
+            :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+            style="background: var(--gz-surface); border-color: var(--gz-border);"
+        >
+            {{-- Top Branding Header --}}
+            <div>
+                <div class="h-16 px-6 border-b flex items-center justify-between" style="border-color: var(--gz-border);">
+                    <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5">
+                        @if($siteSettings && $siteSettings->logo)
+                            <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="{{ $siteSettings->system_name ?? 'Logo' }}" class="h-8 w-8 object-contain">
+                        @else
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm" style="background: var(--gz-pop); color: var(--gz-ink);">
+                                K
+                            </div>
+                        @endif
+                        <div>
+                            <span class="gz-font-display font-extrabold text-base tracking-tight block leading-tight" style="color: var(--gz-ink);">
+                                {{ $siteSettings->system_name ?? 'KYMNET' }}
+                            </span>
+                            <span class="text-[10px] uppercase font-bold tracking-widest block" style="color: var(--gz-muted);">
+                                Admin Portal
+                            </span>
+                        </div>
+                    </a>
+
+                    <button
+                        type="button"
+                        @click="sidebarOpen = false"
+                        class="lg:hidden p-1.5 rounded-lg text-gray-500 hover:text-black dark:hover:text-white"
+                        aria-label="Close sidebar"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Sidebar Navigation Links --}}
+                <div class="p-4 overflow-y-auto max-h-[calc(100vh-180px)]">
+                    {{-- Section: Operations --}}
+                    <div class="mb-6">
+                        <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider" style="color: var(--gz-muted);">
+                            Operations
+                        </div>
+
+                        <nav class="space-y-1">
+                            {{-- Overview --}}
+                            <a
+                                href="{{ route('admin.dashboard') }}"
+                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition"
+                                style="{{ request()->routeIs('admin.dashboard') ? 'background: var(--gz-pop); color: var(--gz-ink); font-weight: 700;' : 'color: var(--gz-muted);' }}"
+                                @if(request()->routeIs('admin.dashboard')) aria-current="page" @endif
+                            >
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                                </svg>
+                                <span>Overview</span>
+                            </a>
+
+                            {{-- Courts --}}
+                            <a
+                                href="{{ route('admin.courts.index') }}"
+                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition"
+                                style="{{ request()->routeIs('admin.courts.*') ? 'background: var(--gz-pop); color: var(--gz-ink); font-weight: 700;' : 'color: var(--gz-muted);' }}"
+                                @if(request()->routeIs('admin.courts.*')) aria-current="page" @endif
+                            >
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                </svg>
+                                <span>Courts</span>
+                            </a>
+
+                            {{-- Events --}}
+                            <a
+                                href="{{ route('admin.events.index') }}"
+                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition"
+                                style="{{ request()->routeIs('admin.events.*') ? 'background: var(--gz-pop); color: var(--gz-ink); font-weight: 700;' : 'color: var(--gz-muted);' }}"
+                                @if(request()->routeIs('admin.events.*')) aria-current="page" @endif
+                            >
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <span>Events</span>
+                            </a>
+
+                            {{-- Open Play & Tournaments --}}
+                            <a
+                                href="{{ route('admin.open-play.index') }}"
+                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition"
+                                style="{{ request()->routeIs('admin.open-play.*') ? 'background: var(--gz-pop); color: var(--gz-ink); font-weight: 700;' : 'color: var(--gz-muted);' }}"
+                                @if(request()->routeIs('admin.open-play.*')) aria-current="page" @endif
+                            >
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                                <span>Open Play & Tournaments</span>
+                            </a>
+
+                            {{-- Financials --}}
+                            <a
+                                href="{{ route('admin.finance') }}"
+                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition"
+                                style="{{ request()->routeIs('admin.finance') ? 'background: var(--gz-pop); color: var(--gz-ink); font-weight: 700;' : 'color: var(--gz-muted);' }}"
+                                @if(request()->routeIs('admin.finance')) aria-current="page" @endif
+                            >
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                                <span>Financials</span>
+                            </a>
+
+                            {{-- Customization --}}
+                            <a
+                                href="{{ route('admin.customization.index') }}"
+                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition"
+                                style="{{ request()->routeIs('admin.customization.*') ? 'background: var(--gz-pop); color: var(--gz-ink); font-weight: 700;' : 'color: var(--gz-muted);' }}"
+                                @if(request()->routeIs('admin.customization.*')) aria-current="page" @endif
+                            >
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                                </svg>
+                                <span>Customization</span>
+                            </a>
+                        </nav>
+                    </div>
+
+                    {{-- Section: Shortcuts --}}
+                    <div>
+                        <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider" style="color: var(--gz-muted);">
+                            Navigation
+                        </div>
+
+                        <nav class="space-y-1">
+                            {{-- View Public Storefront --}}
+                            <a
+                                href="{{ url('/') }}"
+                                class="flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition hover:bg-black/5 dark:hover:bg-white/5"
+                                style="color: var(--gz-muted);"
+                            >
+                                <div class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                    </svg>
+                                    <span>Public Homepage</span>
+                                </div>
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                            </a>
+
+                            {{-- Profile Settings --}}
+                            <a
+                                href="{{ route('profile.edit') }}"
+                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition hover:bg-black/5 dark:hover:bg-white/5"
+                                style="{{ request()->routeIs('profile.*') ? 'background: var(--gz-pop); color: var(--gz-ink); font-weight: 700;' : 'color: var(--gz-muted);' }}"
+                            >
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                                <span>Profile & Security</span>
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Sidebar User Profile & Logout Footer --}}
+            <div class="p-4 border-t" style="border-color: var(--gz-border); background: var(--gz-bg);">
+                <div class="flex items-center justify-between gap-3 mb-3">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0" style="background: var(--gz-ink); color: var(--gz-surface);">
+                            {{ strtoupper(substr($currentUser->name ?? 'A', 0, 1)) }}
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-xs font-bold truncate leading-tight" style="color: var(--gz-ink);" title="{{ $currentUser->name }}">
+                                {{ $currentUser->name }}
+                            </p>
+                            <span class="gz-badge-outline text-[9px] uppercase font-mono font-bold px-1.5 py-0.2 mt-0.5 inline-block">
+                                {{ $currentUser->isAdmin() ? 'ADMIN' : 'MANAGER' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button
+                        type="submit"
+                        class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition border hover:bg-red-50 dark:hover:bg-red-950/20"
+                        style="color: var(--gz-danger); border-color: rgba(196, 69, 58, 0.25);"
+                    >
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                        <span>Sign Out</span>
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        {{-- Main Workspace Content --}}
+        <div class="flex-1 min-w-0 flex flex-col min-h-screen">
+            {{-- Optional Top Page Header --}}
+            @isset($header)
+                <header class="border-b px-4 sm:px-6 lg:px-8 py-4 shrink-0" style="background: var(--gz-surface); border-color: var(--gz-border);">
+                    <div class="max-w-7xl mx-auto">
+                        {{ $header }}
+                    </div>
+                </header>
+            @endisset
+
+            {{-- Main Content Slot --}}
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
                 {{ $slot }}
             </main>
+
+            {{-- Admin Footer --}}
+            <footer class="border-t px-4 sm:px-6 lg:px-8 py-4 shrink-0 text-xs" style="border-color: var(--gz-border); color: var(--gz-muted);">
+                <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+                    <span>{{ $siteSettings->system_name ?? 'KYMNET' }} &copy; {{ date('Y') }} &middot; All Rights Reserved</span>
+                    <span class="inline-flex items-center gap-1.5 font-mono text-[11px]">
+                        <span class="w-2 h-2 rounded-full inline-block" style="background: var(--gz-pop);"></span>
+                        HQ Operations Online
+                    </span>
+                </div>
+            </footer>
         </div>
     </div>
 </body>
