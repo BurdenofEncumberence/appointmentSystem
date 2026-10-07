@@ -96,26 +96,28 @@
                         </h2>
 
                         {{-- Date & Time --}}
-                        <div class="space-y-1.5 text-xs mb-4" style="color: var(--gz-muted);">
+                        <div class="space-y-1.5 text-xs mb-4">
                             <div class="flex items-center gap-2">
-                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 shrink-0" style="color: var(--gz-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                 </svg>
-                                <span class="font-semibold text-black dark:text-white">{{ $session->date->format('l, M j, Y') }}</span>
+                                <span class="font-bold" style="color: var(--gz-ink);">{{ $session->date->format('l, M j, Y') }}</span>
                             </div>
 
                             <div class="flex items-center gap-2">
-                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 shrink-0" style="color: var(--gz-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
-                                <span>{{ $session->time_window }} ({{ $session->duration_hours }} hrs)</span>
+                                <span class="font-semibold" style="color: var(--gz-ink);">{{ $session->time_window }}</span>
+                                <span class="text-xs" style="color: var(--gz-muted);">({{ $session->duration_hours }} hrs)</span>
                             </div>
 
                             <div class="flex items-center gap-2">
-                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 shrink-0" style="color: var(--gz-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                                 </svg>
-                                <span>Allocated: <span class="font-semibold text-black dark:text-white">{{ $session->allocated_courts_label ?: 'Dedicated Courts' }}</span></span>
+                                <span style="color: var(--gz-muted);">Allocated:</span>
+                                <span class="font-semibold" style="color: var(--gz-ink);">{{ $session->allocated_courts_label ?: 'Dedicated Courts' }}</span>
                             </div>
                         </div>
 
