@@ -348,22 +348,6 @@
                                     <span class="text-[10px] block mt-0.5" style="color: var(--gz-muted);">Physical cash collected and verified at the counter</span>
                                 </div>
                             </label>
-
-                            {{-- Other manual counter options in grid --}}
-                            <div class="grid grid-cols-3 gap-1.5 pt-1">
-                                <label class="flex items-center gap-1.5 p-2 border cursor-pointer text-xs rounded" style="border-color: var(--gz-border);">
-                                    <input type="radio" name="payment_method" value="gcash" x-model="selectedPaymentMethod">
-                                    <span class="font-medium text-[11px]">GCash (Manual)</span>
-                                </label>
-                                <label class="flex items-center gap-1.5 p-2 border cursor-pointer text-xs rounded" style="border-color: var(--gz-border);">
-                                    <input type="radio" name="payment_method" value="maya" x-model="selectedPaymentMethod">
-                                    <span class="font-medium text-[11px]">Maya (Manual)</span>
-                                </label>
-                                <label class="flex items-center gap-1.5 p-2 border cursor-pointer text-xs rounded" style="border-color: var(--gz-border);">
-                                    <input type="radio" name="payment_method" value="card" x-model="selectedPaymentMethod">
-                                    <span class="font-medium text-[11px]">POS Card</span>
-                                </label>
-                            </div>
                         </div>
                     </div>
 
