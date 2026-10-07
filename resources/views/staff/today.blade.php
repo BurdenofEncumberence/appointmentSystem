@@ -260,19 +260,17 @@
                                     @php
                                         $isBookingToday = \Carbon\Carbon::parse($booking->date)->isSameDay(now());
                                      @endphp
-                                    @if($isBookingToday)
+                                    @if($isBookingToday && !$isShow)
                                         <div class="flex items-center justify-end gap-2 flex-wrap">
                                             {{-- Mark as SHOW --}}
-                                            @if(!$isShow)
-                                                <form method="POST" action="{{ route('staff.bookings.status', $booking) }}" class="inline">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <input type="hidden" name="attendance_status" value="show">
-                                                    <button type="submit" class="gz-btn-success gz-btn-sm" title="Mark Customer as Present">
-                                                        Show
-                                                    </button>
-                                                </form>
-                                            @endif
+                                            <form method="POST" action="{{ route('staff.bookings.status', $booking) }}" class="inline">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="hidden" name="attendance_status" value="show">
+                                                <button type="submit" class="gz-btn-success gz-btn-sm" title="Mark Customer as Present">
+                                                    Show
+                                                </button>
+                                            </form>
 
                                             {{-- Mark as NO-SHOW --}}
                                             @if(!$isNoShow)
@@ -285,20 +283,8 @@
                                                     </button>
                                                 </form>
                                             @endif
-
-                                            {{-- Reset to Awaiting if already marked --}}
-                                            @if($isShow || $isNoShow)
-                                                <form method="POST" action="{{ route('staff.bookings.status', $booking) }}" class="inline">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <input type="hidden" name="attendance_status" value="scheduled">
-                                                    <button type="submit" class="gz-btn-outline gz-btn-sm" title="Reset to Awaiting">
-                                                        Reset
-                                                    </button>
-                                                </form>
-                                            @endif
                                         </div>
-                                    @else
+                                    @elseif(!$isBookingToday)
                                         <span class="text-xs italic" style="color: var(--gz-muted);" title="Attendance check-in is performed on match day">Check-in on match day</span>
                                     @endif
                                 </td>
