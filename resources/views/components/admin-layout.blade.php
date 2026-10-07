@@ -102,9 +102,6 @@
                             <span class="gz-font-display font-extrabold text-base tracking-tight block leading-tight" style="color: var(--gz-ink);">
                                 {{ $siteSettings->system_name ?? 'KYMNET' }}
                             </span>
-                            <span class="text-[10px] uppercase font-bold tracking-widest block" style="color: var(--gz-muted);">
-                                Admin Portal
-                            </span>
                         </div>
                     </a>
 
