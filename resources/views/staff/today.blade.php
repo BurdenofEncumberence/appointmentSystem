@@ -16,7 +16,7 @@
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-2 print:hidden">
-            <a href="{{ route('staff.walkin.create') }}" class="gz-btn-primary gz-btn-sm" style="background: var(--red); color: white;">
+            <a href="{{ route('staff.walkin.create') }}" class="gz-btn-primary gz-btn-sm">
                 + New Walk-In
             </a>
             <button onclick="window.print()" class="gz-btn-outline gz-btn-sm">
