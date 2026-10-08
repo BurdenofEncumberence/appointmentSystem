@@ -7,7 +7,16 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preload" as="image" href="{{ asset('images/dragon-open.png') }}">
+    <link rel="preload" as="image" href="{{ asset('images/paddle-dragon.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script>
+        try {
+            if (localStorage.getItem('kymnet_theme') === 'night') {
+                document.documentElement.classList.add('night-mode');
+            }
+        } catch (e) {}
+    </script>
     <style>
         :root {
             --bg: #F4F1E9;
@@ -17,13 +26,165 @@
             --border: #E4E0D4;
             --pop: #3ECF7E;
             --pop-dark: #2BA863;
+
+            /* Text color on green buttons: never flips */
+            --on-pop: #12150F;
+            /* Panels that stay dark in both themes */
+            --dark-bg: #12150F;
+            --dark-fg: #FCFBF7;
+
+            /* Map the nav partial's --gz-* variables onto this palette so the nav follows the theme */
+            --gz-bg: var(--bg);
+            --gz-surface: var(--surface);
+            --gz-ink: var(--ink);
+            --gz-muted: var(--muted);
+            --gz-border: var(--border);
+        }
+
+        html.night-mode, body.night-mode {
+            --bg: #10140E !important;
+            --surface: #181E15 !important;
+            --ink: #F4F1E9 !important;
+            --muted: #8F9685 !important;
+            --border: #283324 !important;
+            --pop: #3ECF7E !important;
+            --pop-dark: #2BA863 !important;
         }
 
         body {
             background: var(--bg);
             color: var(--ink);
             font-family: 'Inter', sans-serif;
+            transition: background-color 0.25s ease, color 0.25s ease;
         }
+
+        body.night-mode {
+            background-color: var(--bg) !important;
+            color: var(--ink) !important;
+        }
+
+        body.night-mode .grain {
+            opacity: 0.05;
+            background-image: radial-gradient(circle, var(--pop) 1px, transparent 1px);
+        }
+
+        body.night-mode #hero-arena {
+            box-shadow: 0 0 35px -5px rgba(62, 207, 126, 0.2), 0 20px 40px -15px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Dark panels (banner, CTA, footer) stay dark in both themes */
+        .dark-panel { background: var(--dark-bg); color: var(--dark-fg); }
+        html.night-mode .dark-panel { border: 1px solid var(--border); }
+
+        /* Nav partial components follow the theme */
+        .gz-btn-primary { color: var(--on-pop) !important; }
+        .gz-btn-outline { color: var(--ink); border-color: var(--ink); }
+        .gz-dropdown, .gz-panel {
+            background: var(--surface);
+            color: var(--ink);
+            border-color: var(--border);
+        }
+        .gz-dropdown-item { color: var(--ink); }
+        .gz-dropdown-item:hover { background: var(--bg); }
+        .gz-badge-outline { border-color: var(--border); color: var(--ink); }
+
+        /* Hardcoded Tailwind tints become the same jade palette at night */
+        html.night-mode .bg-emerald-100,
+        html.night-mode .bg-green-100,
+        html.night-mode .bg-purple-100,
+        html.night-mode .bg-amber-100 { background: rgba(62, 207, 126, 0.15) !important; }
+        html.night-mode .text-emerald-800,
+        html.night-mode .text-green-800,
+        html.night-mode .text-purple-800,
+        html.night-mode .text-amber-800,
+        html.night-mode .text-emerald-600 { color: var(--pop) !important; }
+
+        /* Chinese Fretwork / Huiwen Corner Brackets */
+        .huiwen-corner {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            stroke: var(--ink);
+            opacity: 0.22;
+            fill: none;
+            stroke-width: 1.5;
+            pointer-events: none;
+            transition: stroke 0.2s ease, opacity 0.2s ease;
+        }
+        .huiwen-tl { top: 8px; left: 8px; }
+        .huiwen-tr { top: 8px; right: 8px; transform: scaleX(-1); }
+        .huiwen-bl { bottom: 8px; left: 8px; transform: scaleY(-1); }
+        .huiwen-br { bottom: 8px; right: 8px; transform: scale(-1); }
+
+        /* Jade Seal Stamp */
+        .seal-jade {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1.5px solid var(--pop-dark);
+            color: var(--pop-dark);
+            border-radius: 4px;
+            padding: 1px 5px;
+            font-size: 10px;
+            font-weight: 800;
+            line-height: 1;
+            background: rgba(62, 207, 126, 0.12);
+            transform: rotate(-2deg);
+            user-select: none;
+        }
+
+        @keyframes subtleDrift {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            50% { transform: translateY(-8px) translateX(5px); }
+        }
+        .cloud-drift {
+            animation: subtleDrift 14s ease-in-out infinite;
+        }
+
+        /* Dragon Idle & Firing Animations */
+        @keyframes dragonFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25%      { transform: translateY(-6px) rotate(1.5deg); }
+            50%      { transform: translateY(-10px) rotate(0deg); }
+            75%      { transform: translateY(-5px) rotate(-1.5deg); }
+        }
+        .dragon-idle {
+            animation: dragonFloat 3.2s ease-in-out infinite;
+        }
+
+        .dragon-recoil {
+            animation: dragonRecoil 0.4s ease-out !important;
+        }
+        @keyframes dragonRecoil {
+            0% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(0.92) translateX(-8px) rotate(-3deg); }
+            55% { transform: scale(1.08) translateX(10px) rotate(3deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        /* Open-mouth frame stacked over the closed-mouth frame */
+        .mouth-overlay {
+            opacity: 0;
+            transform: none;
+            transition: opacity 0.05s ease;
+        }
+        .mouth-overlay.mouth-open {
+            opacity: 1 !important;
+            transform: none !important;
+        }
+
+        #paddle-cursor {
+            position: absolute;
+            pointer-events: none;
+            z-index: 50;
+            transform: translate(-50%, -38%);
+            transform-origin: 50% 38%;
+            display: none;
+        }
+        .arena-paddle-active {
+            cursor: none !important;
+        }
+
         .font-display {
             font-family: 'Space Grotesk', sans-serif;
             letter-spacing: -0.02em;
@@ -91,7 +252,7 @@
 
         .btn-primary {
             background: var(--pop);
-            color: var(--ink);
+            color: var(--on-pop);
             border-radius: 999px;
             padding: 16px 30px;
             font-weight: 700;
@@ -123,8 +284,21 @@
             background: var(--ink);
             color: var(--surface);
         }
+        /* Outline button for use on always-dark panels */
+        .btn-outline-light {
+            border: 2px solid var(--dark-fg);
+            color: var(--dark-fg);
+            border-radius: 999px;
+            font-weight: 700;
+            transition: background 0.15s ease, color 0.15s ease;
+        }
+        .btn-outline-light:hover {
+            background: var(--dark-fg);
+            color: var(--dark-bg);
+        }
 
         .surface-card {
+            position: relative;
             background: var(--surface);
             border: 1.5px solid var(--border);
             border-radius: 28px;
@@ -138,47 +312,6 @@
         .surface-card:nth-child(2):hover {
             transform: translateY(-4px) rotate(0.5deg);
         }
-
-        .icon-badge {
-            width: 52px;
-            height: 52px;
-            border-radius: 16px;
-            background: rgba(62, 207, 126, 0.12);
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            grid-template-rows: repeat(8, 1fr);
-            padding: 11px;
-            flex-shrink: 0;
-        }
-        .icon-badge div { width: 100%; height: 100%; }
-
-        .pixel-mark {
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
-            background: var(--ink);
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            grid-template-rows: repeat(8, 1fr);
-            padding: 7px;
-            flex-shrink: 0;
-        }
-        .pixel-mark div { width: 100%; height: 100%; }
-
-        .court-frame {
-            aspect-ratio: 4 / 3;
-            background: var(--ink);
-            border-radius: 32px;
-            position: relative;
-            overflow: hidden;
-        }
-        .court-line { position: absolute; background: rgba(244, 241, 233, 0.9); border-radius: 3px; }
-        .court-net {
-            position: absolute; left: 50%; top: 0; bottom: 0; width: 3px;
-            background: repeating-linear-gradient(0deg, rgba(244,241,233,0.55), rgba(244,241,233,0.55) 6px, transparent 6px, transparent 12px);
-            transform: translateX(-50%);
-        }
-        .court-dot { position: absolute; width: 14px; height: 14px; border-radius: 50%; }
 
         .footer-link {
             color: rgba(252, 251, 247, 0.65);
@@ -203,6 +336,19 @@
 </head>
 <body class="antialiased relative">
     <div class="grain"></div>
+
+    <!-- Auspicious Clouds floating in background -->
+    <div class="absolute top-12 left-6 w-48 h-28 opacity-[0.035] pointer-events-none cloud-drift z-0" style="color: var(--ink);">
+        <svg viewBox="0 0 100 60" fill="currentColor">
+            <path d="M20 35 A 12 12 0 0 1 42 27 A 18 18 0 0 1 73 30 A 12 12 0 0 1 90 42 A 10 10 0 0 1 80 55 L 20 55 A 10 10 0 0 1 10 45 A 12 12 0 0 1 20 35 Z"/>
+        </svg>
+    </div>
+    <div class="absolute top-[480px] right-8 w-64 h-36 opacity-[0.03] pointer-events-none cloud-drift z-0" style="color: var(--ink); animation-delay: -7s;">
+        <svg viewBox="0 0 100 60" fill="currentColor">
+            <path d="M20 35 A 12 12 0 0 1 42 27 A 18 18 0 0 1 73 30 A 18 18 0 0 1 90 42 A 10 10 0 0 1 80 55 L 20 55 A 10 10 0 0 1 10 45 A 12 12 0 0 1 20 35 Z"/>
+        </svg>
+    </div>
+
     <x-loading-screen />
 
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -211,8 +357,7 @@
         x-data="{ show: !localStorage.getItem('kymnet_event_banner_dismissed') }"
         x-show="show"
         x-cloak
-        class="relative z-40"
-        style="background: var(--ink); color: var(--surface);"
+        class="relative z-40 dark-panel"
     >
         <div class="max-w-6xl mx-auto px-6 py-2.5 flex items-center justify-between gap-4 text-sm">
             <p class="font-semibold">
@@ -266,21 +411,103 @@
                 </div>
             </div>
 
-            <div class="court-frame" role="img" aria-hidden="true">
-                <div class="court-line" style="top:8%; left:8%; right:8%; height:4px;"></div>
-                <div class="court-line" style="bottom:8%; left:8%; right:8%; height:4px;"></div>
-                <div class="court-line" style="top:8%; bottom:8%; left:8%; width:4px;"></div>
-                <div class="court-line" style="top:8%; bottom:8%; right:8%; width:4px;"></div>
-                <div class="court-net"></div>
-                <div class="court-dot" style="background: var(--pop); left: 30%; top: 40%;"></div>
-                <div class="court-dot" style="background: var(--surface); left: 65%; top: 60%;"></div>
+            <!-- Interactive Pickleball Dragon Arena -->
+            <div class="relative">
+                <div id="hero-arena" class="relative bg-[#12150F] rounded-3xl aspect-[4/3] overflow-hidden border-2 border-[#E4E0D4]/30 shadow-2xl arena-paddle-active select-none" role="region" aria-label="Interactive Pickleball Dragon Arena">
+
+                    <!-- Outer Perimeter Boundary (20' x 44' ratio) -->
+                    <div class="absolute inset-3 border-2 border-[#F4F1E9]/80 rounded-sm pointer-events-none"></div>
+
+                    <!-- Non-Volley Zone ("The Kitchen") -->
+                    <div class="absolute inset-y-3 left-[34%] right-[34%] bg-[#3ECF7E]/15 border-x-2 border-[#F4F1E9]/80 pointer-events-none"></div>
+
+                    <!-- Centerlines for service boxes -->
+                    <div class="absolute top-1/2 left-3 right-[66%] h-0 border-b-2 border-[#F4F1E9]/80 -translate-y-1/2 pointer-events-none"></div>
+                    <div class="absolute top-1/2 left-[66%] right-3 h-0 border-b-2 border-[#F4F1E9]/80 -translate-y-1/2 pointer-events-none"></div>
+
+                    <!-- Center Net -->
+                    <div class="absolute top-0 bottom-0 left-1/2 w-0 border-r-2 border-dashed border-[#F4F1E9] pointer-events-none z-10 -translate-x-1/2 shadow-sm"></div>
+
+                    <!-- Top HUD Bar inside Arena -->
+                    <div class="absolute top-3 left-4 right-4 flex items-center justify-between z-30 pointer-events-none text-xs">
+                        <div class="bg-[#12150F]/85 backdrop-blur-sm border border-white/20 px-3 py-1 rounded-full flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-[#3ECF7E] animate-pulse"></span>
+                            <span class="font-mono font-bold text-emerald-400">RALLY: <span id="hud-rally" class="text-sm">0</span></span>
+                        </div>
+                        <div class="bg-[#12150F]/85 backdrop-blur-sm border border-white/20 px-3 py-1 rounded-full text-gray-300 font-mono text-[11px]">
+                            BEST: <span id="hud-best" class="text-white font-bold">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Mascot Dragon -->
+                    <div id="dragon-actor" class="absolute right-3 bottom-3 w-40 h-40 sm:w-48 sm:h-48 z-20 cursor-pointer pointer-events-auto dragon-idle"
+                         onclick="firePickleball()" title="Click the dragon to serve a pickleball!">
+
+                        {{-- Flipped so he faces the court. Two stacked transparent frames: closed mouth (idle) and open mouth (firing). --}}
+                        <div id="dragon-body" class="relative w-full h-full"
+                             style="transform: scaleX(-1); transition: rotate 0.15s ease-out; filter: drop-shadow(0 0 3px #3ECF7E) drop-shadow(0 12px 20px rgba(0,0,0,0.7));">
+                            <img src="{{ asset('images/dragon-closed.png') }}"
+                                 alt="Pickleball Dragon Mascot"
+                                 class="absolute inset-0 w-full h-full object-contain"
+                                 draggable="false">
+                            <img id="dragon-open"
+                                 src="{{ asset('images/dragon-open.png') }}"
+                                 alt=""
+                                 aria-hidden="true"
+                                 class="absolute inset-0 w-full h-full object-contain mouth-overlay"
+                                 draggable="false">
+                        </div>
+
+                        <div class="absolute -top-6 left-2 bg-[#3ECF7E] text-[#12150F] text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-lg animate-bounce">
+                            CLICK TO SERVE! 🎾
+                        </div>
+                    </div>
+
+                    <!-- Canvas for balls, sparks, physics -->
+                    <canvas id="hero-canvas" class="absolute inset-0 w-full h-full z-10 pointer-events-none"></canvas>
+
+                    <!-- Custom Paddle Cursor -->
+                    <div id="paddle-cursor">
+                        <img src="{{ asset('images/paddle-dragon.png') }}" alt="" aria-hidden="true" draggable="false"
+                             class="w-28 h-28 drop-shadow-[0_8px_16px_rgba(0,0,0,0.6)]">
+                    </div>
+
+                    <!-- Hit Feedback -->
+                    <div id="hud-hit" class="absolute top-1/2 left-1/4 -translate-y-1/2 text-emerald-400 font-display font-black text-2xl opacity-0 transition-opacity pointer-events-none z-30 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+                        POCK! 🏓
+                    </div>
+                </div>
+
+                <!-- Game Controls (theme toggle now lives in the navbar) -->
+                <div class="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs px-1">
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="firePickleball()" class="bg-[#3ECF7E] text-[#12150F] font-bold px-3 py-1.5 rounded-full shadow-[0_2px_0_#2BA863] hover:translate-y-[-1px] transition">
+                            🎾 Serve Ball
+                        </button>
+                        <button type="button" id="auto-serve-btn" onclick="toggleAutoServe()" class="bg-[color:var(--surface)] border border-[color:var(--border)] font-semibold px-3 py-1.5 rounded-full text-[color:var(--muted)] hover:text-[color:var(--ink)] transition">
+                            Auto-Serve: OFF
+                        </button>
+                        <button type="button" id="paddle-toggle-btn" onclick="togglePaddleCursor()" class="bg-[color:var(--surface)] border border-[color:var(--border)] font-semibold px-3 py-1.5 rounded-full text-[color:var(--muted)] hover:text-[color:var(--ink)] transition">
+                            Cursor: 🏓 Paddle
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button type="button" onclick="toggleAudio()" id="sound-btn" class="text-[11px] text-[color:var(--muted)] hover:text-[color:var(--ink)] font-semibold">
+                            🔊 Sound: ON
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Quick Credibility / Arena Highlights Bar -->
+    <!-- Facility Highlights -->
     <section class="relative z-10 max-w-6xl mx-auto px-6 -mt-8 mb-24" aria-label="Facility Highlights">
-        <div class="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-2xl p-6 shadow-sm grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="relative bg-[color:var(--surface)] border border-[color:var(--border)] rounded-2xl p-6 shadow-sm grid grid-cols-2 md:grid-cols-4 gap-6">
+            <svg class="huiwen-corner huiwen-tl" viewBox="0 0 20 20"><path d="M1 19V1H19M5 19V5H19"/></svg>
+            <svg class="huiwen-corner huiwen-tr" viewBox="0 0 20 20"><path d="M1 19V1H19M5 19V5H19"/></svg>
+            <svg class="huiwen-corner huiwen-bl" viewBox="0 0 20 20"><path d="M1 19V1H19M5 19V5H19"/></svg>
+            <svg class="huiwen-corner huiwen-br" viewBox="0 0 20 20"><path d="M1 19V1H19M5 19V5H19"/></svg>
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
@@ -338,31 +565,31 @@
                     @if($event->image)
                         <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->event_title }}" class="w-full h-40 object-cover rounded-lg mb-4">
                     @else
-                        <div class="w-full h-40 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 rounded-lg mb-4 flex items-center justify-center">
+                        <div class="w-full h-40 rounded-lg mb-4 flex items-center justify-center" style="background: rgba(62, 207, 126, 0.15);">
                             <span class="text-4xl">🎉</span>
                         </div>
                     @endif
-                    
+
                     <h3 class="font-display font-bold text-lg mb-2">{{ $event->event_title }}</h3>
-                    
+
                     <div class="flex items-center gap-2 mb-3">
                         <span class="text-sm" style="color: var(--muted);">
                             {{ $event->start_date ? \Carbon\Carbon::parse($event->start_date)->format('M d, Y') : '' }} - {{ $event->end_date ? \Carbon\Carbon::parse($event->end_date)->format('M d, Y') : '' }}
                         </span>
                     </div>
-                    
+
                     @if($event->discount)
-                        <div class="inline-block bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm font-semibold mb-3">
+                        <div class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold mb-3">
                             {{ $event->discount }}% OFF
                         </div>
                     @endif
-                    
+
                     @if($event->details)
-                        <p class="text-sm mb-4" style="color: var(--muted); line-clamp-2">
+                        <p class="text-sm mb-4 line-clamp-2" style="color: var(--muted);">
                             {{ $event->details }}
                         </p>
                     @endif
-                    
+
                     <a href="{{ route('booking') }}" class="btn-primary text-sm w-full justify-center">
                         Book a Court
                     </a>
@@ -400,6 +627,8 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             @forelse($displayCourts as $court)
                 <div class="surface-card p-6 flex flex-col justify-between">
+                    <svg class="huiwen-corner huiwen-tl" viewBox="0 0 20 20"><path d="M1 19V1H19M5 19V5H19"/></svg>
+                    <svg class="huiwen-corner huiwen-tr" viewBox="0 0 20 20"><path d="M1 19V1H19M5 19V5H19"/></svg>
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <span class="text-xs font-bold uppercase px-2 py-0.5 rounded-full" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
@@ -411,8 +640,7 @@
                             </span>
                         </div>
 
-                        <div class="h-28 rounded-2xl relative overflow-hidden mb-5 flex items-center justify-center" style="background: var(--ink);">
-                            <!-- Mini Court Visual Accent -->
+                        <div class="h-28 rounded-2xl relative overflow-hidden mb-5 flex items-center justify-center" style="background: #12150F;">
                             <div class="absolute inset-2 border border-dashed border-stone-600 rounded-lg flex items-center justify-center">
                                 <div class="w-full h-[2px] bg-emerald-400/80"></div>
                                 <div class="absolute w-[2px] h-full bg-stone-500"></div>
@@ -499,7 +727,6 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Perk 1 -->
             <div class="surface-card p-7">
                 <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
@@ -510,7 +737,6 @@
                 </p>
             </div>
 
-            <!-- Perk 2 -->
             <div class="surface-card p-7">
                 <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
@@ -521,7 +747,6 @@
                 </p>
             </div>
 
-            <!-- Perk 3 -->
             <div class="surface-card p-7">
                 <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z" /></svg>
@@ -532,7 +757,6 @@
                 </p>
             </div>
 
-            <!-- Perk 4 -->
             <div class="surface-card p-7">
                 <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
@@ -543,7 +767,6 @@
                 </p>
             </div>
 
-            <!-- Perk 5 -->
             <div class="surface-card p-7">
                 <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
@@ -554,7 +777,6 @@
                 </p>
             </div>
 
-            <!-- Perk 6 -->
             <div class="surface-card p-7">
                 <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
@@ -567,7 +789,7 @@
         </div>
     </section>
 
-    <!-- 3-Step Seamless Booking Process -->
+    <!-- 3-Step Booking Process -->
     <section id="how-it-works" class="relative z-10 max-w-6xl mx-auto px-6 pb-24" aria-labelledby="steps-heading">
         <div class="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-3xl p-8 md:p-12">
             <div class="max-w-2xl mb-12">
@@ -584,7 +806,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
                 <div class="flex flex-col">
-                    <div class="w-12 h-12 rounded-2xl bg-[color:var(--ink)] text-white font-display font-bold text-xl flex items-center justify-center mb-4">
+                    <div class="w-12 h-12 rounded-2xl text-white font-display font-bold text-xl flex items-center justify-center mb-4" style="background: var(--dark-bg); border: 1px solid var(--border);">
                         01
                     </div>
                     <h3 class="font-display font-bold text-lg mb-2">Pick Your Date & Time</h3>
@@ -594,7 +816,7 @@
                 </div>
 
                 <div class="flex flex-col">
-                    <div class="w-12 h-12 rounded-2xl bg-[color:var(--ink)] text-white font-display font-bold text-xl flex items-center justify-center mb-4">
+                    <div class="w-12 h-12 rounded-2xl text-white font-display font-bold text-xl flex items-center justify-center mb-4" style="background: var(--dark-bg); border: 1px solid var(--border);">
                         02
                     </div>
                     <h3 class="font-display font-bold text-lg mb-2">Single or Multi-Slot Cart</h3>
@@ -604,7 +826,7 @@
                 </div>
 
                 <div class="flex flex-col">
-                    <div class="w-12 h-12 rounded-2xl bg-[color:var(--pop)] text-[color:var(--ink)] font-display font-bold text-xl flex items-center justify-center mb-4 shadow-sm">
+                    <div class="w-12 h-12 rounded-2xl font-display font-bold text-xl flex items-center justify-center mb-4 shadow-sm" style="background: var(--pop); color: var(--on-pop);">
                         03
                     </div>
                     <h3 class="font-display font-bold text-lg mb-2">Instant Confirmation & Play</h3>
@@ -710,7 +932,7 @@
         </div>
     </section>
 
-    <!-- Frequently Asked Questions -->
+    <!-- FAQ -->
     <section id="faq" class="relative z-10 max-w-4xl mx-auto px-6 pb-24" aria-labelledby="faq-heading" x-data="{ activeFaq: null }">
         <div class="text-center mb-12">
             <span class="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--pop-dark)]">
@@ -777,10 +999,9 @@
         </div>
     </section>
 
-    <!-- Big Final Call To Action Banner -->
+    <!-- Final Call To Action Banner -->
     <section class="relative z-10 max-w-6xl mx-auto px-6 pb-24" aria-label="Reserve Call To Action">
-        <div class="rounded-3xl p-10 md:p-16 text-center relative overflow-hidden" style="background: var(--ink); color: var(--surface);">
-            <!-- Background accent glow -->
+        <div class="rounded-3xl p-10 md:p-16 text-center relative overflow-hidden dark-panel">
             <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full blur-3xl opacity-20 pointer-events-none" style="background: var(--pop);"></div>
             <div class="absolute -left-20 -bottom-20 w-80 h-80 rounded-full blur-3xl opacity-20 pointer-events-none" style="background: var(--pop);"></div>
 
@@ -798,7 +1019,7 @@
                     <a href="{{ $reserveUrl }}" class="btn-primary text-base py-4 px-8">
                         Reserve a Court Now →
                     </a>
-                    <a href="#courts" class="btn-outline text-white border-white hover:bg-white hover:text-black text-base py-3.5 px-6">
+                    <a href="#courts" class="btn-outline-light text-base py-3.5 px-6">
                         Explore Courts & Rates
                     </a>
                 </div>
@@ -811,16 +1032,16 @@
 
     </main>
 
-    <footer class="relative z-10" style="background: var(--ink); color: rgba(255,255,255,0.7);">
+    <footer class="relative z-10 dark-panel" style="color: rgba(255,255,255,0.7);">
         <div class="max-w-6xl mx-auto px-6 py-14 grid md:grid-cols-4 gap-10">
             <div>
-                <span class="font-display font-bold text-lg" style="color: var(--surface);">KYMNET</span>
+                <span class="font-display font-bold text-lg" style="color: var(--dark-fg);">KYMNET</span>
                 <p class="mt-4 text-sm max-w-xs leading-relaxed">
                     Court booking for the Davao pickleball community. Built by players, for players.
                 </p>
             </div>
             <div>
-                <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: var(--surface);">Explore</h4>
+                <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: var(--dark-fg);">Explore</h4>
                 <ul class="space-y-2 text-sm">
                     <li><a href="{{ $reserveUrl }}" class="footer-link">Reserve a Court</a></li>
                     <li><a href="#courts" class="footer-link">Court Fleet & Rates</a></li>
@@ -829,7 +1050,7 @@
                 </ul>
             </div>
             <div>
-                <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: var(--surface);">Support & Legal</h4>
+                <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: var(--dark-fg);">Support & Legal</h4>
                 <ul class="space-y-2 text-sm">
                     <li><a href="#faq" class="footer-link">Frequently Asked Questions</a></li>
                     <li><a href="{{ route('terms') }}" class="footer-link">Terms & Conditions</a></li>
@@ -838,7 +1059,7 @@
                 </ul>
             </div>
             <div>
-                <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: var(--surface);">Location & Hours</h4>
+                <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: var(--dark-fg);">Location & Hours</h4>
                 <p class="text-sm leading-relaxed" style="color: rgba(255,255,255,0.65);">
                     Davao City, Philippines<br>
                     Open Daily: 8:00 AM – 10:00 PM<br>
@@ -852,41 +1073,286 @@
     </footer>
 
     <script>
-        function renderPixelGrid(id, rows, colorMap) {
-            const el = document.getElementById(id);
-            if (!el) return;
-            el.innerHTML = '';
-            rows.forEach(row => {
-                [...row].forEach(ch => {
-                    const cell = document.createElement('div');
-                    cell.style.background = colorMap[ch] || 'transparent';
-                    el.appendChild(cell);
-                });
-            });
-        }
+        // ===== PICKLEBALL DRAGON GAME ENGINE =====
+        (function() {
+            // ── State ──────────────────────────────────────────
+            let audioEnabled = true;
+            let audioCtx    = null;
+            let rallyScore  = 0;
+            let bestScore   = 0;
+            let autoFire    = false;
+            let autoInterval = null;
+            let paddleCursorEnabled = true;
 
-        const glyphs = {
-            'brand-mark': [
-                "........",".W....W.","..WWWW..",".W.WW.W.",
-                ".W.WW.W.","..WWWW..",".W....W.","........"
-            ],
-            'icon-availability': [
-                "........",".G....G.","..GGGG..",".G.GG.G.",
-                ".G.GG.G.","..GGGG..",".G....G.","........"
-            ],
-            'icon-booking': [
-                "...G....","..GG....",".GGG....","GGGGGGG.",
-                "....GGG.","....GG..","....G...","........"
-            ],
-            'icon-preferences': [
-                "........",".GGGG...","...G....",".GGGGGG.",
-                "...G....",".GG.....","...G....","........"
-            ]
-        };
-        renderPixelGrid('brand-mark', glyphs['brand-mark'], { '.': 'transparent', 'W': '#FCFBF7' });
-        renderPixelGrid('icon-availability', glyphs['icon-availability'], { '.': 'transparent', 'G': '#3ECF7E' });
-        renderPixelGrid('icon-booking', glyphs['icon-booking'], { '.': 'transparent', 'G': '#3ECF7E' });
-        renderPixelGrid('icon-preferences', glyphs['icon-preferences'], { '.': 'transparent', 'G': '#3ECF7E' });
+            // ── Audio ──────────────────────────────────────────
+            function playPaddleSound(frequency = 440, type = 'sine') {
+                if (!audioEnabled) return;
+                try {
+                    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                    const osc  = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.08);
+                    gain.gain.setValueAtTime(0.7, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.09);
+                } catch(e) {}
+            }
+
+            function toggleAudio() {
+                audioEnabled = !audioEnabled;
+                const btn = document.getElementById('sound-btn');
+                if (btn) btn.innerText = audioEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
+            }
+            window.toggleAudio = toggleAudio;
+
+            // ── Canvas & DOM refs ──────────────────────────────
+            const arena        = document.getElementById('hero-arena');
+            const canvas       = document.getElementById('hero-canvas');
+            const ctxC         = canvas ? canvas.getContext('2d') : null;
+            const paddleEl     = document.getElementById('paddle-cursor');
+            const dragonActor  = document.getElementById('dragon-actor');
+            const dragonBody   = document.getElementById('dragon-body');
+            const dragonOpen   = document.getElementById('dragon-open');
+            const hudRally     = document.getElementById('hud-rally');
+            const hudBest      = document.getElementById('hud-best');
+            const hudHit       = document.getElementById('hud-hit');
+
+            if (!arena || !canvas || !ctxC) return; // safety guard
+
+            // ── Resize ─────────────────────────────────────────
+            let arenaRect = arena.getBoundingClientRect();
+            function resizeCanvas() {
+                arenaRect       = arena.getBoundingClientRect();
+                canvas.width    = arenaRect.width;
+                canvas.height   = arenaRect.height;
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            // ── Mouse ──────────────────────────────────────────
+            let mouseX = 80, mouseY = 100, prevMouseX = 80;
+
+            arena.addEventListener('mouseenter', () => {
+                if (paddleCursorEnabled && paddleEl) paddleEl.style.display = 'block';
+            });
+            arena.addEventListener('mouseleave', () => {
+                if (paddleEl) paddleEl.style.display = 'none';
+                if (dragonBody) dragonBody.style.rotate = '0deg';
+            });
+            arena.addEventListener('mousemove', (e) => {
+                arenaRect = arena.getBoundingClientRect();
+                mouseX = e.clientX - arenaRect.left;
+                mouseY = e.clientY - arenaRect.top;
+                if (paddleEl && paddleCursorEnabled) {
+                    paddleEl.style.left = mouseX + 'px';
+                    paddleEl.style.top  = mouseY + 'px';
+                    const dx = mouseX - prevMouseX;
+                    paddleEl.style.transform = `translate(-50%, -38%) rotate(${Math.max(-25, Math.min(25, dx * 2))}deg)`;
+                }
+
+                // Dragon tilts his head toward the cursor
+                if (dragonBody && dragonActor) {
+                    const dr = dragonActor.getBoundingClientRect();
+                    const tilt = Math.max(-12, Math.min(12, ((dr.top + dr.height / 2) - e.clientY) / 12));
+                    dragonBody.style.rotate = tilt + 'deg';
+                }
+
+                prevMouseX = mouseX;
+            });
+
+            // ── Particles & Balls ──────────────────────────────
+            const balls     = [];
+            const particles = [];
+
+            class Pickleball {
+                constructor(x, y, vx, vy) {
+                    this.x = x; this.y = y;
+                    this.vx = vx; this.vy = vy;
+                    this.radius   = 11;
+                    this.spin     = 0;
+                    this.hitCount = 0;
+                }
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    this.vy  += 0.22; // gravity
+                    this.spin += 0.15;
+
+                    if (this.y + this.radius > canvas.height) {
+                        this.y  = canvas.height - this.radius;
+                        this.vy = -this.vy * 0.72;
+                        playPaddleSound(220, 'triangle');
+                    }
+                    if (this.y - this.radius < 0) {
+                        this.y  = this.radius;
+                        this.vy = -this.vy * 0.72;
+                    }
+                    if (this.x - this.radius < 0) {
+                        if (this.hitCount === 0) {
+                            rallyScore = 0;
+                            if (hudRally) hudRally.innerText = rallyScore;
+                        }
+                        return false;
+                    }
+
+                    // Paddle collision (only when cursor mode enabled)
+                    if (paddleCursorEnabled) {
+                        const dist = Math.hypot(this.x - mouseX, this.y - mouseY);
+                        if (dist < this.radius + 40 && this.vx < 0) {
+                            this.vx = Math.abs(this.vx) * 1.08 + 1.5;
+                            this.vy = (this.y - mouseY) * 0.28;
+                            this.hitCount++;
+                            rallyScore++;
+                            if (hudRally) hudRally.innerText = rallyScore;
+                            if (rallyScore > bestScore) {
+                                bestScore = rallyScore;
+                                if (hudBest) hudBest.innerText = bestScore;
+                            }
+                            playPaddleSound(520, 'sine');
+                            createSparks(this.x, this.y);
+                            showHitFeedback();
+                        }
+                    }
+
+                    if (this.x - this.radius > canvas.width) return false;
+                    return true;
+                }
+                draw() {
+                    ctxC.save();
+                    ctxC.translate(this.x, this.y);
+                    ctxC.rotate(this.spin);
+                    const grad = ctxC.createRadialGradient(-3, -3, 2, 0, 0, this.radius);
+                    grad.addColorStop(0, '#E6EE9C');
+                    grad.addColorStop(0.6, '#D4E157');
+                    grad.addColorStop(1, '#9E9D24');
+                    ctxC.fillStyle = grad;
+                    ctxC.beginPath();
+                    ctxC.arc(0, 0, this.radius, 0, Math.PI * 2);
+                    ctxC.fill();
+                    ctxC.fillStyle = '#12150F';
+                    [[-5,-4],[0,-6],[5,-4],[-6,1],[0,0],[6,1],[-4,5],[3,5]].forEach(([hx,hy]) => {
+                        ctxC.beginPath();
+                        ctxC.arc(hx, hy, 1.4, 0, Math.PI * 2);
+                        ctxC.fill();
+                    });
+                    ctxC.restore();
+                }
+            }
+
+            function createSparks(x, y) {
+                for (let i = 0; i < 12; i++) {
+                    particles.push({
+                        x, y,
+                        vx: (Math.random() - 0.5) * 8,
+                        vy: (Math.random() - 0.5) * 8,
+                        alpha: 1,
+                        size:  Math.random() * 3 + 2,
+                        color: Math.random() > 0.4 ? '#3ECF7E' : '#FCFBF7'
+                    });
+                }
+            }
+
+            function showHitFeedback() {
+                if (!hudHit) return;
+                const phrases = ['SWEET SHOT! 🏓', 'CLEAN DINK! ⚡', 'PERFECT RALLY! 🔥', 'DRAGON SMASH! 🐉'];
+                hudHit.innerText  = phrases[Math.floor(Math.random() * phrases.length)];
+                hudHit.style.opacity = '1';
+                setTimeout(() => { hudHit.style.opacity = '0'; }, 700);
+            }
+
+            // ── Fire a pickleball from the dragon's mouth ──────
+            function firePickleball() {
+                if (dragonActor) {
+                    dragonActor.classList.add('dragon-recoil');
+                    setTimeout(() => dragonActor.classList.remove('dragon-recoil'), 400);
+                }
+
+                // Swap to the open-mouth frame for a moment
+                if (dragonOpen) {
+                    dragonOpen.classList.add('mouth-open');
+                    setTimeout(() => dragonOpen.classList.remove('mouth-open'), 260);
+                }
+
+                // Spawn from the dragon's snout (he is flipped, so the snout tip is ~11% from the left, ~49% down)
+                const ar = arena.getBoundingClientRect();
+                const dr = dragonActor.getBoundingClientRect();
+                const mouthX = (dr.left - ar.left) + dr.width * 0.11;
+                const mouthY = (dr.top - ar.top) + dr.height * 0.49;
+
+                const targetY = 40 + Math.random() * (canvas.height - 80);
+                const vx = -(5.5 + Math.random() * 2.5);
+                const vy = (targetY - mouthY) * 0.038 - 1.5;
+                balls.push(new Pickleball(mouthX, mouthY, vx, vy));
+                playPaddleSound(350, 'sawtooth');
+            }
+            window.firePickleball = firePickleball;
+
+            // ── Auto-serve toggle ──────────────────────────────
+            function toggleAutoServe() {
+                autoFire = !autoFire;
+                const btn = document.getElementById('auto-serve-btn');
+                if (autoFire) {
+                    if (btn) { btn.innerText = 'Auto-Serve: ON'; btn.classList.add('text-emerald-700'); }
+                    autoInterval = setInterval(firePickleball, 2300);
+                } else {
+                    if (btn) { btn.innerText = 'Auto-Serve: OFF'; btn.classList.remove('text-emerald-700'); }
+                    clearInterval(autoInterval);
+                }
+            }
+            window.toggleAutoServe = toggleAutoServe;
+
+            // ── Cursor paddle toggle ───────────────────────────
+            function togglePaddleCursor() {
+                paddleCursorEnabled = !paddleCursorEnabled;
+                const btn = document.getElementById('paddle-toggle-btn');
+                if (paddleCursorEnabled) {
+                    arena.classList.add('arena-paddle-active');
+                    if (btn) btn.innerText = 'Cursor: 🏓 Paddle';
+                } else {
+                    arena.classList.remove('arena-paddle-active');
+                    if (paddleEl) paddleEl.style.display = 'none';
+                    if (btn) btn.innerText = 'Cursor: 🖱 Normal';
+                }
+            }
+            window.togglePaddleCursor = togglePaddleCursor;
+
+            // ── Animation Loop ─────────────────────────────────
+            function loop() {
+                ctxC.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = balls.length - 1; i >= 0; i--) {
+                    if (!balls[i].update()) balls.splice(i, 1);
+                    else balls[i].draw();
+                }
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.x += p.vx; p.y += p.vy; p.alpha -= 0.035;
+                    if (p.alpha <= 0) { particles.splice(i, 1); continue; }
+                    ctxC.save();
+                    ctxC.globalAlpha = p.alpha;
+                    ctxC.fillStyle   = p.color;
+                    ctxC.beginPath();
+                    ctxC.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctxC.fill();
+                    ctxC.restore();
+                }
+                requestAnimationFrame(loop);
+            }
+            loop();
+
+            // Initial serve after 1.2s
+            setTimeout(() => { if (balls.length === 0) firePickleball(); }, 1200);
+
+            // Keep body class in sync with the saved theme (toggleTheme itself lives in the nav partial)
+            try {
+                if (localStorage.getItem('kymnet_theme') === 'night') document.body.classList.add('night-mode');
+            } catch (e) {}
+        })();
     </script>
 
 </body>
