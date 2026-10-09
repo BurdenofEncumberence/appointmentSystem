@@ -610,38 +610,7 @@
                 </p>
             </div>
 
-            <!-- Perk 4 -->
-            <div class="surface-card p-7">
-                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
-                </div>
-                <h3 class="font-display font-bold text-lg mb-2">Pro Shop & Gear Rentals</h3>
-                <p class="text-sm leading-relaxed" style="color: var(--muted);">
-                    No paddle? No problem! Rent tournament-grade carbon fiber paddles and official outdoor balls at the front counter, or test out new overgrips.
-                </p>
-            </div>
 
-            <!-- Perk 5 -->
-            <div class="surface-card p-7">
-                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                </div>
-                <h3 class="font-display font-bold text-lg mb-2">Showers & Locker Rooms</h3>
-                <p class="text-sm leading-relaxed" style="color: var(--muted);">
-                    Clean shower stalls, changing rooms, and secured lockers ensure you can rally before work or head straight out with friends feeling completely refreshed.
-                </p>
-            </div>
-
-            <!-- Perk 6 -->
-            <div class="surface-card p-7">
-                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                </div>
-                <h3 class="font-display font-bold text-lg mb-2">Lounge & Refreshment Bar</h3>
-                <p class="text-sm leading-relaxed" style="color: var(--muted);">
-                    Refuel between games with complimentary filtered water refills, chilled electrolyte beverages, shaded spectator benches, and free high-speed Wi-Fi.
-                </p>
-            </div>
         </div>
     </section>
 
