@@ -10,8 +10,10 @@
 <style>
     /* Theme toggle icon swap (works on every page that includes this nav) */
     .theme-icon-sun { display: none; }
-    html.night-mode .theme-icon-sun { display: block; }
-    html.night-mode .theme-icon-moon { display: none; }
+    html.night-mode .theme-icon-sun,
+    html.dark .theme-icon-sun { display: block; }
+    html.night-mode .theme-icon-moon,
+    html.dark .theme-icon-moon { display: none; }
 
     .theme-toggle-btn {
         width: 36px;
@@ -256,13 +258,22 @@
 
 <script>
     // Theme toggle lives here so it works on every page that includes the nav.
-    if (typeof window.toggleTheme === 'undefined') {
-        window.toggleTheme = function () {
-            const isNight = document.documentElement.classList.toggle('night-mode');
+    window.toggleTheme = function () {
+        const isNight = document.documentElement.classList.toggle('night-mode');
+        document.documentElement.classList.toggle('dark', isNight);
+        if (document.body) {
             document.body.classList.toggle('night-mode', isNight);
-            try { localStorage.setItem('kymnet_theme', isNight ? 'night' : 'day'); } catch (e) {}
-        };
-    }
+            document.body.classList.toggle('dark', isNight);
+        }
+        try { localStorage.setItem('kymnet_theme', isNight ? 'night' : 'day'); } catch (e) {}
+    };
+
+    try {
+        if (localStorage.getItem('kymnet_theme') === 'night') {
+            document.documentElement.classList.add('night-mode', 'dark');
+            document.body?.classList.add('night-mode', 'dark');
+        }
+    } catch (e) {}
 
     if (typeof window.renderPixelGrid === 'undefined') {
         window.renderPixelGrid = function (id, rows, colorMap) {

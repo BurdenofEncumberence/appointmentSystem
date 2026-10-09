@@ -221,6 +221,27 @@ input:focus-visible {
     --gz-pop-dark: #2BA863;
 }
 
+html.night-mode,
+body.night-mode,
+html.dark,
+body.dark {
+    --gz-bg: #10140E !important;
+    --gz-surface: #181E15 !important;
+    --gz-ink: #F4F1E9 !important;
+    --gz-muted: #8F9685 !important;
+    --gz-border: #283324 !important;
+    --gz-pop: #3ECF7E !important;
+    --gz-pop-dark: #2BA863 !important;
+
+    --bg: #10140E !important;
+    --surface: #181E15 !important;
+    --ink: #F4F1E9 !important;
+    --muted: #8F9685 !important;
+    --border: #283324 !important;
+    --pop: #3ECF7E !important;
+    --pop-dark: #2BA863 !important;
+}
+
 .gz-page {
     background: var(--gz-bg);
     color: var(--gz-ink);
@@ -967,4 +988,200 @@ input:focus-visible {
 @keyframes kymnet-bar {
     0% { left: -40%; }
     100% { left: 100%; }
+}
+
+/* =====================================================================
+   DARK / NIGHT MODE GLOBAL COMPONENT STYLES
+   ===================================================================== */
+html.night-mode,
+html.dark {
+    background-color: #10140E;
+    color-scheme: dark;
+}
+
+html.night-mode body,
+body.night-mode,
+html.dark body,
+body.dark {
+    background-color: #10140E !important;
+    color: #F4F1E9 !important;
+}
+
+/* Card in dark mode */
+html.night-mode .gz-card,
+body.night-mode .gz-card,
+html.dark .gz-card,
+body.dark .gz-card {
+    background-color: #181E15 !important;
+    border-color: #283324 !important;
+    color: #F4F1E9 !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75) !important;
+}
+
+/* Inputs in dark mode */
+html.night-mode .gz-input,
+body.night-mode .gz-input,
+html.dark .gz-input,
+body.dark .gz-input {
+    background-color: #121610 !important;
+    border-color: #283324 !important;
+    color: #F4F1E9 !important;
+}
+
+html.night-mode .gz-input:focus,
+body.night-mode .gz-input:focus,
+html.dark .gz-input:focus,
+body.dark .gz-input:focus {
+    border-color: #3ECF7E !important;
+    box-shadow: 0 0 0 3px rgba(62, 207, 126, 0.22) !important;
+    outline: none !important;
+}
+
+/* Labels and hints in dark mode */
+html.night-mode .gz-label,
+body.night-mode .gz-label,
+html.dark .gz-label,
+body.dark .gz-label {
+    color: #F4F1E9 !important;
+}
+
+html.night-mode .gz-hint,
+body.night-mode .gz-hint,
+html.dark .gz-hint,
+body.dark .gz-hint {
+    color: #8F9685 !important;
+}
+
+/* Status alerts in dark mode */
+html.night-mode .gz-status,
+body.night-mode .gz-status,
+html.dark .gz-status,
+body.dark .gz-status {
+    background-color: rgba(62, 207, 126, 0.15) !important;
+    border-color: rgba(62, 207, 126, 0.35) !important;
+    color: #3ECF7E !important;
+}
+
+/* Links in dark mode */
+html.night-mode .gz-link,
+body.night-mode .gz-link,
+html.dark .gz-link,
+body.dark .gz-link {
+    color: #3ECF7E !important;
+}
+
+html.night-mode .gz-link:hover,
+body.night-mode .gz-link:hover,
+html.dark .gz-link:hover,
+body.dark .gz-link:hover {
+    color: #86EFAC !important;
+}
+
+/* Navigation items in dark mode */
+html.night-mode .nav-link,
+body.night-mode .nav-link,
+html.dark .nav-link,
+body.dark .nav-link {
+    color: #8F9685;
+}
+
+html.night-mode .nav-link:hover,
+body.night-mode .nav-link:hover,
+html.dark .nav-link:hover,
+body.dark .nav-link:hover {
+    color: #F4F1E9 !important;
+}
+
+html.night-mode .nav-link[aria-current="page"],
+body.night-mode .nav-link[aria-current="page"],
+html.dark .nav-link[aria-current="page"],
+body.dark .nav-link[aria-current="page"] {
+    color: #F4F1E9 !important;
+}
+
+/* Buttons in dark mode */
+html.night-mode .gz-btn-primary,
+body.night-mode .gz-btn-primary,
+html.dark .gz-btn-primary,
+body.dark .gz-btn-primary {
+    background-color: #3ECF7E !important;
+    color: #12150F !important;
+    box-shadow: 0 4px 0 #2BA863 !important;
+}
+
+html.night-mode .gz-btn-primary:hover,
+body.night-mode .gz-btn-primary:hover,
+html.dark .gz-btn-primary:hover,
+body.dark .gz-btn-primary:hover {
+    box-shadow: 0 6px 0 #2BA863 !important;
+}
+
+html.night-mode .gz-btn-outline,
+body.night-mode .gz-btn-outline,
+html.dark .gz-btn-outline,
+body.dark .gz-btn-outline {
+    border-color: #283324 !important;
+    color: #F4F1E9 !important;
+    background-color: transparent !important;
+}
+
+html.night-mode .gz-btn-outline:hover,
+body.night-mode .gz-btn-outline:hover,
+html.dark .gz-btn-outline:hover,
+body.dark .gz-btn-outline:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border-color: #3ECF7E !important;
+    color: #3ECF7E !important;
+}
+
+/* Panels and dropdowns in dark mode */
+html.night-mode .gz-panel,
+body.night-mode .gz-panel,
+html.dark .gz-panel,
+body.dark .gz-panel {
+    background-color: #181E15 !important;
+    border-color: #283324 !important;
+    color: #F4F1E9 !important;
+}
+
+html.night-mode .gz-dropdown,
+body.night-mode .gz-dropdown,
+html.dark .gz-dropdown,
+body.dark .gz-dropdown {
+    background-color: #181E15 !important;
+    border-color: #283324 !important;
+    color: #F4F1E9 !important;
+}
+
+html.night-mode .gz-dropdown-item,
+body.night-mode .gz-dropdown-item,
+html.dark .gz-dropdown-item,
+body.dark .gz-dropdown-item {
+    color: #F4F1E9 !important;
+}
+
+html.night-mode .gz-dropdown-item:hover,
+body.night-mode .gz-dropdown-item:hover,
+html.dark .gz-dropdown-item:hover,
+body.dark .gz-dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Theme toggle button in dark mode */
+html.night-mode .theme-toggle-btn,
+body.night-mode .theme-toggle-btn,
+html.dark .theme-toggle-btn,
+body.dark .theme-toggle-btn {
+    border-color: #283324 !important;
+    background-color: #181E15 !important;
+    color: #F4F1E9 !important;
+}
+
+/* Grain in dark mode */
+html.night-mode .grain,
+body.night-mode .grain,
+html.dark .grain,
+body.dark .grain {
+    opacity: 0.05;
+    background-image: radial-gradient(circle, #3ECF7E 1px, transparent 1px);
 }

@@ -7,10 +7,10 @@
 @php
     $siteSettings = \App\Models\SiteSettings::first();
 @endphp
-<footer class="relative z-10" style="background: var(--gz-ink); color: rgba(255,255,255,0.7);">
+<footer class="relative z-10 border-t" style="background: #12150F; border-color: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7);">
     <div class="max-w-6xl mx-auto px-6 py-14 grid md:grid-cols-4 gap-10">
         <div>
-            <span class="gz-font-display font-bold text-lg" style="color: var(--gz-surface);">{{ $siteSettings->business_name ?? 'KYMNET' }}</span>
+            <span class="gz-font-display font-bold text-lg" style="color: #FCFBF7;">{{ $siteSettings->business_name ?? 'KYMNET' }}</span>
             <p class="mt-4 text-sm max-w-xs leading-relaxed">
                 {{ $siteSettings->tagline ?? 'Court booking for the Davao pickleball community. Built by players, for players.' }}
             </p>
@@ -24,7 +24,7 @@
             @endif
         </div>
         <div>
-            <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: var(--gz-surface);">Explore</h4>
+            <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: #FCFBF7;">Explore</h4>
             <ul class="space-y-2 text-sm">
                 <li><a href="{{ route('booking') }}" class="footer-link">Find courts</a></li>
                 <li><a href="#" class="footer-link">Host a tournament</a></li>
@@ -32,14 +32,14 @@
             </ul>
         </div>
         <div>
-            <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: var(--gz-surface);">Legal & Support</h4>
+            <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: #FCFBF7;">Legal & Support</h4>
             <ul class="space-y-2 text-sm">
                 <li><a href="{{ route('terms') }}" class="footer-link">Terms & Conditions</a></li>
                 <li><a href="{{ route('privacy') }}" class="footer-link">Privacy Policy</a></li>
             </ul>
         </div>
         <div>
-            <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: var(--gz-surface);">Connect</h4>
+            <h4 class="text-xs font-semibold uppercase tracking-wide mb-4" style="color: #FCFBF7;">Connect</h4>
             <ul class="space-y-2 text-sm">
                 @if($siteSettings && $siteSettings->facebook_link)
                     <li><a href="{{ $siteSettings->facebook_link }}" target="_blank" class="footer-link">Facebook</a></li>

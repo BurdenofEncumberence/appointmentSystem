@@ -16,8 +16,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="{{ asset('images/kymnet-logo.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script>
+        try {
+            if (localStorage.getItem('kymnet_theme') === 'night') {
+                document.documentElement.classList.add('night-mode', 'dark');
+            }
+        } catch (e) {}
+    </script>
 </head>
-<body class="antialiased gz-app-shell">
+<body class="antialiased gz-app-shell transition-colors duration-200">
     <div class="grain"></div>
     <x-loading-screen />
 

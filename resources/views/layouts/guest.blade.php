@@ -15,19 +15,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="{{ asset('images/kymnet-logo.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script>
+        try {
+            if (localStorage.getItem('kymnet_theme') === 'night') {
+                document.documentElement.classList.add('night-mode', 'dark');
+            }
+        } catch (e) {}
+    </script>
 </head>
-<body class="antialiased relative gz-app-shell">
+<body class="antialiased relative gz-app-shell min-h-screen flex flex-col justify-between transition-colors duration-200">
     <div class="grain"></div>
     <x-loading-screen />
 
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <div style="background: var(--gz-bg); position: sticky; top: 0; z-index: 50;">
+    <div style="background: var(--gz-bg); position: sticky; top: 0; z-index: 50; transition: background-color 0.2s ease;">
         @include('layouts.navigation')
     </div>
 
-    <main id="main-content" class="relative z-10">
-        <section class="max-w-6xl mx-auto px-6 py-16 flex justify-center" aria-label="{{ $label }}">
+    <main id="main-content" class="relative z-10 flex-1 flex items-center justify-center py-12 sm:py-16">
+        <section class="max-w-6xl w-full mx-auto px-4 sm:px-6 flex justify-center" aria-label="{{ $label }}">
             <div class="gz-card w-full rounded-3xl {{ $cardClass }}">
                 {{ $slot }}
             </div>
