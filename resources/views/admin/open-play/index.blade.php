@@ -33,12 +33,26 @@
     @endif
 
     {{-- Metric Cards --}}
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div class="gz-kpi-card">
             <span class="gz-kpi-label">Upcoming Sessions</span>
             <div class="gz-kpi-value mt-1">{{ number_format($upcomingCount) }}</div>
             <p class="text-[11px] mt-1" style="color: var(--gz-muted);">Active sessions accepting player registrations</p>
         </div>
+
+        <a href="{{ route('admin.open-play.index', ['status' => 'pending_approval']) }}" class="gz-kpi-card block hover:border-black/40 dark:hover:border-white/40 transition">
+            <div class="flex items-center justify-between">
+                <span class="gz-kpi-label">Player Host Requests</span>
+                @if(($pendingRequestsCount ?? 0) > 0)
+                    <span class="gz-badge text-[10px] font-bold bg-amber-500/20 text-amber-700 dark:text-amber-300">Action Required</span>
+                @endif
+            </div>
+            <div class="gz-kpi-value mt-1 flex items-baseline gap-2">
+                <span class="{{ ($pendingRequestsCount ?? 0) > 0 ? 'text-amber-600 dark:text-amber-400 font-extrabold' : '' }}">{{ number_format($pendingRequestsCount ?? 0) }}</span>
+                <span class="text-xs font-normal" style="color: var(--gz-muted);">pending</span>
+            </div>
+            <p class="text-[11px] mt-1" style="color: var(--gz-muted);">Proposals submitted by players awaiting review</p>
+        </a>
 
         <div class="gz-kpi-card">
             <span class="gz-kpi-label">Total Player Registrations</span>
@@ -76,6 +90,53 @@
             </a>
         </div>
     @endif
+
+    {{-- Quick Status Tabs --}}
+    <div class="flex items-center gap-2 mb-4 overflow-x-auto pb-1">
+        <a
+            href="{{ route('admin.open-play.index', array_filter(['type' => $typeFilter !== 'all' ? $typeFilter : null])) }}"
+            class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap {{ $statusFilter === 'all' ? 'bg-[#12150F] text-white dark:bg-white dark:text-black shadow-xs' : 'border hover:bg-black/5 dark:hover:bg-white/5' }}"
+            style="{{ $statusFilter !== 'all' ? 'background: var(--gz-surface); border-color: var(--gz-border); color: var(--gz-ink);' : '' }}"
+        >
+            <span>All Sessions</span>
+            <span class="px-1.5 py-0.5 rounded-full text-[10px] {{ $statusFilter === 'all' ? 'bg-white/20 text-white dark:bg-black/20 dark:text-black' : 'bg-black/10 dark:bg-white/10' }}">
+                {{ $totalSessionsCount ?? 0 }}
+            </span>
+        </a>
+
+        <a
+            href="{{ route('admin.open-play.index', array_filter(['status' => 'pending_approval', 'type' => $typeFilter !== 'all' ? $typeFilter : null])) }}"
+            class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap {{ $statusFilter === 'pending_approval' ? 'bg-amber-500 text-stone-950 font-black shadow-sm' : 'border hover:bg-black/5 dark:hover:bg-white/5' }}"
+            style="{{ $statusFilter !== 'pending_approval' ? 'background: var(--gz-surface); border-color: var(--gz-border); color: var(--gz-ink);' : '' }}"
+        >
+            <span>Host Requests (Pending)</span>
+            <span class="px-1.5 py-0.5 rounded-full text-[10px] {{ ($pendingRequestsCount ?? 0) > 0 ? 'bg-amber-700 text-white font-extrabold' : 'bg-black/10 dark:bg-white/10' }}">
+                {{ $pendingRequestsCount ?? 0 }}
+            </span>
+        </a>
+
+        <a
+            href="{{ route('admin.open-play.index', array_filter(['status' => 'approved_pending_payment', 'type' => $typeFilter !== 'all' ? $typeFilter : null])) }}"
+            class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap {{ $statusFilter === 'approved_pending_payment' ? 'bg-[#12150F] text-white dark:bg-white dark:text-black shadow-xs' : 'border hover:bg-black/5 dark:hover:bg-white/5' }}"
+            style="{{ $statusFilter !== 'approved_pending_payment' ? 'background: var(--gz-surface); border-color: var(--gz-border); color: var(--gz-ink);' : '' }}"
+        >
+            <span>Approved (Awaiting Payment)</span>
+            <span class="px-1.5 py-0.5 rounded-full text-[10px] {{ $statusFilter === 'approved_pending_payment' ? 'bg-white/20 text-white dark:bg-black/20 dark:text-black' : 'bg-black/10 dark:bg-white/10' }}">
+                {{ $approvedPendingPaymentCount ?? 0 }}
+            </span>
+        </a>
+
+        <a
+            href="{{ route('admin.open-play.index', array_filter(['status' => 'scheduled', 'type' => $typeFilter !== 'all' ? $typeFilter : null])) }}"
+            class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap {{ $statusFilter === 'scheduled' ? 'bg-[#12150F] text-white dark:bg-white dark:text-black shadow-xs' : 'border hover:bg-black/5 dark:hover:bg-white/5' }}"
+            style="{{ $statusFilter !== 'scheduled' ? 'background: var(--gz-surface); border-color: var(--gz-border); color: var(--gz-ink);' : '' }}"
+        >
+            <span>Scheduled</span>
+            <span class="px-1.5 py-0.5 rounded-full text-[10px] {{ $statusFilter === 'scheduled' ? 'bg-white/20 text-white dark:bg-black/20 dark:text-black' : 'bg-black/10 dark:bg-white/10' }}">
+                {{ $scheduledCount ?? 0 }}
+            </span>
+        </a>
+    </div>
 
     {{-- Filter Toolbar --}}
     <div class="gz-panel p-4 mb-6">
@@ -233,15 +294,29 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center py-10" style="color: var(--gz-muted);">
-                                <p class="text-sm font-semibold">No Open Play or Tournament sessions found.</p>
-                                <p class="text-xs mt-1">
-                                    @if(Auth::user()->isManager())
-                                        Click "Create Session" above to configure your first communal pickleball event.
-                                    @else
-                                        Waiting for a manager to configure communal sessions.
-                                    @endif
-                                </p>
+                            <td colspan="8" class="text-center py-12 px-4" style="color: var(--gz-muted);">
+                                @if($statusFilter === 'pending_approval')
+                                    <div class="max-w-md mx-auto">
+                                        <div class="w-12 h-12 mx-auto rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-3">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                            </svg>
+                                        </div>
+                                        <h3 class="gz-font-display font-bold text-base" style="color: var(--gz-ink);">No Pending Player Host Requests</h3>
+                                        <p class="text-xs mt-1" style="color: var(--gz-muted);">
+                                            When registered players submit a proposal to host an Open Play session from their player portal (<code class="px-1 py-0.5 rounded bg-black/5 dark:bg-white/10 font-mono">/open-play/host</code>), their requests will appear here for manager review, court scheduling confirmation, and approval.
+                                        </p>
+                                    </div>
+                                @else
+                                    <p class="text-sm font-semibold">No Open Play or Tournament sessions found.</p>
+                                    <p class="text-xs mt-1">
+                                        @if(Auth::user()->isManager())
+                                            Click "Create Session" above to configure your first communal pickleball event.
+                                        @else
+                                            Waiting for a manager to configure communal sessions.
+                                        @endif
+                                    </p>
+                                @endif
                             </td>
                         </tr>
                     @endforelse

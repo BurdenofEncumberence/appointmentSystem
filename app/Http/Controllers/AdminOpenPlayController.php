@@ -44,6 +44,9 @@ class AdminOpenPlayController extends Controller
         $totalOpenPlayRevenue = OpenPlayRegistration::where('payment_status', 'paid')->sum('total_fee');
 
         $pendingRequestsCount = OpenPlaySession::where('session_status', 'pending_approval')->count();
+        $approvedPendingPaymentCount = OpenPlaySession::where('session_status', 'approved_pending_payment')->count();
+        $scheduledCount = OpenPlaySession::where('session_status', 'scheduled')->count();
+        $totalSessionsCount = OpenPlaySession::count();
 
         return view('admin.open-play.index', [
             'sessions' => $sessions,
@@ -51,6 +54,9 @@ class AdminOpenPlayController extends Controller
             'totalRegistrations' => $totalRegistrations,
             'totalOpenPlayRevenue' => $totalOpenPlayRevenue,
             'pendingRequestsCount' => $pendingRequestsCount,
+            'approvedPendingPaymentCount' => $approvedPendingPaymentCount,
+            'scheduledCount' => $scheduledCount,
+            'totalSessionsCount' => $totalSessionsCount,
             'statusFilter' => $statusFilter,
             'typeFilter' => $typeFilter,
         ]);
