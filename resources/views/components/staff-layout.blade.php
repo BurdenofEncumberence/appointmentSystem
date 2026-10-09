@@ -237,5 +237,8 @@
             </footer>
         </div>
     </div>
+
+    <!-- Global Booking Receipt Modal -->
+    <x-booking-receipt-modal />
 </body>
 </html>

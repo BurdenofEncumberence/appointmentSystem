@@ -146,6 +146,19 @@
                                 <span>Overview</span>
                             </a>
 
+                            {{-- Bookings --}}
+                            <a
+                                href="{{ route('admin.bookings.index') }}"
+                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition"
+                                style="{{ request()->routeIs('admin.bookings.*') ? 'background: var(--gz-pop); color: var(--gz-ink); font-weight: 700;' : 'color: var(--gz-muted);' }}"
+                                @if(request()->routeIs('admin.bookings.*')) aria-current="page" @endif
+                            >
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                </svg>
+                                <span>Bookings</span>
+                            </a>
+
                             {{-- Courts --}}
                             <a
                                 href="{{ route('admin.courts.index') }}"
@@ -462,5 +475,8 @@
             </div>
         </div>
     </div>
+
+    <!-- Global Booking Receipt Modal -->
+    <x-booking-receipt-modal />
 </body>
 </html>

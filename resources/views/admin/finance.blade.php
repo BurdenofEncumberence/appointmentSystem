@@ -371,6 +371,7 @@
                             <th>Date</th>
                             <th>Status</th>
                             <th class="text-right">Amount</th>
+                            <th class="text-right">Receipt</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -399,6 +400,23 @@
                                 </td>
                                 <td class="text-right font-semibold" style="color: var(--gz-pop-dark);">
                                     ₱{{ number_format($payment->amount, 2) }}
+                                </td>
+                                <td class="text-right">
+                                    @if($payment->booking_id)
+                                        <button
+                                            type="button"
+                                            @click="$dispatch('open-booking-receipt', {{ $payment->booking_id }})"
+                                            class="gz-btn-outline gz-btn-sm inline-flex items-center gap-1 text-[11px] py-1 px-2"
+                                            title="View Official Receipt"
+                                        >
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                            </svg>
+                                            <span>Receipt</span>
+                                        </button>
+                                    @else
+                                        <span class="text-xs" style="color: var(--gz-muted);">--</span>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

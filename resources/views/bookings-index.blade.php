@@ -424,7 +424,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="flex items-center gap-4 sm:justify-end">
+                                        <div class="flex items-center gap-3 sm:justify-end flex-wrap">
                                             <div class="text-left sm:text-right">
                                                 <span class="text-[10px] uppercase font-bold tracking-wider block" style="color: var(--gz-muted);">
                                                     Transaction Total
@@ -436,6 +436,17 @@
                                             <span class="gz-badge {{ $badgeClass }} text-xs capitalize">
                                                 {{ ucfirst($group['overallStatus']) }}
                                             </span>
+                                            <button
+                                                type="button"
+                                                @click="$dispatch('open-booking-receipt', {{ $group['slots']->first()['b']->id }})"
+                                                class="gz-btn-outline gz-btn-sm inline-flex items-center gap-1.5 text-xs py-1.5 px-3"
+                                                title="View Official Receipt for this transaction"
+                                            >
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                </svg>
+                                                <span>View Receipt</span>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -463,7 +474,7 @@
                                                 <div>
                                                     <div class="flex items-center gap-2 flex-wrap">
                                                         <h4 class="font-bold text-sm" style="color: var(--gz-ink);">
-                                                            {{ $slot['courtName'] }}
+                                                             {{ $slot['courtName'] }}
                                                         </h4>
                                                         @if (!empty($slot['courtSize']))
                                                             <span class="gz-badge gz-badge-neutral text-[10px]">
@@ -488,13 +499,24 @@
                                                 </div>
                                             </div>
 
-                                            <div class="flex items-center gap-3 justify-between sm:justify-end pl-10 sm:pl-0">
+                                            <div class="flex items-center gap-2.5 justify-between sm:justify-end pl-10 sm:pl-0">
                                                 <span class="font-mono font-semibold text-sm" style="color: var(--gz-ink);">
                                                     ₱{{ number_format($slot['amount'], 2) }}
                                                 </span>
                                                 <span class="gz-badge {{ $slotBadgeClass }} text-[11px] capitalize">
                                                     {{ ucfirst($slot['status']) }}
                                                 </span>
+                                                <button
+                                                    type="button"
+                                                    @click="$dispatch('open-booking-receipt', {{ $slot['b']->id }})"
+                                                    class="gz-btn-outline gz-btn-sm inline-flex items-center gap-1 text-[11px] py-1 px-2"
+                                                    title="View Official Receipt for this slot"
+                                                >
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                    </svg>
+                                                    <span>Receipt</span>
+                                                </button>
                                             </div>
                                         </div>
                                     @endforeach
@@ -506,4 +528,7 @@
             </section>
         @endforeach
     </div>
+
+    <!-- Booking Receipt Modal -->
+    <x-booking-receipt-modal />
 </x-app-layout>

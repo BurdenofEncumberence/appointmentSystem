@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminBookingController;
 use App\Http\Controllers\AdminCourtController;
 use App\Http\Controllers\AdminCustomizationController;
 use App\Http\Controllers\AdminDashboardController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\AdminFinanceController;
 use App\Http\Controllers\AdminOpenPlayController;
 use App\Http\Controllers\AdminReportController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\BookingReceiptController;
 use App\Http\Controllers\OpenPlayController;
 use App\Http\Controllers\OpenPlayHostController;
 use App\Http\Controllers\ProfileController;
@@ -80,6 +82,12 @@ Route::middleware(['auth', 'verified'])->prefix('customer')->name('customer.')->
     })->name('dashboard');
 });
 
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/bookings/{booking}/receipt', [BookingReceiptController::class, 'show'])
+        ->whereNumber('booking')
+        ->name('bookings.receipt');
+});
+
 /*
 |--------------------------------------------------------------------------
 | Admin & Manager Workspace
@@ -91,6 +99,7 @@ Route::middleware(['auth', 'verified', 'role:admin,manager'])
     ->name('admin.')
     ->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/bookings', [AdminBookingController::class, 'index'])->name('bookings.index');
         Route::get('/finance', [AdminFinanceController::class, 'index'])->name('finance');
         Route::resource('courts', AdminCourtController::class)
             ->except(['show'])
