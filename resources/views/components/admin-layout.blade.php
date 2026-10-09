@@ -11,6 +11,9 @@
     } elseif (file_exists(public_path('images/kymnet-logo.png'))) {
         $logoPath = asset('images/kymnet-logo.png');
     }
+    $pendingHostRequestsCount = ($currentUser && $currentUser->isManager())
+        ? \App\Models\OpenPlaySession::where('session_status', 'pending_approval')->count()
+        : 0;
 @endphp
 
 <!DOCTYPE html>
@@ -190,7 +193,12 @@
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                                 </svg>
-                                <span>Open Play & Tournaments</span>
+                                <span class="flex-1">Open Play & Tournaments</span>
+                                @if(($pendingHostRequestsCount ?? 0) > 0)
+                                    <span class="inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-mono font-bold rounded-full bg-amber-500 text-stone-950 shrink-0 shadow-xs" title="{{ $pendingHostRequestsCount }} requests pending review">
+                                        {{ $pendingHostRequestsCount }}
+                                    </span>
+                                @endif
                             </a>
 
                             {{-- Financials --}}
