@@ -5,6 +5,12 @@
     $currentUser = Auth::user();
     $shortName = $currentUser->first_name
         ?: (\Illuminate\Support\Str::of($currentUser->name ?? 'Staff')->before(' ')->value() ?: 'Staff');
+    $logoPath = null;
+    if ($siteSettings && $siteSettings->logo && file_exists(public_path('storage/' . $siteSettings->logo))) {
+        $logoPath = asset('storage/' . $siteSettings->logo);
+    } elseif (file_exists(public_path('images/kymnet-logo.png'))) {
+        $logoPath = asset('images/kymnet-logo.png');
+    }
 @endphp
 
 <!DOCTYPE html>
@@ -17,6 +23,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{{ asset('images/kymnet-logo.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="antialiased gz-app-shell">
@@ -41,8 +48,8 @@
                 </button>
 
                 <div class="flex items-center gap-2">
-                    @if($siteSettings && $siteSettings->logo)
-                        <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="{{ $siteSettings->system_name ?? 'Logo' }}" class="h-7 w-7 object-contain">
+                    @if($logoPath)
+                        <img src="{{ $logoPath }}" alt="{{ $siteSettings->system_name ?? 'Logo' }}" class="h-7 w-7 object-contain rounded-lg">
                     @else
                         <div class="w-6 h-6 rounded flex items-center justify-center font-bold text-xs" style="background: var(--gz-pop); color: var(--gz-ink);">
                             K
@@ -77,16 +84,16 @@
 
         {{-- Left Sidebar --}}
         <aside
-            class="fixed inset-y-0 left-0 z-50 w-64 xl:w-72 flex flex-col justify-between border-r transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:h-screen lg:shrink-0"
+            class="fixed inset-y-0 left-0 z-40 w-64 xl:w-72 flex flex-col justify-between border-r transition-transform duration-200 ease-in-out lg:translate-x-0"
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
             style="background: var(--gz-surface); border-color: var(--gz-border);"
         >
-            {{-- Top Branding Header --}}
-            <div>
-                <div class="h-16 px-6 border-b flex items-center justify-between" style="border-color: var(--gz-border);">
+            {{-- Top Branding Header & Nav --}}
+            <div class="flex-1 flex flex-col min-h-0">
+                <div class="h-16 px-6 border-b flex items-center justify-between shrink-0" style="border-color: var(--gz-border);">
                     <a href="{{ route('staff.today') }}" class="flex items-center gap-2.5">
-                        @if($siteSettings && $siteSettings->logo)
-                            <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="{{ $siteSettings->system_name ?? 'Logo' }}" class="h-8 w-8 object-contain">
+                        @if($logoPath)
+                            <img src="{{ $logoPath }}" alt="{{ $siteSettings->system_name ?? 'Logo' }}" class="h-8 w-8 object-contain rounded-lg border border-black/10 dark:border-white/10 shadow-sm shrink-0">
                         @else
                             <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm" style="background: var(--gz-pop); color: var(--gz-ink);">
                                 K
@@ -115,7 +122,7 @@
                 </div>
 
                 {{-- Sidebar Navigation Links --}}
-                <div class="p-4 overflow-y-auto max-h-[calc(100vh-180px)]">
+                <div class="p-4 overflow-y-auto flex-1 min-h-0">
                     <div class="mb-6">
                         <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider" style="color: var(--gz-muted);">
                             Operations
@@ -173,7 +180,7 @@
             </div>
 
             {{-- Sidebar User Profile & Logout Footer --}}
-            <div class="p-4 border-t" style="border-color: var(--gz-border); background: var(--gz-bg);">
+            <div class="p-4 border-t shrink-0" style="border-color: var(--gz-border); background: var(--gz-bg);">
                 <div class="flex items-center gap-2.5 mb-3 min-w-0">
                     <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0" style="background: var(--gz-ink); color: var(--gz-surface);">
                         {{ strtoupper(substr($currentUser->name ?? 'S', 0, 1)) }}
@@ -203,10 +210,10 @@
         </aside>
 
         {{-- Main Workspace Content --}}
-        <div class="flex-1 min-w-0 flex flex-col min-h-screen">
+        <div class="flex-1 min-w-0 flex flex-col min-h-screen lg:ml-64 xl:ml-72">
             {{-- Optional Top Page Header --}}
             @isset($header)
-                <header class="border-b px-4 sm:px-6 lg:px-8 py-4 shrink-0" style="background: var(--gz-surface); border-color: var(--gz-border);">
+                <header class="sticky top-0 z-20 border-b px-4 sm:px-6 lg:px-8 py-4 shrink-0" style="background: var(--gz-surface); border-color: var(--gz-border);">
                     <div class="max-w-7xl mx-auto">
                         {{ $header }}
                     </div>
