@@ -7,8 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="preload" as="image" href="{{ asset('images/dragon-open.png') }}">
-    <link rel="preload" as="image" href="{{ asset('images/paddle-dragon.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/kymnet-logo.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script>
         try {
@@ -139,50 +138,6 @@
         }
         .cloud-drift {
             animation: subtleDrift 14s ease-in-out infinite;
-        }
-
-        /* Dragon Idle & Firing Animations */
-        @keyframes dragonFloat {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            25%      { transform: translateY(-6px) rotate(1.5deg); }
-            50%      { transform: translateY(-10px) rotate(0deg); }
-            75%      { transform: translateY(-5px) rotate(-1.5deg); }
-        }
-        .dragon-idle {
-            animation: dragonFloat 3.2s ease-in-out infinite;
-        }
-
-        .dragon-recoil {
-            animation: dragonRecoil 0.4s ease-out !important;
-        }
-        @keyframes dragonRecoil {
-            0% { transform: scale(1) rotate(0deg); }
-            25% { transform: scale(0.92) translateX(-8px) rotate(-3deg); }
-            55% { transform: scale(1.08) translateX(10px) rotate(3deg); }
-            100% { transform: scale(1) rotate(0deg); }
-        }
-
-        /* Open-mouth frame stacked over the closed-mouth frame */
-        .mouth-overlay {
-            opacity: 0;
-            transform: none;
-            transition: opacity 0.05s ease;
-        }
-        .mouth-overlay.mouth-open {
-            opacity: 1 !important;
-            transform: none !important;
-        }
-
-        #paddle-cursor {
-            position: absolute;
-            pointer-events: none;
-            z-index: 50;
-            transform: translate(-50%, -38%);
-            transform-origin: 50% 38%;
-            display: none;
-        }
-        .arena-paddle-active {
-            cursor: none !important;
         }
 
         .font-display {
@@ -382,19 +337,19 @@
 
     <main id="main-content">
 
-    <section class="relative z-10 max-w-6xl mx-auto px-6 pt-16 pb-24" aria-label="Introduction">
-        <div class="grid md:grid-cols-2 gap-16 items-center">
+    <section class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-10 sm:pt-16 pb-16 sm:pb-24" aria-label="Introduction">
+        <div class="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
             <div>
-                <h1 class="font-display text-5xl md:text-6xl font-bold leading-[1.05]">
+                <h1 class="font-display text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.08] sm:leading-[1.05]">
                     Your court era
                     <br>
                     starts <span style="color: var(--pop-dark);">now.</span>
                 </h1>
-                <p class="mt-6 text-lg max-w-md leading-relaxed" style="color: var(--muted);">
+                <p class="mt-4 sm:mt-6 text-base sm:text-lg max-w-md leading-relaxed" style="color: var(--muted);">
                     No more group chats going back and forth for 45 minutes.
                     See what's open, lock in a time, and go play. That's it.
                 </p>
-                <div class="mt-9 flex flex-wrap items-center gap-4">
+                <div class="mt-6 sm:mt-9 flex flex-wrap items-center gap-3 sm:gap-4">
                     @php
                         $reserveUrl = match(true) {
                             Auth::check() && (Auth::user()->isAdmin() || Auth::user()->hasRole('manager')) => route('admin.dashboard'),
@@ -411,90 +366,99 @@
                 </div>
             </div>
 
-            <!-- Interactive Pickleball Dragon Arena -->
-            <div class="relative">
-                <div id="hero-arena" class="relative bg-[#12150F] rounded-3xl aspect-[4/3] overflow-hidden border-2 border-[#E4E0D4]/30 shadow-2xl arena-paddle-active select-none" role="region" aria-label="Interactive Pickleball Dragon Arena">
+            <!-- Tournament Arena & Regulation Court Showcase -->
+            <div class="relative w-full">
+                <div class="relative bg-gradient-to-b from-[#131710] via-[#171D14] to-[#0E120B] text-white rounded-3xl p-5 sm:p-7 border border-[#3ECF7E]/30 shadow-2xl overflow-hidden">
+                    <!-- Subtle Court Glow & Ambient Lighting -->
+                    <div class="absolute -top-24 -right-24 w-64 h-64 bg-[#3ECF7E]/10 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-[#3ECF7E]/10 rounded-full blur-3xl pointer-events-none"></div>
 
-                    <!-- Outer Perimeter Boundary (20' x 44' ratio) -->
-                    <div class="absolute inset-3 border-2 border-[#F4F1E9]/80 rounded-sm pointer-events-none"></div>
-
-                    <!-- Non-Volley Zone ("The Kitchen") -->
-                    <div class="absolute inset-y-3 left-[34%] right-[34%] bg-[#3ECF7E]/15 border-x-2 border-[#F4F1E9]/80 pointer-events-none"></div>
-
-                    <!-- Centerlines for service boxes -->
-                    <div class="absolute top-1/2 left-3 right-[66%] h-0 border-b-2 border-[#F4F1E9]/80 -translate-y-1/2 pointer-events-none"></div>
-                    <div class="absolute top-1/2 left-[66%] right-3 h-0 border-b-2 border-[#F4F1E9]/80 -translate-y-1/2 pointer-events-none"></div>
-
-                    <!-- Center Net -->
-                    <div class="absolute top-0 bottom-0 left-1/2 w-0 border-r-2 border-dashed border-[#F4F1E9] pointer-events-none z-10 -translate-x-1/2 shadow-sm"></div>
-
-                    <!-- Top HUD Bar inside Arena -->
-                    <div class="absolute top-3 left-4 right-4 flex items-center justify-between z-30 pointer-events-none text-xs">
-                        <div class="bg-[#12150F]/85 backdrop-blur-sm border border-white/20 px-3 py-1 rounded-full flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-[#3ECF7E] animate-pulse"></span>
-                            <span class="font-mono font-bold text-emerald-400">RALLY: <span id="hud-rally" class="text-sm">0</span></span>
+                    <!-- Card Header -->
+                    <div class="relative z-10 flex items-center justify-between pb-4 border-b border-white/10 gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="relative flex h-2.5 w-2.5">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                            </span>
+                            <span class="text-[11px] sm:text-xs font-mono font-bold tracking-wider uppercase text-emerald-400">Live Court Hub</span>
                         </div>
-                        <div class="bg-[#12150F]/85 backdrop-blur-sm border border-white/20 px-3 py-1 rounded-full text-gray-300 font-mono text-[11px]">
-                            BEST: <span id="hud-best" class="text-white font-bold">0</span>
+                        <span class="text-[10px] sm:text-xs text-white/60 font-mono">Open Daily: 8 AM – 10 PM</span>
+                    </div>
+
+                    <!-- Architectural Court Diagram -->
+                    <div class="relative z-10 my-5">
+                        <div class="relative bg-[#0A0D08] rounded-2xl p-3 sm:p-4 border border-white/10 shadow-inner">
+                            <!-- Court Blueprint SVG -->
+                            <div class="relative w-full aspect-[2/1] rounded-lg overflow-hidden bg-gradient-to-br from-[#1B3624] via-[#162E1F] to-[#0E2015] border border-emerald-500/40 shadow-lg">
+                                <!-- Outer Boundary Line -->
+                                <div class="absolute inset-2 sm:inset-3 border-2 border-white/90 rounded-sm"></div>
+
+                                <!-- Center Net with Net Posts -->
+                                <div class="absolute top-0 bottom-0 left-1/2 w-0 border-r-2 border-dashed border-white -translate-x-1/2 z-20 shadow"></div>
+                                <div class="absolute top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-white z-20"></div>
+                                <div class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-white z-20"></div>
+
+                                <!-- Non-Volley Zone ("The Kitchen" - 7ft / 2.13m from net each side) -->
+                                <div class="absolute inset-y-2 sm:inset-y-3 left-[34%] right-[34%] bg-emerald-500/20 border-x-2 border-white/90 flex items-center justify-center pointer-events-none">
+                                    <span class="text-[9px] sm:text-[11px] font-mono font-black uppercase tracking-widest text-emerald-300 drop-shadow select-none">Kitchen / NVZ</span>
+                                </div>
+
+                                <!-- Service Court Centerlines -->
+                                <div class="absolute top-1/2 left-2 sm:left-3 right-[66%] h-0 border-b-2 border-white/90 -translate-y-1/2"></div>
+                                <div class="absolute top-1/2 left-[66%] right-2 sm:right-3 h-0 border-b-2 border-white/90 -translate-y-1/2"></div>
+
+                                <!-- Left Side Service Labels -->
+                                <div class="absolute top-3 left-4 sm:left-6 text-[8px] sm:text-[10px] font-mono text-white/70 select-none uppercase font-semibold">Left Service</div>
+                                <div class="absolute bottom-3 left-4 sm:left-6 text-[8px] sm:text-[10px] font-mono text-white/70 select-none uppercase font-semibold">Right Service</div>
+
+                                <!-- Right Side Service Labels -->
+                                <div class="absolute top-3 right-4 sm:right-6 text-[8px] sm:text-[10px] font-mono text-white/70 select-none uppercase font-semibold">Right Service</div>
+                                <div class="absolute bottom-3 right-4 sm:right-6 text-[8px] sm:text-[10px] font-mono text-white/70 select-none uppercase font-semibold">Left Service</div>
+
+                                <!-- Official Dimensions Overlays -->
+                                <div class="absolute bottom-1.5 left-1/2 -translate-x-1/2 text-[8px] sm:text-[9px] font-mono text-emerald-300/80 bg-black/60 px-2 py-0.5 rounded-full pointer-events-none">
+                                    USA Pickleball Official Spec · 13.41m × 6.10m (44' × 20')
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Mascot Dragon -->
-                    <div id="dragon-actor" class="absolute right-3 bottom-3 w-40 h-40 sm:w-48 sm:h-48 z-20 cursor-pointer pointer-events-auto dragon-idle"
-                         onclick="firePickleball()" title="Click the dragon to serve a pickleball!">
-
-                        {{-- Flipped so he faces the court. Two stacked transparent frames: closed mouth (idle) and open mouth (firing). --}}
-                        <div id="dragon-body" class="relative w-full h-full"
-                             style="transform: scaleX(-1); transition: rotate 0.15s ease-out; filter: drop-shadow(0 0 3px #3ECF7E) drop-shadow(0 12px 20px rgba(0,0,0,0.7));">
-                            <img src="{{ asset('images/dragon-closed.png') }}"
-                                 alt="Pickleball Dragon Mascot"
-                                 class="absolute inset-0 w-full h-full object-contain"
-                                 draggable="false">
-                            <img id="dragon-open"
-                                 src="{{ asset('images/dragon-open.png') }}"
-                                 alt=""
-                                 aria-hidden="true"
-                                 class="absolute inset-0 w-full h-full object-contain mouth-overlay"
-                                 draggable="false">
+                    <!-- Court Specs & Features Grid -->
+                    <div class="relative z-10 grid grid-cols-2 gap-2.5 sm:gap-3 text-xs">
+                        <div class="bg-white/5 hover:bg-white/[0.08] transition rounded-xl p-3 border border-white/10">
+                            <div class="text-[10px] uppercase font-bold tracking-wider text-emerald-400">Regular Courts</div>
+                            <div class="font-display font-bold text-sm sm:text-base text-white mt-0.5">13.41m × 6.10m</div>
+                            <div class="text-[11px] text-white/60 mt-0.5">Official regulation format</div>
                         </div>
-
-                        <div class="absolute -top-6 left-2 bg-[#3ECF7E] text-[#12150F] text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-lg animate-bounce">
-                            CLICK TO SERVE! 🎾
+                        <div class="bg-white/5 hover:bg-white/[0.08] transition rounded-xl p-3 border border-white/10">
+                            <div class="text-[10px] uppercase font-bold tracking-wider text-emerald-400">Junior Courts</div>
+                            <div class="font-display font-bold text-sm sm:text-base text-white mt-0.5">10.00m × 4.50m</div>
+                            <div class="text-[11px] text-white/60 mt-0.5">Youth & training format</div>
+                        </div>
+                        <div class="bg-white/5 hover:bg-white/[0.08] transition rounded-xl p-3 border border-white/10">
+                            <div class="text-[10px] uppercase font-bold tracking-wider text-white/50">Playing Surface</div>
+                            <div class="font-semibold text-white mt-0.5 text-[11px] sm:text-xs">Pro Cushion-Flex™ Acrylic</div>
+                            <div class="text-[10px] text-white/60">Shock-absorbing joint protection</div>
+                        </div>
+                        <div class="bg-white/5 hover:bg-white/[0.08] transition rounded-xl p-3 border border-white/10">
+                            <div class="text-[10px] uppercase font-bold tracking-wider text-white/50">Night Lighting</div>
+                            <div class="font-semibold text-white mt-0.5 text-[11px] sm:text-xs">1,000-Lux Anti-Glare LEDs</div>
+                            <div class="text-[10px] text-white/60">Even ceiling diffusion</div>
                         </div>
                     </div>
 
-                    <!-- Canvas for balls, sparks, physics -->
-                    <canvas id="hero-canvas" class="absolute inset-0 w-full h-full z-10 pointer-events-none"></canvas>
-
-                    <!-- Custom Paddle Cursor -->
-                    <div id="paddle-cursor">
-                        <img src="{{ asset('images/paddle-dragon.png') }}" alt="" aria-hidden="true" draggable="false"
-                             class="w-28 h-28 drop-shadow-[0_8px_16px_rgba(0,0,0,0.6)]">
-                    </div>
-
-                    <!-- Hit Feedback -->
-                    <div id="hud-hit" class="absolute top-1/2 left-1/4 -translate-y-1/2 text-emerald-400 font-display font-black text-2xl opacity-0 transition-opacity pointer-events-none z-30 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
-                        POCK! 🏓
-                    </div>
-                </div>
-
-                <!-- Game Controls (theme toggle now lives in the navbar) -->
-                <div class="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs px-1">
-                    <div class="flex items-center gap-2">
-                        <button type="button" onclick="firePickleball()" class="bg-[#3ECF7E] text-[#12150F] font-bold px-3 py-1.5 rounded-full shadow-[0_2px_0_#2BA863] hover:translate-y-[-1px] transition">
-                            🎾 Serve Ball
-                        </button>
-                        <button type="button" id="auto-serve-btn" onclick="toggleAutoServe()" class="bg-[color:var(--surface)] border border-[color:var(--border)] font-semibold px-3 py-1.5 rounded-full text-[color:var(--muted)] hover:text-[color:var(--ink)] transition">
-                            Auto-Serve: OFF
-                        </button>
-                        <button type="button" id="paddle-toggle-btn" onclick="togglePaddleCursor()" class="bg-[color:var(--surface)] border border-[color:var(--border)] font-semibold px-3 py-1.5 rounded-full text-[color:var(--muted)] hover:text-[color:var(--ink)] transition">
-                            Cursor: 🏓 Paddle
-                        </button>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <button type="button" onclick="toggleAudio()" id="sound-btn" class="text-[11px] text-[color:var(--muted)] hover:text-[color:var(--ink)] font-semibold">
-                            🔊 Sound: ON
-                        </button>
+                    <!-- Live Fleet Bar & Direct Booking Action -->
+                    <div class="relative z-10 mt-4 pt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+                            <span class="text-xs text-white/80 font-medium">
+                                {{ $courts->count() > 0 ? $courts->count() . ' Courts Ready for Booking' : 'Courts Open for Booking' }}
+                            </span>
+                        </div>
+                        <a href="{{ $reserveUrl }}" class="inline-flex items-center justify-center gap-2 bg-[#3ECF7E] text-[#12150F] text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-[#34B86F] transition shadow-md">
+                            <span>Check Live Availability</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -502,46 +466,46 @@
     </section>
 
     <!-- Facility Highlights -->
-    <section class="relative z-10 max-w-6xl mx-auto px-6 -mt-8 mb-24" aria-label="Facility Highlights">
-        <div class="relative bg-[color:var(--surface)] border border-[color:var(--border)] rounded-2xl p-6 shadow-sm grid grid-cols-2 md:grid-cols-4 gap-6">
+    <section class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 -mt-8 mb-20 sm:mb-24" aria-label="Facility Highlights">
+        <div class="relative bg-[color:var(--surface)] border border-[color:var(--border)] rounded-2xl p-4 sm:p-6 shadow-sm grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-6">
             <svg class="huiwen-corner huiwen-tl" viewBox="0 0 20 20"><path d="M1 19V1H19M5 19V5H19"/></svg>
             <svg class="huiwen-corner huiwen-tr" viewBox="0 0 20 20"><path d="M1 19V1H19M5 19V5H19"/></svg>
             <svg class="huiwen-corner huiwen-bl" viewBox="0 0 20 20"><path d="M1 19V1H19M5 19V5H19"/></svg>
             <svg class="huiwen-corner huiwen-br" viewBox="0 0 20 20"><path d="M1 19V1H19M5 19V5H19"/></svg>
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+            <div class="flex items-center gap-2.5 sm:gap-3">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
                 </div>
                 <div>
-                    <div class="font-display font-bold text-lg md:text-xl leading-none">4 Courts</div>
-                    <p class="text-xs mt-1" style="color: var(--muted);">Championship Fleet</p>
+                    <div class="font-display font-bold text-base sm:text-lg md:text-xl leading-none">4 Courts</div>
+                    <p class="text-[11px] sm:text-xs mt-1" style="color: var(--muted);">Championship Fleet</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            <div class="flex items-center gap-2.5 sm:gap-3">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                 </div>
                 <div>
-                    <div class="font-display font-bold text-lg md:text-xl leading-none">1,000 Lux</div>
-                    <p class="text-xs mt-1" style="color: var(--muted);">Anti-Glare Night LEDs</p>
+                    <div class="font-display font-bold text-base sm:text-lg md:text-xl leading-none">1,000 Lux</div>
+                    <p class="text-[11px] sm:text-xs mt-1" style="color: var(--muted);">Anti-Glare Night LEDs</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+            <div class="flex items-center gap-2.5 sm:gap-3">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                 </div>
                 <div>
-                    <div class="font-display font-bold text-lg md:text-xl leading-none">Cushion-Flex™</div>
-                    <p class="text-xs mt-1" style="color: var(--muted);">Low-Impact Joint Safety</p>
+                    <div class="font-display font-bold text-base sm:text-lg md:text-xl leading-none">Cushion-Flex™</div>
+                    <p class="text-[11px] sm:text-xs mt-1" style="color: var(--muted);">Joint Safety</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <div class="flex items-center gap-2.5 sm:gap-3">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </div>
                 <div>
-                    <div class="font-display font-bold text-lg md:text-xl leading-none">Under 60s</div>
-                    <p class="text-xs mt-1" style="color: var(--muted);">Instant Online Booking</p>
+                    <div class="font-display font-bold text-base sm:text-lg md:text-xl leading-none">Under 60s</div>
+                    <p class="text-[11px] sm:text-xs mt-1" style="color: var(--muted);">Instant Booking</p>
                 </div>
             </div>
         </div>
@@ -549,7 +513,7 @@
 
     @if(isset($events) && $events->isNotEmpty())
     <!-- Active Events & Promotions Section -->
-    <section id="events" class="relative z-10 max-w-6xl mx-auto px-6 pb-20" aria-labelledby="events-heading">
+    <section id="events" class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pb-16 sm:pb-20" aria-labelledby="events-heading">
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
             <div>
                 <span class="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--pop-dark)]">
@@ -601,7 +565,7 @@
 
     @if(isset($openPlaySessions) && $openPlaySessions->isNotEmpty())
     <!-- Open Play & Pickleball Tournaments Showcase -->
-    <section id="open-play" class="relative z-10 max-w-6xl mx-auto px-6 pb-20" aria-labelledby="openplay-heading">
+    <section id="open-play" class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pb-16 sm:pb-20" aria-labelledby="openplay-heading">
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
             <div>
                 <span class="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--pop-dark)]">
@@ -674,7 +638,7 @@
     @endif
 
     <!-- Championship Court Fleet Showcase -->
-    <section id="courts" class="relative z-10 max-w-6xl mx-auto px-6 pb-24" aria-labelledby="courts-heading">
+    <section id="courts" class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pb-20 sm:pb-24" aria-labelledby="courts-heading">
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
             <div>
                 <span class="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--pop-dark)]">
@@ -791,7 +755,7 @@
     </section>
 
     <!-- Why Play at KYMNET / Amenities -->
-    <section id="perks" class="relative z-10 max-w-6xl mx-auto px-6 pb-24" aria-labelledby="perks-heading">
+    <section id="perks" class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pb-20 sm:pb-24" aria-labelledby="perks-heading">
         <div class="text-center max-w-2xl mx-auto mb-14">
             <span class="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--pop-dark)]">
                 The KYMNET Experience
@@ -868,8 +832,8 @@
     </section>
 
     <!-- 3-Step Booking Process -->
-    <section id="how-it-works" class="relative z-10 max-w-6xl mx-auto px-6 pb-24" aria-labelledby="steps-heading">
-        <div class="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-3xl p-8 md:p-12">
+    <section id="how-it-works" class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pb-20 sm:pb-24" aria-labelledby="steps-heading">
+        <div class="bg-[color:var(--surface)] border border-[color:var(--border)] rounded-3xl p-6 sm:p-8 md:p-12">
             <div class="max-w-2xl mb-12">
                 <span class="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border border-[color:var(--border)] bg-[color:var(--bg)] text-[color:var(--pop-dark)]">
                     Frictionless Experience
@@ -934,7 +898,7 @@
     </section>
 
     <!-- Player Testimonials -->
-    <section class="relative z-10 max-w-6xl mx-auto px-6 pb-24" aria-labelledby="testimonials-heading">
+    <section class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pb-20 sm:pb-24" aria-labelledby="testimonials-heading">
         <div class="text-center max-w-2xl mx-auto mb-14">
             <span class="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--pop-dark)]">
                 Player Community
@@ -1011,7 +975,7 @@
     </section>
 
     <!-- FAQ -->
-    <section id="faq" class="relative z-10 max-w-4xl mx-auto px-6 pb-24" aria-labelledby="faq-heading" x-data="{ activeFaq: null }">
+    <section id="faq" class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pb-20 sm:pb-24" aria-labelledby="faq-heading" x-data="{ activeFaq: null }">
         <div class="text-center mb-12">
             <span class="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--pop-dark)]">
                 Got Questions?
@@ -1078,8 +1042,8 @@
     </section>
 
     <!-- Final Call To Action Banner -->
-    <section class="relative z-10 max-w-6xl mx-auto px-6 pb-24" aria-label="Reserve Call To Action">
-        <div class="rounded-3xl p-10 md:p-16 text-center relative overflow-hidden dark-panel">
+    <section class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pb-20 sm:pb-24" aria-label="Reserve Call To Action">
+        <div class="rounded-3xl p-6 sm:p-10 md:p-16 text-center relative overflow-hidden dark-panel">
             <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full blur-3xl opacity-20 pointer-events-none" style="background: var(--pop);"></div>
             <div class="absolute -left-20 -bottom-20 w-80 h-80 rounded-full blur-3xl opacity-20 pointer-events-none" style="background: var(--pop);"></div>
 
@@ -1111,7 +1075,7 @@
     </main>
 
     <footer class="relative z-10 dark-panel" style="color: rgba(255,255,255,0.7);">
-        <div class="max-w-6xl mx-auto px-6 py-14 grid md:grid-cols-4 gap-10">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-14 grid md:grid-cols-4 gap-8 sm:gap-10">
             <div>
                 <span class="font-display font-bold text-lg" style="color: var(--dark-fg);">KYMNET</span>
                 <p class="mt-4 text-sm max-w-xs leading-relaxed">
@@ -1145,293 +1109,19 @@
                 </p>
             </div>
         </div>
-        <div class="max-w-6xl mx-auto px-6 pb-8 text-sm" style="color: rgba(255,255,255,0.4);">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 pb-8 text-sm" style="color: rgba(255,255,255,0.4);">
             © {{ date('Y') }} KYMNET. All rights reserved.
         </div>
     </footer>
 
     <script>
-        // ===== PICKLEBALL DRAGON GAME ENGINE =====
-        (function() {
-            // ── State ──────────────────────────────────────────
-            let audioEnabled = true;
-            let audioCtx    = null;
-            let rallyScore  = 0;
-            let bestScore   = 0;
-            let autoFire    = false;
-            let autoInterval = null;
-            let paddleCursorEnabled = true;
-
-            // ── Audio ──────────────────────────────────────────
-            function playPaddleSound(frequency = 440, type = 'sine') {
-                if (!audioEnabled) return;
-                try {
-                    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    if (audioCtx.state === 'suspended') audioCtx.resume();
-                    const osc  = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = type;
-                    osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.08);
-                    gain.gain.setValueAtTime(0.7, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.09);
-                } catch(e) {}
+        try {
+            if (localStorage.getItem('kymnet_theme') === 'night') {
+                document.body.classList.add('night-mode');
             }
-
-            function toggleAudio() {
-                audioEnabled = !audioEnabled;
-                const btn = document.getElementById('sound-btn');
-                if (btn) btn.innerText = audioEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
-            }
-            window.toggleAudio = toggleAudio;
-
-            // ── Canvas & DOM refs ──────────────────────────────
-            const arena        = document.getElementById('hero-arena');
-            const canvas       = document.getElementById('hero-canvas');
-            const ctxC         = canvas ? canvas.getContext('2d') : null;
-            const paddleEl     = document.getElementById('paddle-cursor');
-            const dragonActor  = document.getElementById('dragon-actor');
-            const dragonBody   = document.getElementById('dragon-body');
-            const dragonOpen   = document.getElementById('dragon-open');
-            const hudRally     = document.getElementById('hud-rally');
-            const hudBest      = document.getElementById('hud-best');
-            const hudHit       = document.getElementById('hud-hit');
-
-            if (!arena || !canvas || !ctxC) return; // safety guard
-
-            // ── Resize ─────────────────────────────────────────
-            let arenaRect = arena.getBoundingClientRect();
-            function resizeCanvas() {
-                arenaRect       = arena.getBoundingClientRect();
-                canvas.width    = arenaRect.width;
-                canvas.height   = arenaRect.height;
-            }
-            window.addEventListener('resize', resizeCanvas);
-            resizeCanvas();
-
-            // ── Mouse ──────────────────────────────────────────
-            let mouseX = 80, mouseY = 100, prevMouseX = 80;
-
-            arena.addEventListener('mouseenter', () => {
-                if (paddleCursorEnabled && paddleEl) paddleEl.style.display = 'block';
-            });
-            arena.addEventListener('mouseleave', () => {
-                if (paddleEl) paddleEl.style.display = 'none';
-                if (dragonBody) dragonBody.style.rotate = '0deg';
-            });
-            arena.addEventListener('mousemove', (e) => {
-                arenaRect = arena.getBoundingClientRect();
-                mouseX = e.clientX - arenaRect.left;
-                mouseY = e.clientY - arenaRect.top;
-                if (paddleEl && paddleCursorEnabled) {
-                    paddleEl.style.left = mouseX + 'px';
-                    paddleEl.style.top  = mouseY + 'px';
-                    const dx = mouseX - prevMouseX;
-                    paddleEl.style.transform = `translate(-50%, -38%) rotate(${Math.max(-25, Math.min(25, dx * 2))}deg)`;
-                }
-
-                // Dragon tilts his head toward the cursor
-                if (dragonBody && dragonActor) {
-                    const dr = dragonActor.getBoundingClientRect();
-                    const tilt = Math.max(-12, Math.min(12, ((dr.top + dr.height / 2) - e.clientY) / 12));
-                    dragonBody.style.rotate = tilt + 'deg';
-                }
-
-                prevMouseX = mouseX;
-            });
-
-            // ── Particles & Balls ──────────────────────────────
-            const balls     = [];
-            const particles = [];
-
-            class Pickleball {
-                constructor(x, y, vx, vy) {
-                    this.x = x; this.y = y;
-                    this.vx = vx; this.vy = vy;
-                    this.radius   = 11;
-                    this.spin     = 0;
-                    this.hitCount = 0;
-                }
-                update() {
-                    this.x += this.vx;
-                    this.y += this.vy;
-                    this.vy  += 0.22; // gravity
-                    this.spin += 0.15;
-
-                    if (this.y + this.radius > canvas.height) {
-                        this.y  = canvas.height - this.radius;
-                        this.vy = -this.vy * 0.72;
-                        playPaddleSound(220, 'triangle');
-                    }
-                    if (this.y - this.radius < 0) {
-                        this.y  = this.radius;
-                        this.vy = -this.vy * 0.72;
-                    }
-                    if (this.x - this.radius < 0) {
-                        if (this.hitCount === 0) {
-                            rallyScore = 0;
-                            if (hudRally) hudRally.innerText = rallyScore;
-                        }
-                        return false;
-                    }
-
-                    // Paddle collision (only when cursor mode enabled)
-                    if (paddleCursorEnabled) {
-                        const dist = Math.hypot(this.x - mouseX, this.y - mouseY);
-                        if (dist < this.radius + 40 && this.vx < 0) {
-                            this.vx = Math.abs(this.vx) * 1.08 + 1.5;
-                            this.vy = (this.y - mouseY) * 0.28;
-                            this.hitCount++;
-                            rallyScore++;
-                            if (hudRally) hudRally.innerText = rallyScore;
-                            if (rallyScore > bestScore) {
-                                bestScore = rallyScore;
-                                if (hudBest) hudBest.innerText = bestScore;
-                            }
-                            playPaddleSound(520, 'sine');
-                            createSparks(this.x, this.y);
-                            showHitFeedback();
-                        }
-                    }
-
-                    if (this.x - this.radius > canvas.width) return false;
-                    return true;
-                }
-                draw() {
-                    ctxC.save();
-                    ctxC.translate(this.x, this.y);
-                    ctxC.rotate(this.spin);
-                    const grad = ctxC.createRadialGradient(-3, -3, 2, 0, 0, this.radius);
-                    grad.addColorStop(0, '#E6EE9C');
-                    grad.addColorStop(0.6, '#D4E157');
-                    grad.addColorStop(1, '#9E9D24');
-                    ctxC.fillStyle = grad;
-                    ctxC.beginPath();
-                    ctxC.arc(0, 0, this.radius, 0, Math.PI * 2);
-                    ctxC.fill();
-                    ctxC.fillStyle = '#12150F';
-                    [[-5,-4],[0,-6],[5,-4],[-6,1],[0,0],[6,1],[-4,5],[3,5]].forEach(([hx,hy]) => {
-                        ctxC.beginPath();
-                        ctxC.arc(hx, hy, 1.4, 0, Math.PI * 2);
-                        ctxC.fill();
-                    });
-                    ctxC.restore();
-                }
-            }
-
-            function createSparks(x, y) {
-                for (let i = 0; i < 12; i++) {
-                    particles.push({
-                        x, y,
-                        vx: (Math.random() - 0.5) * 8,
-                        vy: (Math.random() - 0.5) * 8,
-                        alpha: 1,
-                        size:  Math.random() * 3 + 2,
-                        color: Math.random() > 0.4 ? '#3ECF7E' : '#FCFBF7'
-                    });
-                }
-            }
-
-            function showHitFeedback() {
-                if (!hudHit) return;
-                const phrases = ['SWEET SHOT! 🏓', 'CLEAN DINK! ⚡', 'PERFECT RALLY! 🔥', 'DRAGON SMASH! 🐉'];
-                hudHit.innerText  = phrases[Math.floor(Math.random() * phrases.length)];
-                hudHit.style.opacity = '1';
-                setTimeout(() => { hudHit.style.opacity = '0'; }, 700);
-            }
-
-            // ── Fire a pickleball from the dragon's mouth ──────
-            function firePickleball() {
-                if (dragonActor) {
-                    dragonActor.classList.add('dragon-recoil');
-                    setTimeout(() => dragonActor.classList.remove('dragon-recoil'), 400);
-                }
-
-                // Swap to the open-mouth frame for a moment
-                if (dragonOpen) {
-                    dragonOpen.classList.add('mouth-open');
-                    setTimeout(() => dragonOpen.classList.remove('mouth-open'), 260);
-                }
-
-                // Spawn from the dragon's snout (he is flipped, so the snout tip is ~11% from the left, ~49% down)
-                const ar = arena.getBoundingClientRect();
-                const dr = dragonActor.getBoundingClientRect();
-                const mouthX = (dr.left - ar.left) + dr.width * 0.11;
-                const mouthY = (dr.top - ar.top) + dr.height * 0.49;
-
-                const targetY = 40 + Math.random() * (canvas.height - 80);
-                const vx = -(5.5 + Math.random() * 2.5);
-                const vy = (targetY - mouthY) * 0.038 - 1.5;
-                balls.push(new Pickleball(mouthX, mouthY, vx, vy));
-                playPaddleSound(350, 'sawtooth');
-            }
-            window.firePickleball = firePickleball;
-
-            // ── Auto-serve toggle ──────────────────────────────
-            function toggleAutoServe() {
-                autoFire = !autoFire;
-                const btn = document.getElementById('auto-serve-btn');
-                if (autoFire) {
-                    if (btn) { btn.innerText = 'Auto-Serve: ON'; btn.classList.add('text-emerald-700'); }
-                    autoInterval = setInterval(firePickleball, 2300);
-                } else {
-                    if (btn) { btn.innerText = 'Auto-Serve: OFF'; btn.classList.remove('text-emerald-700'); }
-                    clearInterval(autoInterval);
-                }
-            }
-            window.toggleAutoServe = toggleAutoServe;
-
-            // ── Cursor paddle toggle ───────────────────────────
-            function togglePaddleCursor() {
-                paddleCursorEnabled = !paddleCursorEnabled;
-                const btn = document.getElementById('paddle-toggle-btn');
-                if (paddleCursorEnabled) {
-                    arena.classList.add('arena-paddle-active');
-                    if (btn) btn.innerText = 'Cursor: 🏓 Paddle';
-                } else {
-                    arena.classList.remove('arena-paddle-active');
-                    if (paddleEl) paddleEl.style.display = 'none';
-                    if (btn) btn.innerText = 'Cursor: 🖱 Normal';
-                }
-            }
-            window.togglePaddleCursor = togglePaddleCursor;
-
-            // ── Animation Loop ─────────────────────────────────
-            function loop() {
-                ctxC.clearRect(0, 0, canvas.width, canvas.height);
-                for (let i = balls.length - 1; i >= 0; i--) {
-                    if (!balls[i].update()) balls.splice(i, 1);
-                    else balls[i].draw();
-                }
-                for (let i = particles.length - 1; i >= 0; i--) {
-                    const p = particles[i];
-                    p.x += p.vx; p.y += p.vy; p.alpha -= 0.035;
-                    if (p.alpha <= 0) { particles.splice(i, 1); continue; }
-                    ctxC.save();
-                    ctxC.globalAlpha = p.alpha;
-                    ctxC.fillStyle   = p.color;
-                    ctxC.beginPath();
-                    ctxC.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                    ctxC.fill();
-                    ctxC.restore();
-                }
-                requestAnimationFrame(loop);
-            }
-            loop();
-
-            // Initial serve after 1.2s
-            setTimeout(() => { if (balls.length === 0) firePickleball(); }, 1200);
-
-            // Keep body class in sync with the saved theme (toggleTheme itself lives in the nav partial)
-            try {
-                if (localStorage.getItem('kymnet_theme') === 'night') document.body.classList.add('night-mode');
-            } catch (e) {}
-        })();
+        } catch (e) {}
     </script>
+
 
 </body>
 </html>

@@ -30,17 +30,27 @@
 </style>
 
 <nav x-data="{ mobileOpen: false, profileOpen: false }" class="border-b relative" style="border-color: var(--gz-border);">
-    <div class="max-w-6xl mx-auto px-6">
-        <div class="flex justify-between h-16 items-center">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="flex justify-between h-16 items-center gap-2">
             {{-- Left: logo --}}
-            <a href="{{ $homeUrl }}" class="flex items-center gap-2">
-                @if($siteSettings && $siteSettings->logo)
-                    <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="{{ $siteSettings->system_name ?? 'Logo' }}" class="h-8 w-8 object-contain">
+            <a href="{{ $homeUrl }}" class="flex items-center gap-2.5 shrink-0">
+                @php
+                    $logoPath = null;
+                    if ($siteSettings && $siteSettings->logo && file_exists(public_path('storage/' . $siteSettings->logo))) {
+                        $logoPath = asset('storage/' . $siteSettings->logo);
+                    } elseif (file_exists(public_path('images/kymnet-logo.png'))) {
+                        $logoPath = asset('images/kymnet-logo.png');
+                    }
+                @endphp
+                @if($logoPath)
+                    <img src="{{ $logoPath }}" alt="{{ $siteSettings->system_name ?? 'KYMNET' }}" class="h-9 w-9 rounded-xl object-contain border border-black/10 dark:border-white/10 shadow-sm shrink-0">
                 @else
-                    {{-- Fixed dark tile so the cream glyph stays visible in both themes --}}
-                    <div class="pixel-mark" aria-hidden="true" style="width:32px; height:32px; background:#12150F; border:1px solid var(--gz-border); border-radius:10px; display:grid; grid-template-columns:repeat(8,1fr); grid-template-rows:repeat(8,1fr); padding:6px;" id="nav-seal"></div>
+                    <div class="pixel-mark shrink-0" aria-hidden="true" style="width:34px; height:34px; background:#12150F; border:1px solid var(--gz-border); border-radius:10px; display:grid; grid-template-columns:repeat(8,1fr); grid-template-rows:repeat(8,1fr); padding:6px;" id="nav-seal"></div>
                 @endif
-                <span class="gz-font-display font-bold text-base">{{ $siteSettings->system_name ?? 'KYMNET' }}</span>
+                <div class="flex flex-col">
+                    <span class="gz-font-display font-bold text-base tracking-tight leading-none" style="color: var(--gz-ink);">{{ $siteSettings->system_name ?? 'KYMNET' }}</span>
+                    <span class="text-[9px] uppercase tracking-wider font-semibold opacity-70 mt-0.5 leading-none hidden sm:block" style="color: var(--gz-muted);">Pickleball Arena</span>
+                </div>
             </a>
 
             {{-- Center: navigation links (desktop) --}}
@@ -177,20 +187,33 @@
             </div>
 
             {{-- Mobile: theme toggle + menu button --}}
-            <div class="sm:hidden flex items-center gap-2 flex-1 justify-end">
-                <button type="button" onclick="toggleTheme()" class="theme-toggle-btn" aria-label="Toggle night mode">
-                    <svg class="theme-icon-moon w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-                    <svg class="theme-icon-sun w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/></svg>
+            <div class="sm:hidden flex items-center gap-1.5 shrink-0">
+                <button type="button" onclick="toggleTheme()" class="theme-toggle-btn !w-9 !h-9" aria-label="Toggle night mode" title="Toggle theme">
+                    <svg class="theme-icon-moon w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+                    <svg class="theme-icon-sun w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/></svg>
                 </button>
-                <button @click="mobileOpen = !mobileOpen" :aria-expanded="mobileOpen.toString()" aria-controls="mobile-nav-genz" class="gz-btn-outline gz-btn-sm">
-                    <span x-show="!mobileOpen">Menu</span>
-                    <span x-show="mobileOpen" x-cloak>Close</span>
+                <button @click="mobileOpen = !mobileOpen" :aria-expanded="mobileOpen.toString()" aria-controls="mobile-nav-genz"
+                        class="w-9 h-9 rounded-full border border-[color:var(--gz-border)] hover:bg-black/5 dark:hover:bg-white/5 transition flex items-center justify-center shrink-0"
+                        style="color: var(--gz-ink); background: var(--gz-surface);" aria-label="Toggle navigation menu">
+                    <svg x-show="!mobileOpen" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                    <svg x-show="mobileOpen" x-cloak class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="mobile-nav-genz" x-show="mobileOpen" x-cloak class="sm:hidden gz-panel mx-6 mb-4 overflow-hidden">
+    <div id="mobile-nav-genz" x-show="mobileOpen" x-cloak
+         class="sm:hidden gz-panel mx-4 mb-4 overflow-hidden rounded-2xl shadow-xl border border-[color:var(--gz-border)]"
+         x-transition:enter="transition ease-out duration-150"
+         x-transition:enter-start="opacity-0 -translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-100"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 -translate-y-2">
         @auth
             <div class="px-4 py-3 border-b border-[color:var(--gz-border)] bg-[color:var(--gz-bg)]/40">
                 <p class="text-[10px] uppercase font-bold tracking-wider text-[color:var(--gz-muted)]">Signed in as</p>
@@ -223,9 +246,10 @@
             <a href="{{ url('/') }}" class="gz-dropdown-item">Home</a>
             <a href="{{ route('booking') }}" class="gz-dropdown-item">Book Courts</a>
             <a href="{{ route('open-play.index') }}" class="gz-dropdown-item">Open Play & Tournaments</a>
-            <div class="my-1 border-t border-[color:var(--gz-border)]"></div>
-            <a href="{{ route('login') }}" class="gz-dropdown-item">Login</a>
-            <a href="{{ route('register') }}" class="gz-dropdown-item">Register</a>
+            <div class="p-3 border-t border-[color:var(--gz-border)] flex items-center gap-2">
+                <a href="{{ route('login') }}" class="gz-btn-outline gz-btn-sm flex-1 text-center justify-center">Login</a>
+                <a href="{{ route('register') }}" class="gz-btn-primary gz-btn-sm flex-1 text-center justify-center">Register</a>
+            </div>
         @endauth
     </div>
 </nav>
