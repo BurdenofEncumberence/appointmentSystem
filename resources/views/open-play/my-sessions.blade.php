@@ -12,192 +12,200 @@
             @php
                 $submitted = session('host_request_submitted');
             @endphp
-            <div
-                x-show="showSubmittedModal"
-                x-cloak
-                @keydown.escape.window="showSubmittedModal = false"
-                class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6"
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="host-request-modal-title"
-            >
+            <template x-teleport="body">
                 <div
-                    @click.outside="showSubmittedModal = false"
                     x-show="showSubmittedModal"
+                    x-cloak
+                    @keydown.escape.window="showSubmittedModal = false"
+                    class="fixed inset-0 z-[100] overflow-y-auto bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="host-request-modal-title"
                     x-transition:enter="transition ease-out duration-200"
-                    x-transition:enter-start="opacity-0 scale-95"
-                    x-transition:enter-end="opacity-100 scale-100"
+                    x-transition:enter-start="opacity-0"
+                    x-transition:enter-end="opacity-100"
                     x-transition:leave="transition ease-in duration-150"
-                    x-transition:leave-start="opacity-100 scale-100"
-                    x-transition:leave-end="opacity-0 scale-95"
-                    class="relative w-full max-w-xl rounded-2xl border shadow-2xl overflow-hidden my-8"
-                    style="background: var(--gz-surface); border-color: var(--gz-border); color: var(--gz-ink);"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0"
                 >
-                    {{-- Modal Header --}}
-                    <div class="p-6 border-b flex items-start justify-between gap-4" style="border-color: var(--gz-border);">
-                        <div class="flex items-center gap-3.5">
-                            <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(16, 185, 129, 0.12); color: #059669; border: 1px solid rgba(16, 185, 129, 0.25);">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                    <div
+                        @click.outside="showSubmittedModal = false"
+                        x-show="showSubmittedModal"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 scale-95"
+                        x-transition:enter-end="opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-150"
+                        x-transition:leave-start="opacity-100 scale-100"
+                        x-transition:leave-end="opacity-0 scale-95"
+                        class="relative w-full max-w-lg my-auto rounded-2xl border shadow-2xl flex flex-col max-h-[90vh] overflow-hidden"
+                        style="background: var(--gz-surface); border-color: var(--gz-border); color: var(--gz-ink);"
+                    >
+                        {{-- Modal Header (shrink-0) --}}
+                        <div class="p-4 sm:p-5 border-b flex items-start justify-between gap-3 shrink-0" style="border-color: var(--gz-border);">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(16, 185, 129, 0.12); color: #059669; border: 1px solid rgba(16, 185, 129, 0.25);">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <span class="inline-block text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded mb-0.5" style="background: rgba(16, 185, 129, 0.15); color: #047857;">
+                                        Submission Received
+                                    </span>
+                                    <h2 id="host-request-modal-title" class="gz-font-display text-lg sm:text-xl font-extrabold tracking-tight" style="color: var(--gz-ink);">
+                                        Hosting Request Submitted!
+                                    </h2>
+                                    <p class="text-xs" style="color: var(--gz-muted);">
+                                        Your Open Play session request has been successfully logged.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <button
+                                type="button"
+                                @click="showSubmittedModal = false"
+                                class="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 transition shrink-0"
+                                aria-label="Close modal"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                 </svg>
-                            </div>
-                            <div>
-                                <span class="inline-block text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded mb-1" style="background: rgba(16, 185, 129, 0.15); color: #047857;">
-                                    Submission Received
-                                </span>
-                                <h2 id="host-request-modal-title" class="gz-font-display text-xl sm:text-2xl font-extrabold tracking-tight" style="color: var(--gz-ink);">
-                                    Hosting Request Submitted!
-                                </h2>
-                                <p class="text-xs mt-0.5" style="color: var(--gz-muted);">
-                                    Your Open Play session request has been successfully submitted and logged.
-                                </p>
-                            </div>
+                            </button>
                         </div>
 
-                        <button
-                            type="button"
-                            @click="showSubmittedModal = false"
-                            class="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 transition shrink-0"
-                            aria-label="Close modal"
-                        >
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    </div>
+                        {{-- Modal Body (flex-1 overflow-y-auto) --}}
+                        <div class="p-4 sm:p-5 space-y-4 flex-1 overflow-y-auto">
+                            {{-- Session Summary Card --}}
+                            <div class="p-4 rounded-xl border space-y-2.5" style="background: rgba(0, 0, 0, 0.02); border-color: var(--gz-border);">
+                                <div class="flex items-center justify-between gap-2 flex-wrap">
+                                    <span class="text-[11px] font-bold uppercase tracking-wider" style="color: var(--gz-muted);">Session Summary</span>
+                                    <span class="gz-badge text-[10px] font-bold uppercase tracking-wider" style="background: rgba(245, 158, 11, 0.15); color: #b45309; border: 1px solid rgba(245, 158, 11, 0.3);">
+                                        Pending Manager Approval
+                                    </span>
+                                </div>
 
-                    {{-- Modal Body --}}
-                    <div class="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
-                        {{-- Session Summary Card --}}
-                        <div class="p-4 rounded-xl border space-y-3" style="background: rgba(0, 0, 0, 0.02); border-color: var(--gz-border);">
-                            <div class="flex items-center justify-between gap-2 flex-wrap">
-                                <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--gz-muted);">Session Summary</span>
-                                <span class="gz-badge text-xs font-bold uppercase tracking-wider" style="background: rgba(245, 158, 11, 0.15); color: #b45309; border: 1px solid rgba(245, 158, 11, 0.3);">
-                                    Pending Manager Approval
-                                </span>
-                            </div>
+                                <div class="gz-font-display text-base font-bold" style="color: var(--gz-ink);">
+                                    {{ $submitted['title'] ?? 'Open Play Session' }}
+                                </div>
 
-                            <div class="gz-font-display text-lg font-bold" style="color: var(--gz-ink);">
-                                {{ $submitted['title'] ?? 'Open Play Session' }}
-                            </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
+                                    <div class="flex items-center gap-2" style="color: var(--gz-ink);">
+                                        <svg class="w-4 h-4 shrink-0 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                        <div>
+                                            <span class="block text-[10px] uppercase font-semibold" style="color: var(--gz-muted);">Date</span>
+                                            <span class="font-medium">{{ $submitted['date'] ?? '' }}</span>
+                                        </div>
+                                    </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs pt-1">
-                                <div class="flex items-center gap-2" style="color: var(--gz-ink);">
-                                    <svg class="w-4 h-4 shrink-0 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                    </svg>
-                                    <div>
-                                        <span class="block text-[10px] uppercase font-semibold" style="color: var(--gz-muted);">Date</span>
-                                        <span class="font-medium">{{ $submitted['date'] ?? '' }}</span>
+                                    <div class="flex items-center gap-2" style="color: var(--gz-ink);">
+                                        <svg class="w-4 h-4 shrink-0 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <div>
+                                            <span class="block text-[10px] uppercase font-semibold" style="color: var(--gz-muted);">Time Window</span>
+                                            <span class="font-medium">{{ $submitted['time'] ?? '' }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center gap-2" style="color: var(--gz-ink);">
+                                        <svg class="w-4 h-4 shrink-0 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                        </svg>
+                                        <div>
+                                            <span class="block text-[10px] uppercase font-semibold" style="color: var(--gz-muted);">Courts</span>
+                                            <span class="font-medium">{{ $submitted['courts'] ?? 'Assigned Courts' }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center gap-2" style="color: var(--gz-ink);">
+                                        <svg class="w-4 h-4 shrink-0 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                        </svg>
+                                        <div>
+                                            <span class="block text-[10px] uppercase font-semibold" style="color: var(--gz-muted);">Capacity & Slot Fee</span>
+                                            <span class="font-medium">{{ $submitted['max_capacity'] ?? 0 }} players • ₱{{ number_format($submitted['price_per_slot'] ?? 0, 2) }}/slot</span>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="flex items-center gap-2" style="color: var(--gz-ink);">
-                                    <svg class="w-4 h-4 shrink-0 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    <div>
-                                        <span class="block text-[10px] uppercase font-semibold" style="color: var(--gz-muted);">Time Window</span>
-                                        <span class="font-medium">{{ $submitted['time'] ?? '' }}</span>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-center gap-2" style="color: var(--gz-ink);">
-                                    <svg class="w-4 h-4 shrink-0 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                                    </svg>
-                                    <div>
-                                        <span class="block text-[10px] uppercase font-semibold" style="color: var(--gz-muted);">Courts</span>
-                                        <span class="font-medium">{{ $submitted['courts'] ?? 'Assigned Courts' }}</span>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-center gap-2" style="color: var(--gz-ink);">
-                                    <svg class="w-4 h-4 shrink-0 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                                    </svg>
-                                    <div>
-                                        <span class="block text-[10px] uppercase font-semibold" style="color: var(--gz-muted);">Capacity & Slot Fee</span>
-                                        <span class="font-medium">{{ $submitted['max_capacity'] ?? 0 }} players • ₱{{ number_format($submitted['price_per_slot'] ?? 0, 2) }}/slot</span>
-                                    </div>
+                                <div class="pt-2 border-t flex items-center justify-between" style="border-color: var(--gz-border);">
+                                    <span class="text-xs font-semibold" style="color: var(--gz-muted);">Court Appointment Fee:</span>
+                                    <span class="gz-font-display text-base font-bold text-emerald-600 dark:text-emerald-400">
+                                        ₱{{ number_format($submitted['court_fee'] ?? 0, 2) }}
+                                    </span>
                                 </div>
                             </div>
 
-                            <div class="pt-2 border-t flex items-center justify-between" style="border-color: var(--gz-border);">
-                                <span class="text-xs font-semibold" style="color: var(--gz-muted);">Court Appointment Fee:</span>
-                                <span class="gz-font-display text-base font-bold text-emerald-600 dark:text-emerald-400">
-                                    ₱{{ number_format($submitted['court_fee'] ?? 0, 2) }}
-                                </span>
-                            </div>
-                        </div>
+                            {{-- Step-by-Step Approval & Payment Guide --}}
+                            <div class="space-y-2.5">
+                                <h3 class="text-[11px] font-bold uppercase tracking-wider" style="color: var(--gz-muted);">
+                                    What Happens Next?
+                                </h3>
 
-                        {{-- Step-by-Step Approval & Payment Guide --}}
-                        <div class="space-y-3">
-                            <h3 class="text-xs font-bold uppercase tracking-wider" style="color: var(--gz-muted);">
-                                What Happens Next?
-                            </h3>
+                                <div class="space-y-2.5 text-xs">
+                                    {{-- Step 1 --}}
+                                    <div class="flex items-start gap-2.5">
+                                        <div class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[11px] shrink-0 bg-emerald-500 text-white shadow-xs">
+                                            1
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="font-bold text-xs" style="color: var(--gz-ink);">Request Logged (Current Step)</p>
+                                            <p class="text-[11px] mt-0.5 leading-relaxed" style="color: var(--gz-muted);">
+                                                Your session is registered with status <strong class="text-amber-600 dark:text-amber-400">Pending Manager Approval</strong>. No payment is required at this stage.
+                                            </p>
+                                        </div>
+                                    </div>
 
-                            <div class="space-y-3 text-xs">
-                                {{-- Step 1 --}}
-                                <div class="flex items-start gap-3">
-                                    <div class="w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 bg-emerald-500 text-white shadow-xs">
-                                        1
+                                    {{-- Step 2 --}}
+                                    <div class="flex items-start gap-2.5">
+                                        <div class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[11px] shrink-0 border" style="background: var(--gz-surface); border-color: var(--gz-border); color: var(--gz-ink);">
+                                            2
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="font-bold text-xs" style="color: var(--gz-ink);">Manager Review & Acceptance</p>
+                                            <p class="text-[11px] mt-0.5 leading-relaxed" style="color: var(--gz-muted);">
+                                                The facility manager reviews court schedules and accepts your request. You can check the approval status here at any time.
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div class="flex-1">
-                                        <p class="font-bold" style="color: var(--gz-ink);">Request Logged (Current Step)</p>
-                                        <p class="mt-0.5 leading-relaxed" style="color: var(--gz-muted);">
-                                            Your session has been registered with status <strong class="text-amber-600 dark:text-amber-400">Pending Manager Approval</strong>. No payment is required at this stage.
-                                        </p>
-                                    </div>
-                                </div>
 
-                                {{-- Step 2 --}}
-                                <div class="flex items-start gap-3">
-                                    <div class="w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 border" style="background: var(--gz-surface); border-color: var(--gz-border); color: var(--gz-ink);">
-                                        2
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="font-bold" style="color: var(--gz-ink);">Manager Review & Acceptance</p>
-                                        <p class="mt-0.5 leading-relaxed" style="color: var(--gz-muted);">
-                                            The facility manager reviews court schedules and accepts your request. You can check the approval status here at any time.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {{-- Step 3 --}}
-                                <div class="flex items-start gap-3">
-                                    <div class="w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 border" style="background: var(--gz-surface); border-color: var(--gz-border); color: var(--gz-ink);">
-                                        3
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="font-bold" style="color: var(--gz-ink);">Pay Court Fee to Secure Appointment</p>
-                                        <p class="mt-0.5 leading-relaxed" style="color: var(--gz-muted);">
-                                            Once accepted, a payment action will unlock on this page. Settle the court fee (₱{{ number_format($submitted['court_fee'] ?? 0, 2) }}) via Cash or Online Checkout to lock in the appointment and publish the session for player registrations.
-                                        </p>
+                                    {{-- Step 3 --}}
+                                    <div class="flex items-start gap-2.5">
+                                        <div class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[11px] shrink-0 border" style="background: var(--gz-surface); border-color: var(--gz-border); color: var(--gz-ink);">
+                                            3
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="font-bold text-xs" style="color: var(--gz-ink);">Pay Court Fee to Secure Appointment</p>
+                                            <p class="text-[11px] mt-0.5 leading-relaxed" style="color: var(--gz-muted);">
+                                                Once accepted, a payment action will unlock on this page. Settle the court fee (₱{{ number_format($submitted['court_fee'] ?? 0, 2) }}) via Cash or Online Checkout to lock in the appointment and publish the session for player registrations.
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    {{-- Modal Footer --}}
-                    <div class="p-6 border-t flex flex-col sm:flex-row items-center justify-end gap-3" style="border-color: var(--gz-border); background: rgba(0, 0, 0, 0.01);">
-                        <a
-                            href="{{ route('open-play.index') }}"
-                            class="gz-btn-outline gz-btn-sm w-full sm:w-auto text-center"
-                        >
-                            Browse Open Play
-                        </a>
-                        <button
-                            type="button"
-                            @click="showSubmittedModal = false"
-                            class="gz-btn-primary gz-btn-sm w-full sm:w-auto text-center font-bold"
-                        >
-                            View My Sessions
-                        </button>
+                        {{-- Modal Footer (shrink-0) --}}
+                        <div class="p-4 sm:p-5 border-t flex flex-col sm:flex-row items-center justify-end gap-2.5 shrink-0" style="border-color: var(--gz-border); background: rgba(0, 0, 0, 0.01);">
+                            <a
+                                href="{{ route('open-play.index') }}"
+                                class="gz-btn-outline gz-btn-sm w-full sm:w-auto text-center text-xs"
+                            >
+                                Browse Open Play
+                            </a>
+                            <button
+                                type="button"
+                                @click="showSubmittedModal = false"
+                                class="gz-btn-primary gz-btn-sm w-full sm:w-auto text-center text-xs font-bold"
+                            >
+                                View My Sessions
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </template>
         @endif
 
         {{-- Header & Breadcrumb --}}
