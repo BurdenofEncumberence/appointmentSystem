@@ -26,7 +26,7 @@ class OpenPlayController extends Controller
 
         $query = OpenPlaySession::with(['courts', 'registrations'])
             ->where('date', '>=', today())
-            ->where('session_status', '!=', 'cancelled')
+            ->whereIn('session_status', ['scheduled', 'ongoing'])
             ->orderBy('date', 'asc')
             ->orderBy('start_time', 'asc');
 
@@ -49,7 +49,7 @@ class OpenPlayController extends Controller
 
         // Skill level options for filtering
         $availableSkills = OpenPlaySession::where('date', '>=', today())
-            ->where('session_status', '!=', 'cancelled')
+            ->whereIn('session_status', ['scheduled', 'ongoing'])
             ->pluck('skill_level')
             ->unique()
             ->values();
@@ -68,6 +68,11 @@ class OpenPlayController extends Controller
      */
     public function show(OpenPlaySession $session): View
     {
+        if (! in_array($session->session_status, ['scheduled', 'ongoing', 'completed'], true)) {
+            $user = Auth::user();
+            abort_unless($user && ($user->id === $session->created_by || $user->isManager() || $user->isAdmin()), 404);
+        }
+
         $session->load(['courts', 'registrations']);
 
         return view('open-play.show', [
@@ -107,8 +112,8 @@ class OpenPlayController extends Controller
                 // Acquire pessimistic row lock on the session to serialize capacity verification
                 $lockedSession = OpenPlaySession::where('id', $session->id)->lockForUpdate()->firstOrFail();
 
-                if ($lockedSession->session_status === 'cancelled') {
-                    throw new DomainException('This session has been cancelled and is no longer accepting registrations.');
+                if (! in_array($lockedSession->session_status, ['scheduled', 'ongoing'], true)) {
+                    throw new DomainException('This session is not currently open for registrations.');
                 }
 
                 if ($lockedSession->date < today()) {

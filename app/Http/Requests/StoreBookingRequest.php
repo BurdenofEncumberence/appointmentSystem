@@ -167,7 +167,7 @@ class StoreBookingRequest extends FormRequest
                 }
 
                 $openPlayConflict = OpenPlaySession::whereDate('date', $date)
-                    ->where('session_status', '!=', 'cancelled')
+                    ->whereIn('session_status', ['scheduled', 'approved_pending_payment', 'ongoing'])
                     ->whereHas('courts', function ($q) use ($courtId) {
                         $q->where('courts.id', $courtId);
                     })

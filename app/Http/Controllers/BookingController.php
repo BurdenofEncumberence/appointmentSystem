@@ -62,7 +62,7 @@ class BookingController extends Controller
         // Include courts allocated to active Open Play / Tournament sessions
         $openPlaySessions = OpenPlaySession::with('courts')
             ->where('date', '>=', now()->toDateString())
-            ->where('session_status', '!=', 'cancelled')
+            ->whereIn('session_status', ['scheduled', 'approved_pending_payment', 'ongoing'])
             ->get();
 
         $specialSlots = [];

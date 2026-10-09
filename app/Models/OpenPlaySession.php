@@ -22,15 +22,23 @@ class OpenPlaySession extends Model
         'max_capacity',
         'skill_level',
         'price_per_slot',
+        'court_fee',
         'details',
         'session_status',
+        'host_payment_status',
+        'host_payment_method',
+        'host_paid_at',
+        'manager_note',
+        'paymongo_checkout_session_id',
         'created_by',
     ];
 
     protected $casts = [
         'date' => 'date',
         'price_per_slot' => 'decimal:2',
+        'court_fee' => 'decimal:2',
         'max_capacity' => 'integer',
+        'host_paid_at' => 'datetime',
     ];
 
     public function courts(): BelongsToMany
@@ -119,5 +127,36 @@ class OpenPlaySession extends Model
     public function getAllocatedCourtsLabelAttribute(): string
     {
         return $this->courts->pluck('court_name')->join(', ');
+    }
+
+    /**
+     * Compute total court hire fee based on duration and allocated court rates.
+     */
+    public function calculateCourtFee(): float
+    {
+        $duration = $this->duration_hours;
+        $totalHourly = (float) $this->courts->sum('price_per_hour');
+
+        return round($totalHourly * $duration, 2);
+    }
+
+    public function isHostPlayer(): bool
+    {
+        return $this->creator && $this->creator->isPlayer();
+    }
+
+    public function isPendingApproval(): bool
+    {
+        return $this->session_status === 'pending_approval';
+    }
+
+    public function isApprovedPendingPayment(): bool
+    {
+        return $this->session_status === 'approved_pending_payment';
+    }
+
+    public function isSecured(): bool
+    {
+        return in_array($this->session_status, ['scheduled', 'ongoing', 'completed'], true);
     }
 }

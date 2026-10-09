@@ -70,7 +70,7 @@ class StaffWalkInController extends Controller
         // Include courts allocated to active Open Play / Tournament sessions
         $openPlaySessions = \App\Models\OpenPlaySession::with('courts')
             ->whereDate('date', $selectedDate)
-            ->where('session_status', '!=', 'cancelled')
+            ->whereIn('session_status', ['scheduled', 'approved_pending_payment', 'ongoing'])
             ->get();
 
         $specialSlots = [];

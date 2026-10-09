@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Booking;
 use App\Models\Court;
 use App\Models\OpenPlayRegistration;
 use App\Models\OpenPlaySession;
@@ -21,7 +22,7 @@ class AdminOpenPlayController extends Controller
         $statusFilter = $request->query('status', 'all');
         $typeFilter = $request->query('type', 'all');
 
-        $query = OpenPlaySession::with(['courts', 'registrations'])
+        $query = OpenPlaySession::with(['courts', 'registrations', 'creator'])
             ->orderBy('date', 'desc')
             ->orderBy('start_time', 'desc');
 
@@ -42,11 +43,14 @@ class AdminOpenPlayController extends Controller
         $totalRegistrations = OpenPlayRegistration::whereIn('payment_status', ['paid', 'pending'])->sum('slots_count');
         $totalOpenPlayRevenue = OpenPlayRegistration::where('payment_status', 'paid')->sum('total_fee');
 
+        $pendingRequestsCount = OpenPlaySession::where('session_status', 'pending_approval')->count();
+
         return view('admin.open-play.index', [
             'sessions' => $sessions,
             'upcomingCount' => $upcomingCount,
             'totalRegistrations' => $totalRegistrations,
             'totalOpenPlayRevenue' => $totalOpenPlayRevenue,
+            'pendingRequestsCount' => $pendingRequestsCount,
             'statusFilter' => $statusFilter,
             'typeFilter' => $typeFilter,
         ]);
@@ -224,5 +228,78 @@ class AdminOpenPlayController extends Controller
             'max_capacity.required' => 'Please set the maximum player capacity.',
             'price_per_slot.required' => 'Please specify the participation fee per player ticket.',
         ]);
+    }
+
+    /**
+     * Accept a player's Open Play hosting request.
+     */
+    public function acceptHostRequest(Request $request, OpenPlaySession $open_play): RedirectResponse
+    {
+        abort_unless(Auth::user()?->isManager(), 403, 'Only managers are authorized to accept or reject Open Play host requests.');
+
+        if ($open_play->session_status !== 'pending_approval') {
+            return back()->with('error', 'This request is not currently pending manager approval.');
+        }
+
+        // Verify court availability
+        $courtIds = $open_play->courts->pluck('id')->all();
+        $date = Carbon::parse($open_play->date)->toDateString();
+        $startTime = Carbon::parse($open_play->start_time)->format('H:i:s');
+        $endTime = Carbon::parse($open_play->end_time)->format('H:i:s');
+
+        foreach ($courtIds as $courtId) {
+            $conflictBooking = Booking::where('court_id', $courtId)
+                ->whereDate('date', $date)
+                ->where('booking_status', '!=', 'cancelled')
+                ->where(function ($q) use ($startTime, $endTime) {
+                    $q->where('start_time', '<', $endTime)
+                      ->where('end_time', '>', $startTime);
+                })
+                ->exists();
+
+            if ($conflictBooking) {
+                return back()->with('error', 'Cannot accept: one of the requested courts has an active booking conflict during this time slot.');
+            }
+
+            $conflictSession = OpenPlaySession::where('id', '!=', $open_play->id)
+                ->whereDate('date', $date)
+                ->whereIn('session_status', ['scheduled', 'approved_pending_payment', 'ongoing'])
+                ->whereHas('courts', fn ($q) => $q->where('courts.id', $courtId))
+                ->where(function ($q) use ($startTime, $endTime) {
+                    $q->where('start_time', '<', $endTime)
+                      ->where('end_time', '>', $startTime);
+                })
+                ->exists();
+
+            if ($conflictSession) {
+                return back()->with('error', 'Cannot accept: one of the requested courts is already assigned to another scheduled session.');
+            }
+        }
+
+        $open_play->update([
+            'session_status' => 'approved_pending_payment',
+            'manager_note' => $request->input('manager_note'),
+        ]);
+
+        return back()->with('status', "Host request for '{$open_play->title}' has been accepted! The host can now pay to secure the court appointment.");
+    }
+
+    /**
+     * Reject a player's Open Play hosting request.
+     */
+    public function rejectHostRequest(Request $request, OpenPlaySession $open_play): RedirectResponse
+    {
+        abort_unless(Auth::user()?->isManager(), 403, 'Only managers are authorized to accept or reject Open Play host requests.');
+
+        if ($open_play->session_status !== 'pending_approval') {
+            return back()->with('error', 'This request is not currently pending manager approval.');
+        }
+
+        $open_play->update([
+            'session_status' => 'rejected',
+            'manager_note' => $request->input('manager_note'),
+        ]);
+
+        return back()->with('status', "Host request for '{$open_play->title}' has been rejected.");
     }
 }

@@ -43,6 +43,73 @@
         </div>
     @endif
 
+    @if (session('error'))
+        <div class="mb-4 p-4 rounded-xl text-sm" style="background: var(--gz-danger-bg); color: var(--gz-danger);" role="alert">
+            <p class="font-bold">{{ session('error') }}</p>
+        </div>
+    @endif
+
+    {{-- Host Request Review Card (if created by a player) --}}
+    @if ($session->isHostPlayer())
+        <div class="gz-panel p-5 mb-6 border" style="background: var(--gz-surface); border-color: var(--gz-border);">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--gz-muted);">Player-Hosted Session</span>
+                        <span class="gz-badge text-[10px] uppercase font-bold
+                            {{ $session->session_status === 'pending_approval' ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300' : '' }}
+                            {{ $session->session_status === 'approved_pending_payment' ? 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300' : '' }}
+                            {{ $session->session_status === 'scheduled' ? 'gz-badge-success' : '' }}
+                            {{ $session->session_status === 'rejected' ? 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400' : '' }}
+                        ">
+                            {{ str_replace('_', ' ', $session->session_status) }}
+                        </span>
+                    </div>
+                    <div class="text-sm font-bold" style="color: var(--gz-ink);">
+                        Host: {{ $session->creator?->name }} ({{ $session->creator?->email }})
+                    </div>
+                    <div class="text-xs flex items-center gap-4 flex-wrap" style="color: var(--gz-muted);">
+                        <span>Court Hire Fee: <strong class="font-mono text-emerald-600 dark:text-emerald-400">₱{{ number_format($session->court_fee, 2) }}</strong></span>
+                        <span>Payment Status: <strong class="capitalize">{{ $session->host_payment_status }}</strong> @if($session->host_payment_method)({{ ucfirst($session->host_payment_method) }})@endif</span>
+                        @if($session->host_paid_at)
+                            <span>Paid At: {{ $session->host_paid_at->format('M d, Y h:i A') }}</span>
+                        @endif
+                    </div>
+                    @if($session->manager_note)
+                        <div class="text-xs mt-2 p-2.5 rounded border" style="background: var(--gz-bg); border-color: var(--gz-border);">
+                            <span class="font-bold text-[10px] uppercase tracking-wider block" style="color: var(--gz-muted);">Manager Note:</span>
+                            <span style="color: var(--gz-ink);">{{ $session->manager_note }}</span>
+                        </div>
+                    @endif
+                </div>
+
+                @if($session->session_status === 'pending_approval' && Auth::user()->isManager())
+                    <div class="flex items-center gap-2 pt-3 md:pt-0 border-t md:border-t-0" style="border-color: var(--gz-border);">
+                        <form method="POST" action="{{ route('admin.open-play.accept', $session) }}" class="inline">
+                            @csrf
+                            <button type="submit" class="gz-btn-primary gz-btn-sm flex items-center gap-1.5 shadow-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>Accept Request</span>
+                            </button>
+                        </form>
+
+                        <form method="POST" action="{{ route('admin.open-play.reject', $session) }}" class="inline" onsubmit="return confirm('Reject this player hosting request?');">
+                            @csrf
+                            <button type="submit" class="gz-btn-outline gz-btn-sm text-red-600 hover:text-red-700 flex items-center gap-1.5">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                                <span>Reject</span>
+                            </button>
+                        </form>
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endif
+
     {{-- Overview KPI Grid --}}
     <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
         <div class="gz-kpi-card">

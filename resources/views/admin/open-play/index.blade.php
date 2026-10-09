@@ -53,6 +53,30 @@
         </div>
     </div>
 
+    {{-- Pending Host Requests Alert for Managers --}}
+    @if(($pendingRequestsCount ?? 0) > 0 && Auth::user()->isManager())
+        <div class="mb-6 p-4 rounded-xl flex items-center justify-between flex-wrap gap-3" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3);">
+            <div class="flex items-center gap-3">
+                <div class="p-2 rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <p class="font-bold text-sm text-amber-800 dark:text-amber-300">
+                        {{ $pendingRequestsCount }} Player Host Request{{ $pendingRequestsCount > 1 ? 's' : '' }} Pending Review
+                    </p>
+                    <p class="text-xs" style="color: var(--gz-muted);">
+                        Players have requested to host communal Open Play sessions. Review court allocations and accept or decline.
+                    </p>
+                </div>
+            </div>
+            <a href="{{ route('admin.open-play.index', ['status' => 'pending_approval']) }}" class="gz-btn-sm gz-btn-outline font-bold text-amber-700 hover:bg-amber-500/10">
+                View Pending Requests
+            </a>
+        </div>
+    @endif
+
     {{-- Filter Toolbar --}}
     <div class="gz-panel p-4 mb-6">
         <form method="GET" action="{{ route('admin.open-play.index') }}" class="flex flex-wrap items-center gap-4">
@@ -60,9 +84,12 @@
                 <label for="filter-status" class="text-xs font-semibold" style="color: var(--gz-muted);">Status:</label>
                 <select id="filter-status" name="status" onchange="this.form.submit()" class="gz-select text-xs py-1.5 px-3">
                     <option value="all" {{ $statusFilter === 'all' ? 'selected' : '' }}>All Statuses</option>
+                    <option value="pending_approval" {{ $statusFilter === 'pending_approval' ? 'selected' : '' }}>Pending Host Approval</option>
+                    <option value="approved_pending_payment" {{ $statusFilter === 'approved_pending_payment' ? 'selected' : '' }}>Approved (Pending Payment)</option>
                     <option value="scheduled" {{ $statusFilter === 'scheduled' ? 'selected' : '' }}>Scheduled</option>
                     <option value="ongoing" {{ $statusFilter === 'ongoing' ? 'selected' : '' }}>Ongoing</option>
                     <option value="completed" {{ $statusFilter === 'completed' ? 'selected' : '' }}>Completed</option>
+                    <option value="rejected" {{ $statusFilter === 'rejected' ? 'selected' : '' }}>Rejected</option>
                     <option value="cancelled" {{ $statusFilter === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                 </select>
             </div>
@@ -114,8 +141,12 @@
                                         {{ $session->title }}
                                     </a>
                                 </div>
-                                <div class="text-[11px] mt-0.5" style="color: var(--gz-muted);">
+                                <div class="text-[11px] mt-0.5 flex items-center gap-1.5 flex-wrap" style="color: var(--gz-muted);">
                                     <span class="font-mono uppercase font-bold">{{ str_replace('_', ' ', $session->session_type) }}</span>
+                                    @if($session->isHostPlayer())
+                                        <span>•</span>
+                                        <span class="font-semibold text-emerald-600 dark:text-emerald-400">Host: {{ $session->creator?->name ?? 'Player' }}</span>
+                                    @endif
                                 </div>
                             </td>
                             <td class="py-3 px-4 whitespace-nowrap">
@@ -157,24 +188,42 @@
                                     {{ $session->session_status === 'scheduled' ? 'gz-badge-success' : '' }}
                                     {{ $session->session_status === 'ongoing' ? 'gz-badge-primary' : '' }}
                                     {{ $session->session_status === 'completed' ? 'gz-badge-outline' : '' }}
-                                    {{ $session->session_status === 'cancelled' ? 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400' : '' }}
+                                    {{ $session->session_status === 'pending_approval' ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300' : '' }}
+                                    {{ $session->session_status === 'approved_pending_payment' ? 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300' : '' }}
+                                    {{ $session->session_status === 'rejected' ? 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400' : '' }}
+                                    {{ $session->session_status === 'cancelled' ? 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300' : '' }}
                                 ">
-                                    {{ $session->session_status }}
+                                    {{ str_replace('_', ' ', $session->session_status) }}
                                 </span>
                             </td>
                             <td class="py-3 px-4 text-right whitespace-nowrap">
                                 <div class="flex items-center justify-end gap-2">
-                                    <a href="{{ route('admin.open-play.show', $session) }}" class="gz-btn-outline gz-btn-sm" title="View Roster">
-                                        Roster
+                                    @if($session->session_status === 'pending_approval' && Auth::user()->isManager())
+                                        <form method="POST" action="{{ route('admin.open-play.accept', $session) }}" class="inline">
+                                            @csrf
+                                            <button type="submit" class="gz-btn-primary gz-btn-sm text-[11px] py-1 px-2.5" title="Accept Host Request">
+                                                Accept
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ route('admin.open-play.reject', $session) }}" class="inline" onsubmit="return confirm('Reject this hosting request?');">
+                                            @csrf
+                                            <button type="submit" class="gz-btn-outline gz-btn-sm text-[11px] py-1 px-2.5 text-red-600 hover:text-red-700" title="Reject Host Request">
+                                                Reject
+                                            </button>
+                                        </form>
+                                    @endif
+
+                                    <a href="{{ route('admin.open-play.show', $session) }}" class="gz-btn-outline gz-btn-sm text-[11px] py-1 px-2.5" title="View Details">
+                                        View
                                     </a>
                                     @if(Auth::user()->isManager())
-                                        <a href="{{ route('admin.open-play.edit', $session) }}" class="gz-btn-outline gz-btn-sm" title="Edit Session">
+                                        <a href="{{ route('admin.open-play.edit', $session) }}" class="gz-btn-outline gz-btn-sm text-[11px] py-1 px-2.5" title="Edit Session">
                                             Edit
                                         </a>
                                         <form method="POST" action="{{ route('admin.open-play.destroy', $session) }}" onsubmit="return confirm('Are you sure you want to delete or cancel this session?');" class="inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="gz-btn-outline gz-btn-sm text-red-600 hover:text-red-700" title="Delete or Cancel">
+                                            <button type="submit" class="gz-btn-outline gz-btn-sm text-[11px] py-1 px-2.5 text-red-600 hover:text-red-700" title="Delete or Cancel">
                                                 Cancel
                                             </button>
                                         </form>

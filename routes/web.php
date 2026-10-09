@@ -9,6 +9,7 @@ use App\Http\Controllers\AdminOpenPlayController;
 use App\Http\Controllers\AdminReportController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\OpenPlayController;
+use App\Http\Controllers\OpenPlayHostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StaffTodayController;
 use App\Http\Controllers\StaffWalkInController;
@@ -40,7 +41,7 @@ Route::get('/', function () {
         ->get();
     $openPlaySessions = \App\Models\OpenPlaySession::with('courts')
         ->where('date', '>=', now()->toDateString())
-        ->where('session_status', '!=', 'cancelled')
+        ->whereIn('session_status', ['scheduled', 'ongoing'])
         ->orderBy('date')
         ->orderBy('start_time')
         ->take(3)
@@ -54,7 +55,7 @@ Route::view('/terms', 'legal.terms')->name('terms');
 Route::view('/privacy', 'legal.privacy')->name('privacy');
 
 Route::get('/open-play', [OpenPlayController::class, 'index'])->name('open-play.index');
-Route::get('/open-play/{session}', [OpenPlayController::class, 'show'])->name('open-play.show');
+Route::get('/open-play/{session}', [OpenPlayController::class, 'show'])->whereNumber('session')->name('open-play.show');
 
 /*
 |--------------------------------------------------------------------------
@@ -96,6 +97,10 @@ Route::middleware(['auth', 'verified', 'role:admin,manager'])
             ->whereNumber('court');
         Route::resource('events', AdminEventController::class);
         Route::resource('open-play', AdminOpenPlayController::class);
+        Route::post('/open-play/{open_play}/accept', [AdminOpenPlayController::class, 'acceptHostRequest'])
+            ->name('open-play.accept');
+        Route::post('/open-play/{open_play}/reject', [AdminOpenPlayController::class, 'rejectHostRequest'])
+            ->name('open-play.reject');
         Route::patch('/open-play/registrations/{registration}/attendance', [AdminOpenPlayController::class, 'updateAttendance'])
             ->name('open-play.attendance');
         Route::get('/reports/export', [AdminReportController::class, 'export'])->name('reports.export');
@@ -146,6 +151,17 @@ Route::middleware(['auth', 'verified', 'prevent.staff_admin_booking'])
             ->name('booking.paymongo.success');
         Route::get('/booking/paymongo/cancel', [BookingController::class, 'paymongoCancel'])
             ->name('booking.paymongo.cancel');
+
+        Route::get('/open-play/host', [OpenPlayHostController::class, 'create'])->name('open-play.host.create');
+        Route::post('/open-play/host', [OpenPlayHostController::class, 'store'])
+            ->middleware('throttle:15,1')
+            ->name('open-play.host.store');
+        Route::get('/open-play/my-sessions', [OpenPlayHostController::class, 'index'])->name('open-play.host.index');
+        Route::get('/open-play/{session}/host-pay', [OpenPlayHostController::class, 'showPayment'])->name('open-play.host.pay.show');
+        Route::post('/open-play/{session}/host-pay', [OpenPlayHostController::class, 'processPayment'])->name('open-play.host.pay.process');
+        Route::get('/open-play/host-pay/success', [OpenPlayHostController::class, 'paymongoSuccess'])->name('open-play.host.paymongo.success');
+        Route::get('/open-play/host-pay/cancel', [OpenPlayHostController::class, 'paymongoCancel'])->name('open-play.host.paymongo.cancel');
+        Route::delete('/open-play/my-sessions/{session}', [OpenPlayHostController::class, 'destroy'])->name('open-play.host.destroy');
 
         Route::post('/open-play/{session}/reserve', [OpenPlayController::class, 'store'])
             ->middleware('throttle:20,1')
