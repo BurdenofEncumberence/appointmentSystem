@@ -7,6 +7,28 @@
     };
 @endphp
 
+<style>
+    /* Theme toggle icon swap (works on every page that includes this nav) */
+    .theme-icon-sun { display: none; }
+    html.night-mode .theme-icon-sun { display: block; }
+    html.night-mode .theme-icon-moon { display: none; }
+
+    .theme-toggle-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        border: 1.5px solid var(--gz-border);
+        background: var(--gz-surface, transparent);
+        color: var(--gz-ink);
+        cursor: pointer;
+        transition: border-color 0.15s ease, transform 0.15s ease;
+        flex-shrink: 0;
+    }
+    .theme-toggle-btn:hover { border-color: var(--pop, #3ECF7E); transform: rotate(-12deg); }
+</style>
+
 <nav x-data="{ mobileOpen: false, profileOpen: false }" class="border-b relative" style="border-color: var(--gz-border);">
     <div class="max-w-6xl mx-auto px-6">
         <div class="flex justify-between h-16 items-center">
@@ -15,7 +37,8 @@
                 @if($siteSettings && $siteSettings->logo)
                     <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="{{ $siteSettings->system_name ?? 'Logo' }}" class="h-8 w-8 object-contain">
                 @else
-                    <div class="pixel-mark" aria-hidden="true" style="width:32px; height:32px; background: var(--gz-ink); display:grid; grid-template-columns:repeat(8,1fr); grid-template-rows:repeat(8,1fr); padding:6px;" id="nav-seal"></div>
+                    {{-- Fixed dark tile so the cream glyph stays visible in both themes --}}
+                    <div class="pixel-mark" aria-hidden="true" style="width:32px; height:32px; background:#12150F; border:1px solid var(--gz-border); border-radius:10px; display:grid; grid-template-columns:repeat(8,1fr); grid-template-rows:repeat(8,1fr); padding:6px;" id="nav-seal"></div>
                 @endif
                 <span class="gz-font-display font-bold text-base">{{ $siteSettings->system_name ?? 'KYMNET' }}</span>
             </a>
@@ -25,8 +48,20 @@
                 <div class="flex gap-6 text-sm font-semibold" style="color: var(--gz-muted);">
                     @auth
                         @if(Auth::user()->isAdmin() || Auth::user()->hasRole('manager'))
-                            <a href="{{ route('admin.dashboard') }}" class="nav-link" @if(request()->routeIs('admin.*')) aria-current="page" @endif>
-                                Admin Dashboard
+                            <a href="{{ route('admin.dashboard') }}" class="nav-link" @if(request()->routeIs('admin.dashboard')) aria-current="page" @endif>
+                                Overview
+                            </a>
+                            <a href="{{ route('admin.courts.index') }}" class="nav-link" @if(request()->routeIs('admin.courts.*')) aria-current="page" @endif>
+                                Courts
+                            </a>
+                            <a href="{{ route('admin.events.index') }}" class="nav-link" @if(request()->routeIs('admin.events.*')) aria-current="page" @endif>
+                                Events
+                            </a>
+                            <a href="{{ route('admin.finance') }}" class="nav-link" @if(request()->routeIs('admin.finance')) aria-current="page" @endif>
+                                Financials
+                            </a>
+                            <a href="{{ route('admin.customization.index') }}" class="nav-link" @if(request()->routeIs('admin.customization.*')) aria-current="page" @endif>
+                                Customization
                             </a>
                         @elseif(Auth::user()->hasRole('staff'))
                             <a href="{{ route('staff.today') }}" class="nav-link" @if(request()->routeIs('staff.today')) aria-current="page" @endif>
@@ -63,11 +98,16 @@
                 </div>
             </div>
 
-            {{-- Right: account/auth buttons (desktop) --}}
-            <div class="hidden sm:flex items-center gap-4 relative">
+            {{-- Right: theme toggle + account/auth buttons (desktop) --}}
+            <div class="hidden sm:flex items-center gap-3 relative">
+                <button type="button" onclick="toggleTheme()" class="theme-toggle-btn" aria-label="Toggle night mode" title="Toggle night mode">
+                    <svg class="theme-icon-moon w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+                    <svg class="theme-icon-sun w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/></svg>
+                </button>
+
                 @auth
                     @php
-                        $userShortName = Auth::user()->first_name 
+                        $userShortName = Auth::user()->first_name
                             ?: (\Illuminate\Support\Str::of(Auth::user()->name ?? 'Account')->before(' ')->value() ?: 'Account');
                     @endphp
                     <button @click="profileOpen = !profileOpen" @click.outside="profileOpen = false"
@@ -85,7 +125,7 @@
                          x-transition:leave="transition ease-in duration-100"
                          x-transition:leave-start="opacity-100 translate-y-0"
                          x-transition:leave-end="opacity-0 translate-y-1">
-                        
+
                         <div class="px-4 py-3 border-b border-[color:var(--gz-border)] bg-[color:var(--gz-bg)]/40">
                             <p class="text-[10px] uppercase font-bold tracking-wider text-[color:var(--gz-muted)]">Signed in as</p>
                             <p class="text-sm font-bold truncate text-[color:var(--gz-ink)]" title="{{ Auth::user()->name }}">{{ $userShortName }}</p>
@@ -135,8 +175,12 @@
                 @endauth
             </div>
 
-            {{-- Mobile menu button --}}
+            {{-- Mobile: theme toggle + menu button --}}
             <div class="sm:hidden flex items-center gap-2 flex-1 justify-end">
+                <button type="button" onclick="toggleTheme()" class="theme-toggle-btn" aria-label="Toggle night mode">
+                    <svg class="theme-icon-moon w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+                    <svg class="theme-icon-sun w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/></svg>
+                </button>
                 <button @click="mobileOpen = !mobileOpen" :aria-expanded="mobileOpen.toString()" aria-controls="mobile-nav-genz" class="gz-btn-outline gz-btn-sm">
                     <span x-show="!mobileOpen">Menu</span>
                     <span x-show="mobileOpen" x-cloak>Close</span>
@@ -185,8 +229,17 @@
 </nav>
 
 <script>
+    // Theme toggle lives here so it works on every page that includes the nav.
+    if (typeof window.toggleTheme === 'undefined') {
+        window.toggleTheme = function () {
+            const isNight = document.documentElement.classList.toggle('night-mode');
+            document.body.classList.toggle('night-mode', isNight);
+            try { localStorage.setItem('kymnet_theme', isNight ? 'night' : 'day'); } catch (e) {}
+        };
+    }
+
     if (typeof window.renderPixelGrid === 'undefined') {
-        window.renderPixelGrid = function(id, rows, colorMap) {
+        window.renderPixelGrid = function (id, rows, colorMap) {
             const el = document.getElementById(id);
             if (!el) return;
             el.innerHTML = '';
