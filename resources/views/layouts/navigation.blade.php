@@ -45,7 +45,7 @@
                     }
                 @endphp
                 @if($logoPath)
-                    <img src="{{ $logoPath }}" alt="{{ $siteSettings->system_name ?? 'KYMNET' }}" class="h-9 w-9 rounded-xl object-contain border border-black/10 dark:border-white/10 shadow-sm shrink-0">
+                    <img src="{{ $logoPath }}" alt="{{ $siteSettings->system_name ?? 'KYMNET' }}" class="h-9 w-auto max-h-9 max-w-[130px] object-contain rounded-lg shrink-0">
                 @else
                     <div class="pixel-mark shrink-0" aria-hidden="true" style="width:34px; height:34px; background:#12150F; border:1px solid var(--gz-border); border-radius:10px; display:grid; grid-template-columns:repeat(8,1fr); grid-template-rows:repeat(8,1fr); padding:6px;" id="nav-seal"></div>
                 @endif

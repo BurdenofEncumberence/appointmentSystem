@@ -56,7 +56,7 @@
 
                 <div class="flex items-center gap-2">
                     @if($logoPath)
-                        <img src="{{ $logoPath }}" alt="{{ $siteSettings->system_name ?? 'Logo' }}" class="h-7 w-7 object-contain rounded-lg">
+                        <img src="{{ $logoPath }}" alt="{{ $siteSettings->system_name ?? 'Logo' }}" class="h-7 w-auto max-h-7 max-w-[100px] object-contain rounded-lg">
                     @else
                         <div class="w-6 h-6 rounded flex items-center justify-center font-bold text-xs" style="background: var(--gz-pop); color: var(--gz-ink);">
                             K
@@ -102,7 +102,7 @@
                 <div class="h-16 px-6 border-b flex items-center justify-between shrink-0" style="border-color: var(--gz-border);">
                     <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5">
                         @if($logoPath)
-                            <img src="{{ $logoPath }}" alt="{{ $siteSettings->system_name ?? 'Logo' }}" class="h-8 w-8 object-contain rounded-lg border border-black/10 dark:border-white/10 shadow-sm shrink-0">
+                            <img src="{{ $logoPath }}" alt="{{ $siteSettings->system_name ?? 'Logo' }}" class="h-8 w-auto max-h-8 max-w-[110px] object-contain rounded-lg shrink-0">
                         @else
                             <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm" style="background: var(--gz-pop); color: var(--gz-ink);">
                                 K

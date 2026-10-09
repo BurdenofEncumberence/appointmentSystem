@@ -69,7 +69,7 @@
                     <img
                         src="{{ $receipt['logo_url'] }}"
                         alt="{{ $receipt['system_name'] }}"
-                        class="h-12 w-12 rounded-xl object-contain border border-black/10 shrink-0"
+                        class="h-12 w-auto max-h-12 max-w-[160px] object-contain rounded-xl shrink-0"
                     >
                     <div>
                         <h1 class="font-display font-extrabold text-xl sm:text-2xl tracking-tight leading-none text-[#12150F]">
