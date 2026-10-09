@@ -132,8 +132,7 @@
                             {{-- Today's Schedule --}}
                             <a
                                 href="{{ route('staff.today') }}"
-                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition"
-                                style="{{ request()->routeIs('staff.today') ? 'background: var(--gz-pop); color: var(--gz-ink); font-weight: 700;' : 'color: var(--gz-muted);' }}"
+                                class="gz-sidebar-nav-link {{ request()->routeIs('staff.today') ? 'is-active' : '' }}"
                                 @if(request()->routeIs('staff.today')) aria-current="page" @endif
                             >
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -145,8 +144,7 @@
                             {{-- Walk-In Booking --}}
                             <a
                                 href="{{ route('staff.walkin.create') }}"
-                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition"
-                                style="{{ request()->routeIs('staff.walkin.*') ? 'background: var(--gz-pop); color: var(--gz-ink); font-weight: 700;' : 'color: var(--gz-muted);' }}"
+                                class="gz-sidebar-nav-link {{ request()->routeIs('staff.walkin.*') ? 'is-active' : '' }}"
                                 @if(request()->routeIs('staff.walkin.*')) aria-current="page" @endif
                             >
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -165,8 +163,7 @@
                         <nav class="space-y-1">
                             <a
                                 href="{{ route('profile.edit') }}"
-                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition"
-                                style="{{ request()->routeIs('profile.*') ? 'background: var(--gz-pop); color: var(--gz-ink); font-weight: 700;' : 'color: var(--gz-muted);' }}"
+                                class="gz-sidebar-nav-link {{ request()->routeIs('profile.*') ? 'is-active' : '' }}"
                                 @if(request()->routeIs('profile.*')) aria-current="page" @endif
                             >
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -197,8 +194,7 @@
                     @csrf
                     <button
                         type="submit"
-                        class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition border hover:bg-red-50 dark:hover:bg-red-950/20"
-                        style="color: var(--gz-danger); border-color: rgba(196, 69, 58, 0.25);"
+                        class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold transition border border-red-200 text-red-600 hover:bg-red-600 hover:text-white hover:border-red-600 active:scale-98 dark:border-red-900/40 dark:hover:bg-red-700"
                     >
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>

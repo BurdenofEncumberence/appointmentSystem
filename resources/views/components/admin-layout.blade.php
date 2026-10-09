@@ -136,8 +136,7 @@
                             {{-- Overview --}}
                             <a
                                 href="{{ route('admin.dashboard') }}"
-                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition"
-                                style="{{ request()->routeIs('admin.dashboard') ? 'background: var(--gz-pop); color: var(--gz-ink); font-weight: 700;' : 'color: var(--gz-muted);' }}"
+                                class="gz-sidebar-nav-link {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}"
                                 @if(request()->routeIs('admin.dashboard')) aria-current="page" @endif
                             >
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,8 +148,7 @@
                             {{-- Bookings --}}
                             <a
                                 href="{{ route('admin.bookings.index') }}"
-                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition"
-                                style="{{ request()->routeIs('admin.bookings.*') ? 'background: var(--gz-pop); color: var(--gz-ink); font-weight: 700;' : 'color: var(--gz-muted);' }}"
+                                class="gz-sidebar-nav-link {{ request()->routeIs('admin.bookings.*') ? 'is-active' : '' }}"
                                 @if(request()->routeIs('admin.bookings.*')) aria-current="page" @endif
                             >
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -162,8 +160,7 @@
                             {{-- Courts --}}
                             <a
                                 href="{{ route('admin.courts.index') }}"
-                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition"
-                                style="{{ request()->routeIs('admin.courts.*') ? 'background: var(--gz-pop); color: var(--gz-ink); font-weight: 700;' : 'color: var(--gz-muted);' }}"
+                                class="gz-sidebar-nav-link {{ request()->routeIs('admin.courts.*') ? 'is-active' : '' }}"
                                 @if(request()->routeIs('admin.courts.*')) aria-current="page" @endif
                             >
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -175,8 +172,7 @@
                             {{-- Events --}}
                             <a
                                 href="{{ route('admin.events.index') }}"
-                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition"
-                                style="{{ request()->routeIs('admin.events.*') ? 'background: var(--gz-pop); color: var(--gz-ink); font-weight: 700;' : 'color: var(--gz-muted);' }}"
+                                class="gz-sidebar-nav-link {{ request()->routeIs('admin.events.*') ? 'is-active' : '' }}"
                                 @if(request()->routeIs('admin.events.*')) aria-current="page" @endif
                             >
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -188,8 +184,7 @@
                             {{-- Open Play & Tournaments --}}
                             <a
                                 href="{{ route('admin.open-play.index') }}"
-                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition"
-                                style="{{ request()->routeIs('admin.open-play.*') ? 'background: var(--gz-pop); color: var(--gz-ink); font-weight: 700;' : 'color: var(--gz-muted);' }}"
+                                class="gz-sidebar-nav-link {{ request()->routeIs('admin.open-play.*') ? 'is-active' : '' }}"
                                 @if(request()->routeIs('admin.open-play.*')) aria-current="page" @endif
                             >
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -201,8 +196,7 @@
                             {{-- Financials --}}
                             <a
                                 href="{{ route('admin.finance') }}"
-                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition"
-                                style="{{ request()->routeIs('admin.finance') ? 'background: var(--gz-pop); color: var(--gz-ink); font-weight: 700;' : 'color: var(--gz-muted);' }}"
+                                class="gz-sidebar-nav-link {{ request()->routeIs('admin.finance') ? 'is-active' : '' }}"
                                 @if(request()->routeIs('admin.finance')) aria-current="page" @endif
                             >
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -214,8 +208,7 @@
                             {{-- Customization --}}
                             <a
                                 href="{{ route('admin.customization.index') }}"
-                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition"
-                                style="{{ request()->routeIs('admin.customization.*') ? 'background: var(--gz-pop); color: var(--gz-ink); font-weight: 700;' : 'color: var(--gz-muted);' }}"
+                                class="gz-sidebar-nav-link {{ request()->routeIs('admin.customization.*') ? 'is-active' : '' }}"
                                 @if(request()->routeIs('admin.customization.*')) aria-current="page" @endif
                             >
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -228,8 +221,7 @@
                             <button
                                 type="button"
                                 @click="exportModalOpen = true"
-                                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition text-left hover:bg-black/5 dark:hover:bg-white/5"
-                                style="color: var(--gz-muted);"
+                                class="gz-sidebar-nav-link"
                             >
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -263,8 +255,7 @@
                     @csrf
                     <button
                         type="submit"
-                        class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition border hover:bg-red-50 dark:hover:bg-red-950/20"
-                        style="color: var(--gz-danger); border-color: rgba(196, 69, 58, 0.25);"
+                        class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold transition border border-red-200 text-red-600 hover:bg-red-600 hover:text-white hover:border-red-600 active:scale-98 dark:border-red-900/40 dark:hover:bg-red-700"
                     >
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>

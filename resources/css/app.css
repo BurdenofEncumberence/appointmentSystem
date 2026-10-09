@@ -673,6 +673,84 @@ input:focus-visible {
 }
 
 /* =====================================================================
+   SIDEBAR NAVIGATION LINKS (Admin & Staff Workspaces)
+   Polished hover state for inactive navigation buttons:
+   - Subtle background tint
+   - Text color transition to var(--gz-ink)
+   - Icon color transition & micro-scaling
+   - Smooth horizontal nudge
+   - Active state keeps the bright green pill
+   ===================================================================== */
+.gz-sidebar-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gz-muted);
+    background-color: transparent;
+    border: 1px solid transparent;
+    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    text-decoration: none;
+    user-select: none;
+    width: 100%;
+    text-align: left;
+}
+
+.gz-sidebar-nav-link svg {
+    color: var(--gz-muted);
+    flex-shrink: 0;
+    transition: transform 0.18s ease, color 0.18s ease, stroke 0.18s ease;
+}
+
+.gz-sidebar-nav-link:hover {
+    background-color: rgba(18, 21, 15, 0.07);
+    border-color: rgba(18, 21, 15, 0.08);
+    color: var(--gz-ink);
+    transform: translateX(3px);
+}
+
+.gz-sidebar-nav-link:hover svg {
+    color: var(--gz-ink);
+    transform: scale(1.1);
+}
+
+.gz-sidebar-nav-link:active {
+    transform: translateX(1px);
+    background-color: rgba(18, 21, 15, 0.11);
+}
+
+.gz-sidebar-nav-link:focus-visible {
+    outline: 2px solid var(--gz-pop-dark);
+    outline-offset: 2px;
+}
+
+/* Active State */
+.gz-sidebar-nav-link.is-active,
+.gz-sidebar-nav-link[aria-current="page"] {
+    background-color: var(--gz-pop) !important;
+    border-color: var(--gz-pop) !important;
+    color: var(--gz-ink) !important;
+    font-weight: 700 !important;
+    transform: none !important;
+    box-shadow: 0 1px 3px rgba(18, 21, 15, 0.1);
+}
+
+.gz-sidebar-nav-link.is-active svg,
+.gz-sidebar-nav-link[aria-current="page"] svg {
+    color: var(--gz-ink) !important;
+    transform: none !important;
+}
+
+.dark .gz-sidebar-nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* =====================================================================
    SHARED PAGE CHROME (Gen Z theme)
    Used by every full page that includes <x-site-header /> and
    <x-site-footer /> — welcome, login, register, etc. Was previously
