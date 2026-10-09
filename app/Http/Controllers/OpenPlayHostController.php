@@ -137,6 +137,16 @@ class OpenPlayHostController extends Controller
         $session->courts()->sync($validated['allocated_courts']);
 
         return redirect()->route('open-play.host.index')
+            ->with('host_request_submitted', [
+                'id' => $session->id,
+                'title' => $session->title,
+                'date' => Carbon::parse($session->date)->format('D, M j, Y'),
+                'time' => Carbon::parse($session->start_time)->format('g:i A') . ' – ' . Carbon::parse($session->end_time)->format('g:i A'),
+                'courts' => $selectedCourts->pluck('court_name')->join(', '),
+                'court_fee' => (float) $session->court_fee,
+                'max_capacity' => (int) $session->max_capacity,
+                'price_per_slot' => (float) $session->price_per_slot,
+            ])
             ->with('status', "Your Open Play hosting request for '{$session->title}' has been submitted! It is now pending review and acceptance by the facility manager.");
     }
 

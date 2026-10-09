@@ -48,6 +48,8 @@ test('player can submit open play host request which starts in pending_approval 
     ]);
 
     $response->assertRedirect(route('open-play.host.index'));
+    $response->assertSessionHas('host_request_submitted');
+    $response->assertSessionHas('status');
 
     $session = OpenPlaySession::where('title', 'Sunday Social Open Play')->first();
     expect($session)->not->toBeNull();
@@ -57,6 +59,14 @@ test('player can submit open play host request which starts in pending_approval 
     expect($session->courts)->toHaveCount(2);
     // Court Alpha is 300/hr, Beta is 200/hr = 500/hr * 2 hrs = 1000.00 court_fee
     expect((float) $session->court_fee)->toBe(1000.00);
+
+    // Follow redirect to ensure confirmation message and modal are rendered
+    $followResponse = $this->actingAs($player)->get(route('open-play.host.index'));
+    $followResponse->assertOk();
+    $followResponse->assertSee('Hosting Request Submitted!');
+    $followResponse->assertSee('Sunday Social Open Play');
+    $followResponse->assertSee('Pending Manager Approval');
+    $followResponse->assertSee('Pay Court Fee to Secure Appointment');
 });
 
 test('player strictly cannot host a tournament and validation fails', function () {
