@@ -302,6 +302,26 @@ body.dark {
     outline-offset: 2px;
 }
 
+.gz-select {
+    width: 100%;
+    background-color: var(--gz-bg);
+    border: 1.5px solid var(--gz-border);
+    padding: 10px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--gz-ink);
+    transition: border-color 0.15s ease;
+}
+.gz-select:focus {
+    outline: none;
+    border-color: var(--gz-pop);
+    box-shadow: 0 0 0 3px rgba(62, 207, 126, 0.18);
+}
+.gz-select:focus-visible {
+    outline: 3px solid var(--gz-pop-dark);
+    outline-offset: 2px;
+}
+
 .gz-error {
     color: #C4453A;
     font-size: 13px;
@@ -1035,6 +1055,74 @@ body.dark .gz-input:focus {
     border-color: #3ECF7E !important;
     box-shadow: 0 0 0 3px rgba(62, 207, 126, 0.22) !important;
     outline: none !important;
+}
+
+/* Select dropdowns and options in dark mode - black text on clean white background */
+html.night-mode select,
+body.night-mode select,
+html.dark select,
+body.dark select,
+html.night-mode .gz-select,
+body.night-mode .gz-select,
+html.dark .gz-select,
+body.dark .gz-select,
+html.night-mode select.gz-input,
+body.night-mode select.gz-input,
+html.dark select.gz-input,
+body.dark select.gz-input,
+html.night-mode .gz-input select,
+body.night-mode .gz-input select,
+html.dark .gz-input select,
+body.dark .gz-input select {
+    background-color: #FFFFFF !important;
+    border-color: #D1D5DB !important;
+    color: #12150F !important;
+}
+
+html.night-mode select option,
+body.night-mode select option,
+html.dark select option,
+body.dark select option,
+html.night-mode .gz-select option,
+body.night-mode .gz-select option,
+html.dark .gz-select option,
+body.dark .gz-select option,
+html.night-mode select.gz-input option,
+body.night-mode select.gz-input option,
+html.dark select.gz-input option,
+body.dark select.gz-input option,
+html.night-mode select optgroup,
+body.night-mode select optgroup,
+html.dark select optgroup,
+body.dark select optgroup {
+    background-color: #FFFFFF !important;
+    color: #12150F !important;
+}
+
+html.night-mode select option:disabled,
+body.night-mode select option:disabled,
+html.dark select option:disabled,
+body.dark select option:disabled {
+    color: #6B7280 !important;
+}
+
+html.night-mode select:focus,
+body.night-mode select:focus,
+html.dark select:focus,
+body.dark select:focus,
+html.night-mode .gz-select:focus,
+body.night-mode .gz-select:focus,
+html.dark .gz-select:focus,
+body.dark .gz-select:focus,
+html.night-mode select.gz-input:focus,
+body.night-mode select.gz-input:focus,
+html.dark select.gz-input:focus,
+body.dark select.gz-input:focus {
+    background-color: #FFFFFF !important;
+    border-color: #3ECF7E !important;
+    box-shadow: 0 0 0 3px rgba(62, 207, 126, 0.22) !important;
+    outline: none !important;
+    color: #12150F !important;
 }
 
 /* Labels and hints in dark mode */

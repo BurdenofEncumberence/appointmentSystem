@@ -205,7 +205,7 @@
                         @if($recentPlayers->isNotEmpty())
                             <div class="flex items-center gap-2">
                                 <label for="quick_player" class="text-xs whitespace-nowrap" style="color: var(--gz-muted);">Autofill Player:</label>
-                                <select id="quick_player" @change="selectPlayer($event)" class="text-xs p-1 border bg-white" style="border-color: var(--gz-border);">
+                                <select id="quick_player" @change="selectPlayer($event)" class="text-xs p-1 border bg-white text-[#12150F]" style="border-color: var(--gz-border);">
                                     <option value="">-- Choose member --</option>
                                     @foreach($recentPlayers as $p)
                                         <option value="{{ $p->id }}">{{ $p->name }} ({{ $p->email }})</option>
