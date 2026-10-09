@@ -72,32 +72,59 @@
             </div>
 
             <div class="border rounded-xl p-4 mb-4" style="border-color: var(--gz-border); background: var(--gz-surface);">
-                <span class="text-xs font-bold uppercase tracking-wider block mb-2" style="color: var(--gz-muted);">Allocated Courts</span>
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--gz-muted);">
+                        Allocated Courts ({{ $session->courts->count() }} {{ \Illuminate\Support\Str::plural('Court', $session->courts->count()) }})
+                    </span>
+                    <span class="text-[11px] font-semibold uppercase tracking-wider" style="color: var(--gz-muted);">
+                        Fee Breakdown
+                    </span>
+                </div>
                 <div class="divide-y text-xs" style="border-color: var(--gz-border);">
                     @foreach($session->courts as $court)
-                        <div class="py-2 flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold" style="color: var(--gz-ink);">{{ $court->court_name }}</span>
-                                <span class="text-[11px]" style="color: var(--gz-muted);">({{ ucfirst($court->court_type) }})</span>
+                        @php
+                            $courtSubtotal = round($court->price_per_hour * $session->duration_hours, 2);
+                        @endphp
+                        <div class="py-2.5 flex items-center justify-between">
+                            <div class="space-y-0.5">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-bold text-sm" style="color: var(--gz-ink);">{{ $court->court_name }}</span>
+                                    @if($court->court_type)
+                                        <span class="text-[10px] px-1.5 py-0.5 rounded font-semibold uppercase tracking-wider bg-black/5 dark:bg-white/10" style="color: var(--gz-muted);">
+                                            {{ ucfirst($court->court_type) }}
+                                        </span>
+                                    @endif
+                                </div>
+                                <div class="text-[11px]" style="color: var(--gz-muted);">
+                                    ₱{{ number_format($court->price_per_hour, 2) }}/hr × {{ $session->duration_hours }} hr(s)
+                                </div>
                             </div>
-                            <span class="font-mono" style="color: var(--gz-muted);">₱{{ number_format($court->price_per_hour, 2) }}/hr</span>
+                            <div class="text-right">
+                                <span class="font-mono font-bold text-sm" style="color: var(--gz-ink);">
+                                    ₱{{ number_format($courtSubtotal, 2) }}
+                                </span>
+                            </div>
                         </div>
                     @endforeach
                 </div>
             </div>
 
             {{-- Fee Computation --}}
-            <div class="p-4 rounded-xl border text-xs" style="background: var(--gz-bg); border-color: var(--gz-border);">
-                <div class="flex items-center justify-between mb-1" style="color: var(--gz-muted);">
+            <div class="p-4 rounded-xl border text-xs space-y-1.5" style="background: var(--gz-bg); border-color: var(--gz-border);">
+                <div class="flex items-center justify-between" style="color: var(--gz-muted);">
                     <span>Number of Reserved Courts:</span>
                     <span class="font-semibold">{{ $session->courts->count() }} court(s)</span>
                 </div>
-                <div class="flex items-center justify-between mb-1" style="color: var(--gz-muted);">
+                <div class="flex items-center justify-between" style="color: var(--gz-muted);">
+                    <span>Combined Hourly Rate:</span>
+                    <span class="font-mono font-semibold">₱{{ number_format($session->courts->sum('price_per_hour'), 2) }}/hr</span>
+                </div>
+                <div class="flex items-center justify-between" style="color: var(--gz-muted);">
                     <span>Session Duration:</span>
                     <span class="font-semibold">{{ $session->duration_hours }} hour(s)</span>
                 </div>
                 <div class="border-t my-2" style="border-color: var(--gz-border);"></div>
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between pt-1">
                     <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--gz-ink);">Total Court Appointment Fee:</span>
                     <span class="gz-font-display text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">
                         ₱{{ number_format($session->court_fee, 2) }}

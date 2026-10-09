@@ -143,6 +143,8 @@ class OpenPlayHostController extends Controller
                 'date' => Carbon::parse($session->date)->format('D, M j, Y'),
                 'time' => Carbon::parse($session->start_time)->format('g:i A') . ' – ' . Carbon::parse($session->end_time)->format('g:i A'),
                 'courts' => $selectedCourts->pluck('court_name')->join(', '),
+                'courts_count' => $selectedCourts->count(),
+                'courts_breakdown' => $selectedCourts->map(fn ($c) => "{$c->court_name} (₱" . number_format($c->price_per_hour, 2) . "/hr)")->join(', '),
                 'court_fee' => (float) $session->court_fee,
                 'max_capacity' => (int) $session->max_capacity,
                 'price_per_slot' => (float) $session->price_per_slot,
@@ -210,22 +212,55 @@ class OpenPlayHostController extends Controller
         // Online PayMongo Checkout
         if ($payMongoService->isConfigured() && $session->court_fee > 0) {
             $formattedDate = $session->date->format('M d, Y');
-            $lineItems = [
-                [
-                    'name' => "Court Appointment Fee: {$session->title}",
-                    'description' => "{$formattedDate} | {$session->time_window} | {$session->courts->count()} court(s)",
-                    'amount' => (int) round($session->court_fee * 100),
+            $durationHours = (float) $session->duration_hours;
+            $courts = $session->courts;
+            $courtCount = $courts->count();
+            $totalCentavos = (int) round($session->court_fee * 100);
+            $runningCentavos = 0;
+            $lineItems = [];
+
+            foreach ($courts as $index => $court) {
+                $courtHourly = (float) $court->price_per_hour;
+                $courtTypeName = $court->court_type ? ' (' . ucfirst($court->court_type) . ')' : '';
+
+                if ($index === $courtCount - 1) {
+                    $itemCentavos = $totalCentavos - $runningCentavos;
+                } else {
+                    $itemCentavos = (int) round($courtHourly * $durationHours * 100);
+                    $runningCentavos += $itemCentavos;
+                }
+
+                $lineItems[] = [
+                    'name' => "{$court->court_name}{$courtTypeName} – {$session->title}",
+                    'description' => "Court Hire: {$court->court_name} | {$durationHours} hr(s) @ ₱" . number_format($courtHourly, 2) . "/hr | {$formattedDate} ({$session->time_window})",
+                    'amount' => $itemCentavos,
                     'currency' => 'PHP',
                     'quantity' => 1,
-                ]
-            ];
+                ];
+            }
+
+            if (empty($lineItems)) {
+                $lineItems[] = [
+                    'name' => "Court Appointment Fee: {$session->title}",
+                    'description' => "{$formattedDate} | {$session->time_window} | {$courtCount} court(s)",
+                    'amount' => $totalCentavos,
+                    'currency' => 'PHP',
+                    'quantity' => 1,
+                ];
+            }
+
+            $courtSummaryList = $courts->map(function ($c) use ($durationHours) {
+                return "{$c->court_name} (₱" . number_format($c->price_per_hour, 2) . "/hr x {$durationHours}h = ₱" . number_format($c->price_per_hour * $durationHours, 2) . ")";
+            })->join(', ');
+
+            $checkoutDescription = "KYMNET Court Appointment: {$session->title} [{$courtCount} court" . ($courtCount > 1 ? 's' : '') . ": {$courtSummaryList}]";
 
             $successUrl = route('open-play.host.paymongo.success') . '?session_id={CHECKOUT_SESSION_ID}&open_play_id=' . $session->id;
             $cancelUrl = route('open-play.host.paymongo.cancel') . '?session_id={CHECKOUT_SESSION_ID}&open_play_id=' . $session->id;
 
             try {
                 $checkout = $payMongoService->createCheckoutSession($lineItems, [
-                    'description' => "KYMNET Court Appointment: {$session->title}",
+                    'description' => $checkoutDescription,
                     'reference_number' => "HOST-{$session->id}",
                     'success_url' => $successUrl,
                     'cancel_url' => $cancelUrl,

@@ -114,8 +114,8 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                                         </svg>
                                         <div>
-                                            <span class="block text-[10px] uppercase font-semibold" style="color: var(--gz-muted);">Courts</span>
-                                            <span class="font-medium">{{ $submitted['courts'] ?? 'Assigned Courts' }}</span>
+                                            <span class="block text-[10px] uppercase font-semibold" style="color: var(--gz-muted);">Courts ({{ $submitted['courts_count'] ?? 1 }} {{ \Illuminate\Support\Str::plural('Court', $submitted['courts_count'] ?? 1) }})</span>
+                                            <span class="font-medium">{{ $submitted['courts_breakdown'] ?? ($submitted['courts'] ?? 'Assigned Courts') }}</span>
                                         </div>
                                     </div>
 

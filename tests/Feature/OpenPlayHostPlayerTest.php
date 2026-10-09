@@ -3,6 +3,8 @@
 use App\Models\Court;
 use App\Models\OpenPlaySession;
 use App\Models\User;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
 
 beforeEach(function () {
     $this->court1 = Court::create([
@@ -243,4 +245,76 @@ test('another player cannot process payment for a session they did not host', fu
     $this->actingAs($otherPlayer)->post(route('open-play.host.pay.process', $session), [
         'payment_method' => 'cash',
     ])->assertForbidden();
+});
+
+test('host player payment breakdown shows individual courts and creates detailed paymongo checkout line items', function () {
+    Config::set('services.paymongo.secret_key', 'sk_test_fake_secret_key');
+    Config::set('services.paymongo.public_key', 'pk_test_fake_public_key');
+
+    $player = User::factory()->create(['role' => 'player']);
+
+    $session = OpenPlaySession::create([
+        'title' => 'Alpha and Beta Social Play',
+        'session_type' => 'open_play',
+        'date' => today()->addDays(3)->toDateString(),
+        'start_time' => '18:00',
+        'end_time' => '20:00',
+        'max_capacity' => 12,
+        'skill_level' => 'All Levels',
+        'price_per_slot' => 150.00,
+        // Alpha (300/hr) + Beta (200/hr) = 500/hr * 2 hrs = 1000.00
+        'court_fee' => 1000.00,
+        'session_status' => 'approved_pending_payment',
+        'host_payment_status' => 'unpaid',
+        'created_by' => $player->id,
+    ]);
+    $session->courts()->sync([$this->court1->id, $this->court2->id]);
+
+    // Check payment page displays detailed court breakdown and prices
+    $viewResponse = $this->actingAs($player)->get(route('open-play.host.pay.show', $session));
+    $viewResponse->assertOk();
+    $viewResponse->assertSee('Allocated Courts (2 Courts)');
+    $viewResponse->assertSee('Court Alpha');
+    $viewResponse->assertSee('₱300.00/hr × 2 hr(s)');
+    $viewResponse->assertSee('₱600.00');
+    $viewResponse->assertSee('Court Beta');
+    $viewResponse->assertSee('₱200.00/hr × 2 hr(s)');
+    $viewResponse->assertSee('₱400.00');
+    $viewResponse->assertSee('₱1,000.00');
+
+    Http::fake([
+        'https://api.paymongo.com/v1/checkout_sessions' => Http::response([
+            'data' => [
+                'id' => 'cs_test_host_session_xyz789',
+                'type' => 'checkout_session',
+                'attributes' => [
+                    'checkout_url' => 'https://checkout.paymongo.com/cs_test_host_session_xyz789',
+                    'status' => 'active',
+                ],
+            ],
+        ], 200),
+    ]);
+
+    $response = $this->actingAs($player)->post(route('open-play.host.pay.process', $session), [
+        'payment_method' => 'paymongo',
+    ]);
+
+    $response->assertRedirect('https://checkout.paymongo.com/cs_test_host_session_xyz789');
+
+    Http::assertSent(function ($request) {
+        $payload = $request->data();
+        $lineItems = $payload['data']['attributes']['line_items'] ?? [];
+        $description = $payload['data']['attributes']['description'] ?? '';
+
+        expect($lineItems)->toHaveCount(2);
+        expect($lineItems[0]['name'])->toContain('Court Alpha');
+        expect($lineItems[0]['amount'])->toBe(60000); // ₱600.00
+        expect($lineItems[1]['name'])->toContain('Court Beta');
+        expect($lineItems[1]['amount'])->toBe(40000); // ₱400.00
+        expect($description)->toContain('2 courts');
+        expect($description)->toContain('Court Alpha');
+        expect($description)->toContain('Court Beta');
+
+        return true;
+    });
 });
