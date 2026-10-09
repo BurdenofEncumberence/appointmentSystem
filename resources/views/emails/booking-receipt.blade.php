@@ -167,8 +167,8 @@
         .btn-view {
             display: inline-block;
             background: #3ECF7E;
-            color: #12150F;
-            text-decoration: none;
+            color: #ffffff !important;
+            text-decoration: none !important;
             font-weight: 700;
             font-size: 14px;
             padding: 12px 24px;
@@ -176,6 +176,14 @@
             border: 2px solid #12150F;
             box-shadow: 2px 3px 0px #12150F;
             margin: 10px 0 20px 0;
+        }
+        .btn-view,
+        .btn-view:link,
+        .btn-view:visited,
+        .btn-view:hover,
+        .btn-view:active {
+            color: #ffffff !important;
+            text-decoration: none !important;
         }
     </style>
 </head>
@@ -281,7 +289,7 @@
         </div>
 
         <div style="text-align: center;">
-            <a href="{{ route('bookings.index') }}" class="btn-view">View My Bookings Online →</a>
+            <a href="{{ route('bookings.index') }}" class="btn-view" style="display: inline-block; background-color: #3ECF7E; color: #ffffff !important; text-decoration: none !important; font-weight: 700; font-size: 14px; padding: 12px 24px; border-radius: 999px; border: 2px solid #12150F; box-shadow: 2px 3px 0px #12150F; margin: 10px 0 20px 0;"><span style="color: #ffffff !important; text-decoration: none !important;">View My Bookings Online &rarr;</span></a>
         </div>
 
         <!-- Footer -->
