@@ -114,7 +114,7 @@
 
                     <div class="flex items-center gap-2">
                         <a
-                            :href="receipt ? `/bookings/${receipt.booking_id}/receipt` : '#'"
+                            :href="receipt ? `/bookings/${receipt.booking_id}/receipt?autoprint=1` : '#'"
                             target="_blank"
                             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#E5A823] text-[#12150F] border border-[#12150F] shadow-[2px_2px_0_#12150F] hover:bg-[#D49B1F] transition"
                             title="Open standalone printable receipt"
@@ -235,10 +235,29 @@
                             <span class="font-mono text-lg text-[#12150F]" x-text="'₱' + formatMoney(receipt?.total_amount)"></span>
                         </div>
 
+                        <template x-if="receipt && receipt.cash_tendered !== null">
+                            <div class="pt-2 border-t border-dashed border-[#12150F]/20 space-y-1">
+                                <div class="flex items-center justify-between text-[#565A4E]">
+                                    <span>Cash Tendered</span>
+                                    <span class="font-mono font-bold text-[#12150F]" x-text="'₱' + formatMoney(receipt.cash_tendered)"></span>
+                                </div>
+                                <div class="flex items-center justify-between font-bold text-emerald-900 bg-emerald-50 px-2 py-1 rounded border border-emerald-200">
+                                    <span>Change Returned</span>
+                                    <span class="font-mono font-extrabold text-sm" x-text="'₱' + formatMoney(receipt.change_amount || 0)"></span>
+                                </div>
+                            </div>
+                        </template>
+
                         <div class="flex items-center justify-between text-[11px] text-[#7A7E73] pt-1">
                             <span>Payment Status</span>
                             <span class="font-bold uppercase tracking-wider" :class="receipt?.payment_status === 'paid' ? 'text-emerald-700' : 'text-amber-700'" x-text="receipt?.payment_status"></span>
                         </div>
+                    </div>
+
+                    <!-- Non-Refundable Notice -->
+                    <div class="p-2.5 rounded-lg border border-dashed border-[#12150F]/20 bg-[#12150F]/[0.02] text-center text-[10px]">
+                        <span class="font-bold text-[#12150F] block">NON-REFUNDABLE TRANSACTION</span>
+                        <span class="text-[#7A7E73]">Court reservations are final. No refunds on cancellations or no-shows.</span>
                     </div>
 
                     <!-- Footer Note -->

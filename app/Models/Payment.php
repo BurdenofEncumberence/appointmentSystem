@@ -14,11 +14,19 @@ class Payment extends Model
         'payment_method',
         'payment_status',
         'amount',
+        'cash_tendered',
+        'change_amount',
         'ref_num',
         'checkout_session_id',
         'paymongo_payment_id',
         'time',
         'date',
+    ];
+
+    protected $casts = [
+        'amount' => 'decimal:2',
+        'cash_tendered' => 'decimal:2',
+        'change_amount' => 'decimal:2',
     ];
 
     public function booking()

@@ -46,6 +46,7 @@
                 middleName: @json(old('middle_name', '')),
                 lastName: @json(old('last_name', '')),
                 email: @json(old('email', '')),
+                cashTendered: @json(old('cash_tendered', '')),
 
                 courts: @json($courts),
                 bookedSlots: @json($bookedSlots),
@@ -58,6 +59,35 @@
 
                 get courtRate() {
                     return this.currentCourt ? Number(this.currentCourt.price_per_hour) : 0;
+                },
+
+                get cashTenderedNum() {
+                    const parsed = parseFloat(this.cashTendered);
+                    return isNaN(parsed) ? 0 : parsed;
+                },
+
+                get changeDue() {
+                    if (this.selectedPaymentMethod !== 'cash') return 0;
+                    return Math.max(0, this.cashTenderedNum - this.courtRate);
+                },
+
+                get isCashValid() {
+                    if (this.selectedPaymentMethod !== 'cash') return true;
+                    if (this.cashTendered === '' || this.cashTendered === null) return false;
+                    return this.cashTenderedNum >= this.courtRate;
+                },
+
+                get cashShortage() {
+                    if (this.selectedPaymentMethod !== 'cash') return 0;
+                    return Math.max(0, this.courtRate - this.cashTenderedNum);
+                },
+
+                setExactCash() {
+                    this.cashTendered = this.courtRate > 0 ? this.courtRate.toFixed(2) : '0.00';
+                },
+
+                setCashAmount(val) {
+                    this.cashTendered = Number(val).toFixed(2);
                 },
 
                 getSpecialSlot(slot) {
@@ -348,10 +378,99 @@
                                     <span class="text-[10px] block mt-0.5" style="color: var(--gz-muted);">Physical cash collected and verified at the counter</span>
                                 </div>
                             </label>
+
+                            {{-- Cash Tendered & Change Calculator (Active when Cash is selected) --}}
+                            <div x-show="selectedPaymentMethod === 'cash'" x-transition class="p-3.5 border rounded-lg space-y-3" style="background: rgba(229,168,35,0.05); border-color: var(--gz-pop-dark);">
+                                <div class="flex items-center justify-between">
+                                    <label for="cash_tendered" class="gz-label text-xs font-bold mb-0">
+                                        Amount Paid by Customer <span class="text-red-600">*</span>
+                                    </label>
+                                    <button
+                                        type="button"
+                                        @click="setExactCash()"
+                                        class="text-[11px] font-bold underline cursor-pointer"
+                                        style="color: var(--gz-pop-dark);"
+                                    >
+                                        Exact Amount
+                                    </button>
+                                </div>
+
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none font-bold text-sm text-[color:var(--gz-muted)]">₱</span>
+                                    <input
+                                        id="cash_tendered"
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        name="cash_tendered"
+                                        x-model="cashTendered"
+                                        :required="selectedPaymentMethod === 'cash'"
+                                        class="gz-input pl-8 font-mono font-bold text-base"
+                                        placeholder="0.00"
+                                        autocomplete="off"
+                                    >
+                                </div>
+
+                                {{-- Denomination shortcut buttons --}}
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span class="text-[10px] uppercase font-bold" style="color: var(--gz-muted);">Presets:</span>
+                                    <button type="button" @click="setExactCash()" class="px-2 py-0.5 text-xs font-semibold rounded border bg-white hover:bg-black/5" style="border-color: var(--gz-border);">
+                                        Exact (₱<span x-text="courtRate.toFixed(2)"></span>)
+                                    </button>
+                                    <button type="button" @click="setCashAmount(500)" class="px-2 py-0.5 text-xs font-semibold rounded border bg-white hover:bg-black/5" style="border-color: var(--gz-border);">
+                                        ₱500
+                                    </button>
+                                    <button type="button" @click="setCashAmount(1000)" class="px-2 py-0.5 text-xs font-semibold rounded border bg-white hover:bg-black/5" style="border-color: var(--gz-border);">
+                                        ₱1,000
+                                    </button>
+                                    <button type="button" @click="setCashAmount(1500)" class="px-2 py-0.5 text-xs font-semibold rounded border bg-white hover:bg-black/5" style="border-color: var(--gz-border);">
+                                        ₱1,500
+                                    </button>
+                                    <button type="button" @click="setCashAmount(2000)" class="px-2 py-0.5 text-xs font-semibold rounded border bg-white hover:bg-black/5" style="border-color: var(--gz-border);">
+                                        ₱2,000
+                                    </button>
+                                </div>
+
+                                {{-- Real-time Change / Shortage Output --}}
+                                <div class="p-2.5 rounded border text-xs"
+                                     :class="{
+                                        'bg-emerald-50 border-emerald-300 text-emerald-900': isCashValid && cashTendered !== '',
+                                        'bg-red-50 border-red-300 text-red-800': !isCashValid && cashTendered !== '',
+                                        'bg-white border-dashed text-[color:var(--gz-muted)]': cashTendered === ''
+                                     }"
+                                     style="border-color: var(--gz-border);">
+                                    <template x-if="cashTendered === ''">
+                                        <div class="flex items-center justify-between">
+                                            <span>Change to return:</span>
+                                            <span class="font-mono font-bold">₱0.00</span>
+                                        </div>
+                                    </template>
+                                    <template x-if="isCashValid && cashTendered !== ''">
+                                        <div class="flex items-center justify-between">
+                                            <span class="font-bold flex items-center gap-1.5">
+                                                <span class="inline-block w-2 h-2 rounded-full bg-emerald-600"></span>
+                                                Customer Change:
+                                            </span>
+                                            <span class="font-mono font-extrabold text-base text-emerald-800" x-text="'₱' + changeDue.toFixed(2)"></span>
+                                        </div>
+                                    </template>
+                                    <template x-if="!isCashValid && cashTendered !== ''">
+                                        <div class="flex items-center justify-between">
+                                            <span class="font-bold flex items-center gap-1.5">
+                                                <span class="inline-block w-2 h-2 rounded-full bg-red-600"></span>
+                                                Insufficient cash:
+                                            </span>
+                                            <span class="font-mono font-bold text-red-700" x-text="'Short ₱' + cashShortage.toFixed(2)"></span>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                @error('cash_tendered')
+                                    <p class="gz-error text-xs" role="alert">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
                     </div>
-
-
 
                     {{-- Arrival / Attendance Status --}}
                     <div class="mb-6">
@@ -377,9 +496,9 @@
                     {{-- Submit Button --}}
                     <button
                         type="submit"
-                        :disabled="!selectedSlot"
+                        :disabled="!selectedSlot || (selectedPaymentMethod === 'cash' && !isCashValid)"
                         class="gz-btn-primary w-full py-3 text-sm justify-center flex items-center gap-2"
-                        :class="{'opacity-50 cursor-not-allowed': !selectedSlot}"
+                        :class="{'opacity-50 cursor-not-allowed': !selectedSlot || (selectedPaymentMethod === 'cash' && !isCashValid)}"
                     >
                         <template x-if="selectedPaymentMethod === 'paymongo'">
                             <span>Pay Online via PayMongo (<span x-text="'₱' + courtRate.toFixed(2)"></span>) →</span>
@@ -390,6 +509,9 @@
                     </button>
                     <p x-show="!selectedSlot" class="text-xs text-center mt-2 text-red-600 font-semibold">
                         Please choose an open time slot above.
+                    </p>
+                    <p x-show="selectedSlot && selectedPaymentMethod === 'cash' && !isCashValid" class="text-xs text-center mt-2 text-red-600 font-semibold">
+                        Please input customer cash tendered (minimum ₱<span x-text="courtRate.toFixed(2)"></span>).
                     </p>
                 </div>
 

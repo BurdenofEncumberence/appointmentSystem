@@ -193,8 +193,31 @@
                     <span>Total Amount Paid</span>
                     <span class="font-mono text-lg text-[#12150F]">₱{{ number_format($receipt['total_amount'], 2) }}</span>
                 </div>
+
+                @if($receipt['cash_tendered'] !== null)
+                    <div class="pt-2 border-t border-dashed border-[#12150F]/20 space-y-1.5">
+                        <div class="flex items-center justify-between text-[#565A4E]">
+                            <span>Cash Tendered</span>
+                            <span class="font-mono font-bold text-[#12150F]">₱{{ number_format($receipt['cash_tendered'], 2) }}</span>
+                        </div>
+                        <div class="flex items-center justify-between font-bold text-emerald-900 bg-emerald-50 px-2 py-1.5 rounded border border-emerald-200">
+                            <span>Change Given</span>
+                            <span class="font-mono font-extrabold text-sm">₱{{ number_format($receipt['change_amount'] ?? 0, 2) }}</span>
+                        </div>
+                    </div>
+                @endif
             </div>
         </section>
+
+        <!-- Non-Refundable Notice Banner -->
+        <div class="mb-6 p-3 rounded-xl border border-dashed border-[#12150F]/30 bg-[#12150F]/[0.02] text-center text-[11px]">
+            <span class="font-black tracking-wider uppercase text-[#12150F] block">
+                Non-Refundable Transaction · All Court Bookings Are Final
+            </span>
+            <span class="text-[#565A4E] text-[10px]">
+                Please review court schedule and times carefully. Cancellations and no-shows are not eligible for cash or digital refunds.
+            </span>
+        </div>
 
         <!-- Terms & Verification Badge -->
         <footer class="pt-4 border-t border-[#12150F]/15 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-[#7A7E73]">
@@ -209,7 +232,7 @@
                     <svg class="w-3.5 h-3.5 text-[#A67512]" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                     </svg>
-                    <span>VERIFIED DIGITAL RECEIPT</span>
+                    <span>VERIFIED OFFICIAL RECEIPT</span>
                 </div>
                 <div class="text-[9px] text-[#7A7E73] mt-1 font-mono">
                     {{ $receipt['system_name'] }} · SECURE TRANSACTION
@@ -218,6 +241,16 @@
         </footer>
 
     </main>
+
+    @if(request()->boolean('autoprint') || request()->boolean('print'))
+        <script>
+            window.addEventListener('DOMContentLoaded', () => {
+                setTimeout(() => {
+                    window.print();
+                }, 300);
+            });
+        </script>
+    @endif
 
 </body>
 </html>

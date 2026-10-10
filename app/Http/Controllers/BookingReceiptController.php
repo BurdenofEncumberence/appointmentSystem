@@ -112,6 +112,8 @@ class BookingReceiptController extends Controller
             'overall_status' => $booking->booking_status,
             'payment_method' => $methodLabel,
             'payment_status' => $paymentStatus,
+            'cash_tendered' => $firstPayment?->cash_tendered !== null ? (float) $firstPayment->cash_tendered : null,
+            'change_amount' => $firstPayment?->change_amount !== null ? (float) $firstPayment->change_amount : null,
             'items' => $items,
             'subtotal' => $subtotal,
             'discount_percent' => $discountPercent,

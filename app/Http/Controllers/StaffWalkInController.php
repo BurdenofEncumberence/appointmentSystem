@@ -124,6 +124,7 @@ class StaffWalkInController extends Controller
             'court_id' => ['required', 'integer', 'exists:courts,id'],
             'time_slot' => ['required', 'string'],
             'payment_method' => ['required', 'in:cash,paymongo,gcash,maya,card,counter'],
+            'cash_tendered' => ['nullable', 'numeric', 'min:0'],
             'attendance_status' => ['required', 'in:show,confirmed'],
             'ref_num' => ['nullable', 'string', 'max:100'],
         ]);
@@ -193,6 +194,23 @@ class StaffWalkInController extends Controller
         $end = Carbon::parse($endTime);
         $hours = max(1, $start->diffInMinutes($end) / 60);
         $amount = round($court->price_per_hour * $hours, 2);
+
+        $cashTendered = null;
+        $changeAmount = null;
+
+        if ($validated['payment_method'] === 'cash') {
+            if (isset($validated['cash_tendered']) && $validated['cash_tendered'] !== '' && $validated['cash_tendered'] !== null) {
+                $cashTendered = round((float) $validated['cash_tendered'], 2);
+                if ($cashTendered < $amount) {
+                    return back()->withInput()->withErrors([
+                        'cash_tendered' => 'Cash tendered (₱' . number_format($cashTendered, 2) . ') must be at least the total amount due (₱' . number_format($amount, 2) . ').',
+                    ]);
+                }
+            } else {
+                $cashTendered = $amount;
+            }
+            $changeAmount = round(max(0, $cashTendered - $amount), 2);
+        }
 
         // PayMongo Online Gateway handling
         if ($validated['payment_method'] === 'paymongo') {
@@ -298,6 +316,8 @@ class StaffWalkInController extends Controller
             $startTime,
             $endTime,
             $amount,
+            $cashTendered,
+            $changeAmount,
             $paymentRef,
             &$createdBooking
         ) {
@@ -317,6 +337,8 @@ class StaffWalkInController extends Controller
                 'payment_method' => $validated['payment_method'],
                 'payment_status' => 'paid',
                 'amount' => $amount,
+                'cash_tendered' => $cashTendered,
+                'change_amount' => $changeAmount,
                 'ref_num' => $paymentRef,
                 'date' => now()->toDateString(),
                 'time' => now()->format('H:i:s'),
@@ -342,11 +364,24 @@ class StaffWalkInController extends Controller
 
         $methodLabel = strtoupper($validated['payment_method']);
         $statusText = $validated['attendance_status'] === 'show' ? 'SHOW (Present)' : 'SCHEDULED';
+        $statusMessage = "Walk-in booking confirmed for {$fullName} at {$court->court_name} ({$validated['time_slot']}). Attendance: {$statusText}. Payment: ₱" . number_format($amount, 2) . " via {$methodLabel} [{$paymentRef}].";
 
-        return redirect()->route('staff.today')->with(
-            'status',
-            "Walk-in booking confirmed for {$fullName} at {$court->court_name} ({$validated['time_slot']}). Attendance: {$statusText}. Payment: ₱" . number_format($amount, 2) . " via {$methodLabel} [{$paymentRef}]."
-        );
+        if ($validated['payment_method'] === 'cash') {
+            $statusMessage .= " Tendered: ₱" . number_format($cashTendered, 2) . " · Change: ₱" . number_format($changeAmount, 2) . ".";
+        }
+
+        return redirect()->route('staff.today')->with([
+            'status' => $statusMessage,
+            'print_receipt_booking_id' => $createdBooking->id,
+            'print_receipt_ref' => $paymentRef,
+            'receipt_customer_name' => $fullName,
+            'receipt_court_name' => $court->court_name,
+            'receipt_time_slot' => $validated['time_slot'],
+            'receipt_amount' => $amount,
+            'receipt_payment_method' => $validated['payment_method'],
+            'receipt_cash_tendered' => $cashTendered,
+            'receipt_change_amount' => $changeAmount,
+        ]);
     }
 
     /**
@@ -439,10 +474,16 @@ class StaffWalkInController extends Controller
             $methodLabel = strtoupper(str_replace('_', ' ', $sourceType));
             $statusText = $booking && $booking->booking_status === 'show' ? 'SHOW (Present)' : 'SCHEDULED';
 
-            return redirect()->route('staff.today')->with(
-                'status',
-                "Walk-in booking confirmed via PayMongo ({$methodLabel}) for {$booking?->user?->name}! Attendance: {$statusText}. Ref: {$payment->ref_num}."
-            );
+            return redirect()->route('staff.today')->with([
+                'status' => "Walk-in booking confirmed via PayMongo ({$methodLabel}) for {$booking?->user?->name}! Attendance: {$statusText}. Ref: {$payment->ref_num}.",
+                'print_receipt_booking_id' => $booking?->id,
+                'print_receipt_ref' => $payment->ref_num,
+                'receipt_customer_name' => $booking?->user?->name,
+                'receipt_court_name' => $booking?->court?->court_name,
+                'receipt_time_slot' => $booking ? (Carbon::parse($booking->start_time)->format('g:i A') . ' - ' . Carbon::parse($booking->end_time)->format('g:i A')) : null,
+                'receipt_amount' => $payment->amount,
+                'receipt_payment_method' => 'paymongo',
+            ]);
         }
 
         return redirect()->route('staff.today')->with(

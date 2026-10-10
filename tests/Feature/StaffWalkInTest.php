@@ -344,3 +344,77 @@ test('staff walk-in paymongo cancel callback releases pending booking slot', fun
     expect($booking->booking_status)->toBe('cancelled');
     expect($payment->payment_status)->toBe('failed');
 });
+
+test('staff walk-in with cash tenders more than amount due and records change correctly with receipt print prompt', function () {
+    $staff = User::factory()->create(['role' => 'staff']);
+    $court = Court::create([
+        'court_name' => 'Court A',
+        'price_per_hour' => 400,
+        'court_status' => 'available',
+    ]);
+
+    $response = $this->actingAs($staff)->post(route('staff.walkin.store'), [
+        'first_name' => 'Maria',
+        'last_name' => 'Santos',
+        'date' => today()->toDateString(),
+        'court_id' => $court->id,
+        'time_slot' => '9:00 AM - 10:00 AM',
+        'payment_method' => 'cash',
+        'cash_tendered' => '1000.00',
+        'attendance_status' => 'show',
+    ]);
+
+    $response->assertRedirect(route('staff.today'));
+    $response->assertSessionHas('print_receipt_booking_id');
+    $response->assertSessionHas('receipt_cash_tendered', 1000.00);
+    $response->assertSessionHas('receipt_change_amount', 600.00);
+
+    $booking = Booking::where('court_id', $court->id)->latest()->first();
+    $payment = Payment::where('booking_id', $booking->id)->first();
+
+    expect((float) $payment->amount)->toBe(400.00);
+    expect((float) $payment->cash_tendered)->toBe(1000.00);
+    expect((float) $payment->change_amount)->toBe(600.00);
+
+    // Verify receipt page shows cash breakdown and non-refundable badge
+    $receiptResponse = $this->actingAs($staff)->get(route('bookings.receipt', ['booking' => $booking->id]));
+    $receiptResponse->assertOk();
+    $receiptResponse->assertSee('1,000.00');
+    $receiptResponse->assertSee('600.00');
+    $receiptResponse->assertSee('Non-Refundable Transaction');
+
+    // Verify receipt JSON endpoint returns cash tendered and change
+    $jsonResponse = $this->actingAs($staff)->getJson(route('bookings.receipt', ['booking' => $booking->id]));
+    $jsonResponse->assertOk();
+    $jsonResponse->assertJsonPath('cash_tendered', 1000);
+    $jsonResponse->assertJsonPath('change_amount', 600);
+});
+
+test('staff walk-in with cash tenders less than amount due fails validation', function () {
+    $staff = User::factory()->create(['role' => 'staff']);
+    $court = Court::create([
+        'court_name' => 'Court B',
+        'price_per_hour' => 500,
+        'court_status' => 'available',
+    ]);
+
+    $response = $this->actingAs($staff)
+        ->from(route('staff.walkin.create'))
+        ->post(route('staff.walkin.store'), [
+            'first_name' => 'Pedro',
+            'last_name' => 'Penduko',
+            'date' => today()->toDateString(),
+            'court_id' => $court->id,
+            'time_slot' => '11:00 AM - 12:00 PM',
+            'payment_method' => 'cash',
+            'cash_tendered' => '300.00',
+            'attendance_status' => 'show',
+        ]);
+
+    $response->assertRedirect(route('staff.walkin.create'));
+    $response->assertSessionHasErrors(['cash_tendered']);
+
+    // Ensure no booking or payment was created
+    expect(Booking::where('court_id', $court->id)->count())->toBe(0);
+});
+

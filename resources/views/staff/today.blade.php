@@ -35,6 +35,70 @@
         </div>
     @endif
 
+    {{-- Recent Transaction / Receipt Prompt Card --}}
+    @if(session('print_receipt_booking_id'))
+        <div class="gz-panel mb-6 border-2 border-[#12150F] shadow-[4px_4px_0_#12150F] print:hidden" style="background: var(--gz-surface);">
+            <div class="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <span class="inline-block px-2.5 py-0.5 bg-[#12150F] text-[#E5A823] text-[10px] font-mono font-black uppercase tracking-wider rounded">
+                            Transaction Completed
+                        </span>
+                        <span class="font-mono font-bold text-xs" style="color: var(--gz-ink);">
+                            REF: #{{ session('print_receipt_ref') }}
+                        </span>
+                    </div>
+                    <h2 class="gz-font-display font-bold text-lg" style="color: var(--gz-ink);">
+                        Walk-in Confirmed: {{ session('receipt_customer_name') }}
+                    </h2>
+                    <div class="flex items-center gap-3 text-xs flex-wrap" style="color: var(--gz-muted);">
+                        @if(session('receipt_court_name'))
+                            <span>Court: <strong style="color: var(--gz-ink);">{{ session('receipt_court_name') }}</strong></span>
+                        @endif
+                        @if(session('receipt_time_slot'))
+                            <span>Slot: <strong style="color: var(--gz-ink);">{{ session('receipt_time_slot') }}</strong></span>
+                        @endif
+                        @if(session('receipt_amount') !== null)
+                            <span>Total: <strong class="font-mono" style="color: var(--gz-pop-dark);">₱{{ number_format(session('receipt_amount'), 2) }}</strong></span>
+                        @endif
+                        @if(session('receipt_cash_tendered') !== null)
+                            <span>Tendered: <strong class="font-mono" style="color: var(--gz-ink);">₱{{ number_format(session('receipt_cash_tendered'), 2) }}</strong></span>
+                            <span class="px-2 py-0.5 rounded font-bold bg-emerald-100 text-emerald-800">
+                                Change: ₱{{ number_format(session('receipt_change_amount') ?? 0, 2) }}
+                            </span>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2.5 flex-wrap shrink-0">
+                    <a
+                        href="{{ route('bookings.receipt', ['booking' => session('print_receipt_booking_id'), 'autoprint' => 1]) }}"
+                        target="_blank"
+                        class="gz-btn-primary gz-btn-sm inline-flex items-center gap-2 font-bold py-2 px-3 text-xs"
+                        title="Open receipt in printable window"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                        </svg>
+                        <span>Print Official Receipt</span>
+                    </a>
+
+                    <button
+                        type="button"
+                        @click="$dispatch('open-booking-receipt', {{ session('print_receipt_booking_id') }})"
+                        class="gz-btn-outline gz-btn-sm inline-flex items-center gap-1.5 py-2 px-3 text-xs"
+                    >
+                        <span>View Receipt Modal</span>
+                    </button>
+
+                    <a href="{{ route('staff.walkin.create') }}" class="gz-btn-outline gz-btn-sm py-2 px-3 text-xs">
+                        + Next Walk-In
+                    </a>
+                </div>
+            </div>
+        </div>
+    @endif
+
     {{-- 4 Attendance KPI Counter Ledgers --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 print:hidden">
         {{-- Total Scheduled --}}
@@ -265,13 +329,25 @@
                                             type="button"
                                             @click="$dispatch('open-booking-receipt', {{ $booking->id }})"
                                             class="gz-btn-outline gz-btn-sm inline-flex items-center gap-1 text-[11px] py-1 px-2"
-                                            title="View Official Receipt"
+                                            title="View Official Receipt Modal"
                                         >
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                             </svg>
                                             <span>Receipt</span>
                                         </button>
+
+                                        <a
+                                            href="{{ route('bookings.receipt', ['booking' => $booking->id, 'autoprint' => 1]) }}"
+                                            target="_blank"
+                                            class="gz-btn-outline gz-btn-sm inline-flex items-center gap-1 text-[11px] py-1 px-2"
+                                            title="Print Official Receipt"
+                                        >
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                                            </svg>
+                                            <span>Print</span>
+                                        </a>
 
                                         @if($isBookingToday && !$isShow)
                                             {{-- Mark as SHOW --}}
