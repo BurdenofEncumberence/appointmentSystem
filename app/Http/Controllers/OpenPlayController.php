@@ -48,11 +48,15 @@ class OpenPlayController extends Controller
         $sessions = $query->paginate(9)->withQueryString();
 
         // Skill level options for filtering
-        $availableSkills = OpenPlaySession::where('date', '>=', today())
+        $dbSkills = OpenPlaySession::where('date', '>=', today())
             ->whereIn('session_status', ['scheduled', 'ongoing'])
             ->pluck('skill_level')
+            ->filter()
             ->unique()
-            ->values();
+            ->values()
+            ->all();
+
+        $availableSkills = collect(array_unique(array_merge(OpenPlaySession::SKILL_LEVELS, $dbSkills)))->values();
 
         return view('open-play.index', [
             'sessions' => $sessions,

@@ -13,6 +13,17 @@ class OpenPlaySession extends Model
 {
     use HasFactory;
 
+    public const SKILL_LEVELS = [
+        'All Levels',
+        'Beginner (2.0 - 2.5)',
+        'Novice / Advanced Beginner (2.5 - 3.0)',
+        'Intermediate (3.0 - 3.5)',
+        'Advanced Intermediate (3.5 - 4.0)',
+        'Advanced (4.0 - 4.5)',
+        'Expert / Pro (4.5+)',
+        'Tournament Open',
+    ];
+
     protected $fillable = [
         'title',
         'session_type',

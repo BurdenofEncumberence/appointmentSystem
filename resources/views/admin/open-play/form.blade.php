@@ -247,23 +247,20 @@
                         <label for="skill_level" class="block text-xs font-bold uppercase tracking-wider mb-1" style="color: var(--gz-muted);">
                             Target Skill Level <span class="text-red-500">*</span>
                         </label>
-                        <input
-                            type="text"
-                            id="skill_level"
-                            name="skill_level"
-                            value="{{ old('skill_level', $session->skill_level ?? 'All Levels') }}"
-                            placeholder="e.g. Beginner 2.0-3.0, Intermediate 3.5+, All Levels"
-                            required
-                            class="gz-input w-full text-sm"
-                            list="skill_levels_list"
-                        >
-                        <datalist id="skill_levels_list">
-                            <option value="All Levels">
-                            <option value="Beginner (2.0 - 2.5)">
-                            <option value="Intermediate (3.0 - 3.5)">
-                            <option value="Advanced (4.0+)">
-                            <option value="Tournament Open">
-                        </datalist>
+                        <select id="skill_level" name="skill_level" required class="gz-select w-full text-sm">
+                            @php
+                                $currentSkill = old('skill_level', $session->skill_level ?? 'All Levels');
+                                $skillsList = \App\Models\OpenPlaySession::SKILL_LEVELS;
+                            @endphp
+                            @foreach($skillsList as $skill)
+                                <option value="{{ $skill }}" {{ $currentSkill === $skill ? 'selected' : '' }}>
+                                    {{ $skill }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <p class="text-[11px] mt-1" style="color: var(--gz-muted);">
+                            Expected player skill range for this session.
+                        </p>
                     </div>
 
                     <div>

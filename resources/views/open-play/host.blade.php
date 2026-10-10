@@ -280,14 +280,18 @@
 
                         <div>
                             <label for="skill_level" class="block text-xs font-bold uppercase tracking-wider mb-1" style="color: var(--gz-muted);">
-                                Skill Level <span class="text-red-500">*</span>
+                                Target Skill Level <span class="text-red-500">*</span>
                             </label>
                             <select id="skill_level" name="skill_level" required class="gz-select w-full text-sm">
-                                @php $currentSkill = old('skill_level', $session->skill_level ?? 'All Levels'); @endphp
-                                <option value="All Levels" {{ $currentSkill === 'All Levels' ? 'selected' : '' }}>All Levels</option>
-                                <option value="Beginner (1.0 - 2.5)" {{ $currentSkill === 'Beginner (1.0 - 2.5)' ? 'selected' : '' }}>Beginner (1.0 - 2.5)</option>
-                                <option value="Intermediate (3.0 - 3.5)" {{ $currentSkill === 'Intermediate (3.0 - 3.5)' ? 'selected' : '' }}>Intermediate (3.0 - 3.5)</option>
-                                <option value="Advanced (4.0+)" {{ $currentSkill === 'Advanced (4.0+)' ? 'selected' : '' }}>Advanced (4.0+)</option>
+                                @php
+                                    $currentSkill = old('skill_level', $session->skill_level ?? 'All Levels');
+                                    $skillsList = \App\Models\OpenPlaySession::SKILL_LEVELS;
+                                @endphp
+                                @foreach($skillsList as $skill)
+                                    <option value="{{ $skill }}" {{ $currentSkill === $skill ? 'selected' : '' }}>
+                                        {{ $skill }}
+                                    </option>
+                                @endforeach
                             </select>
                             <p class="text-[11px] mt-1" style="color: var(--gz-muted);">Expected player level range.</p>
                         </div>
