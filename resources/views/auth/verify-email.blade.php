@@ -1,4 +1,4 @@
-<x-guest-layout title="Verify Email — KYMNET" label="Verify email">
+<x-guest-layout title="Verify Email — Gaoshou Pickleball" label="Verify email">
     <h1 class="gz-font-display font-bold text-2xl mb-1">Check your inbox.</h1>
     <p class="gz-hint mb-6">
         Thanks for signing up! Before getting started, click the verification link we just emailed you. Didn't get it? We can send another.

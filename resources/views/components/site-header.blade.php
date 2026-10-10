@@ -7,7 +7,7 @@
     <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
         <a href="{{ url('/') }}" class="flex items-center gap-3">
             <div class="pixel-mark" id="site-header-mark" aria-hidden="true"></div>
-            <span class="gz-font-display font-bold text-lg">KYMNET</span>
+            <span class="gz-font-display font-bold text-lg">{{ \App\Models\SiteSettings::first()?->system_name ?? 'Gaoshou Pickleball' }}</span>
         </a>
 
         <nav class="hidden sm:flex items-center gap-8 text-sm font-semibold" style="color: var(--gz-muted);" aria-label="Primary">

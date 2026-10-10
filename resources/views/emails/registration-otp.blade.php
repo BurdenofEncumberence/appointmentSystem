@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KYMNET Verification Code</title>
+    <title>{{ \App\Models\SiteSettings::first()?->system_name ?? 'Gaoshou Pickleball' }} Verification Code</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -86,12 +86,12 @@
 <body>
     <div class="container">
         <div class="brand">
-            <span class="brand-badge">KYMNET</span>
+            <span class="brand-badge">{{ \App\Models\SiteSettings::first()?->system_name ?? 'Gaoshou Pickleball' }}</span>
         </div>
 
         <h1>Verify your email address</h1>
         <p>Hi {{ $userName }},</p>
-        <p>Thanks for joining KYMNET! To complete your court account registration, please enter the 6-digit verification code below:</p>
+        <p>Thanks for joining {{ \App\Models\SiteSettings::first()?->system_name ?? 'Gaoshou Pickleball' }}! To complete your court account registration, please enter the 6-digit verification code below:</p>
 
         <div class="otp-box">
             <div class="otp-code">{{ $otp }}</div>
@@ -101,7 +101,7 @@
         <p>If you did not request this registration, please ignore this email. No account will be created without this verification code.</p>
 
         <div class="footer">
-            &copy; {{ date('Y') }} KYMNET &middot; Davao Pickleball Arena & Court Booking
+            &copy; {{ date('Y') }} {{ \App\Models\SiteSettings::first()?->system_name ?? 'Gaoshou Pickleball' }} &middot; Davao Pickleball Arena & Court Booking
         </div>
     </div>
 </body>

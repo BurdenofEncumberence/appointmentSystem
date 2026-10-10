@@ -1,4 +1,4 @@
-<x-guest-layout title="Terms and Conditions — KYMNET" label="Terms & Conditions" card-class="max-w-[760px]">
+<x-guest-layout title="Terms and Conditions — Gaoshou Pickleball" label="Terms & Conditions" card-class="max-w-[760px]">
     <div class="mb-6">
         @auth
             <a href="{{ url('/') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 hover:text-emerald-700 mb-3">
@@ -10,14 +10,14 @@
             </a>
         @endauth
         <h1 class="gz-font-display font-bold text-2xl md:text-3xl text-stone-900 mb-1">Terms and Conditions</h1>
-        <p class="gz-hint text-sm">Last updated: {{ date('F Y') }} · KYMNET Court Booking System</p>
+        <p class="gz-hint text-sm">Last updated: {{ date('F Y') }} · Gaoshou Pickleball Court Booking System</p>
     </div>
 
     <div class="space-y-6 text-sm text-stone-700 leading-relaxed max-h-[500px] overflow-y-auto pr-2 border-y border-stone-200 py-4">
         <section>
             <h2 class="font-bold text-base text-stone-900 mb-2">1. Acceptance of Agreement</h2>
             <p>
-                By creating an account, reserving court slots, or utilizing any services provided by KYMNET ("the Platform", "we", "us"), you agree to be legally bound by these Terms and Conditions. If you do not agree to these terms, you may not register or utilize our court facilities.
+                By creating an account, reserving court slots, or utilizing any services provided by Gaoshou Pickleball ("the Platform", "we", "us"), you agree to be legally bound by these Terms and Conditions. If you do not agree to these terms, you may not register or utilize our court facilities.
             </p>
         </section>
 
@@ -52,14 +52,14 @@
         <section>
             <h2 class="font-bold text-base text-stone-900 mb-2">6. Limitation of Liability</h2>
             <p>
-                Participation in racquet sports carries inherent physical risk. KYMNET and its affiliates are not liable for any personal injury, illness, loss, or property damage sustained while using our court premises, except where required by applicable Philippine law.
+                Participation in racquet sports carries inherent physical risk. Gaoshou Pickleball and its affiliates are not liable for any personal injury, illness, loss, or property damage sustained while using our court premises, except where required by applicable Philippine law.
             </p>
         </section>
 
         <section>
             <h2 class="font-bold text-base text-stone-900 mb-2">7. Changes to Terms</h2>
             <p>
-                KYMNET reserves the right to amend or update these Terms and Conditions at any time. Continued use of the platform following any modifications constitutes your formal acceptance of the revised terms.
+                Gaoshou Pickleball reserves the right to amend or update these Terms and Conditions at any time. Continued use of the platform following any modifications constitutes your formal acceptance of the revised terms.
             </p>
         </section>
     </div>

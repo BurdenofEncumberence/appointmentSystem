@@ -1,4 +1,4 @@
-<x-guest-layout title="Reset Password — KYMNET" label="Reset password">
+<x-guest-layout title="Reset Password — Gaoshou Pickleball" label="Reset password">
     <h1 class="gz-font-display font-bold text-2xl mb-1">Reset your password.</h1>
     <p class="gz-hint mb-6">Pick a new one and you're back in.</p>
 

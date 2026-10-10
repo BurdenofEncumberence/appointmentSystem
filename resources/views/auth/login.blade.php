@@ -1,4 +1,4 @@
-<x-guest-layout title="Log In — KYMNET" label="Log in">
+<x-guest-layout title="Log In — Gaoshou Pickleball" label="Log in">
     <h1 class="gz-font-display font-bold text-2xl mb-1">Welcome back.</h1>
     <p class="gz-hint mb-6">Log in to lock in your next court.</p>
 

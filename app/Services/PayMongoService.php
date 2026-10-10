@@ -63,7 +63,7 @@ class PayMongoService
                         'gcash',
                         'card',
                     ],
-                    'description' => $options['description'] ?? 'KYMNET Court Booking',
+                    'description' => $options['description'] ?? 'Gaoshou Pickleball Court Booking',
                     'success_url' => $options['success_url'],
                     'cancel_url' => $options['cancel_url'],
                     'reference_number' => $options['reference_number'] ?? null,

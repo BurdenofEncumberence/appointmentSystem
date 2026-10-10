@@ -1,4 +1,4 @@
-<x-guest-layout title="Forgot Password — KYMNET" label="Forgot password">
+<x-guest-layout title="Forgot Password — Gaoshou Pickleball" label="Forgot password">
     <h1 class="gz-font-display font-bold text-2xl mb-1">Forgot your password?</h1>
     <p class="gz-hint mb-6">No worries — we'll email you a link to reset it.</p>
 

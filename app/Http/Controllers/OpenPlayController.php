@@ -182,7 +182,7 @@ class OpenPlayController extends Controller
 
             try {
                 $checkout = $payMongoService->createCheckoutSession($lineItems, [
-                    'description' => "KYMNET {$sessionTypeLabel} Slot ({$registration->ref_num})",
+                    'description' => "Gaoshou Pickleball {$sessionTypeLabel} Slot ({$registration->ref_num})",
                     'reference_number' => $registration->ref_num,
                     'success_url' => $successUrl,
                     'cancel_url' => $cancelUrl,

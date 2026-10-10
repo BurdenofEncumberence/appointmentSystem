@@ -40,17 +40,19 @@
                     $logoPath = null;
                     if ($siteSettings && $siteSettings->logo && file_exists(public_path('storage/' . $siteSettings->logo))) {
                         $logoPath = asset('storage/' . $siteSettings->logo);
+                    } elseif (file_exists(public_path('images/logo.png'))) {
+                        $logoPath = asset('images/logo.png');
                     } elseif (file_exists(public_path('images/kymnet-logo.png'))) {
                         $logoPath = asset('images/kymnet-logo.png');
                     }
                 @endphp
                 @if($logoPath)
-                    <img src="{{ $logoPath }}" alt="{{ $siteSettings->system_name ?? 'KYMNET' }}" class="h-9 w-auto max-h-9 max-w-[130px] object-contain rounded-lg shrink-0">
+                    <img src="{{ $logoPath }}" alt="{{ $siteSettings->system_name ?? 'Gaoshou Pickleball' }}" class="h-9 w-auto max-h-9 max-w-[130px] object-contain rounded-lg shrink-0">
                 @else
                     <div class="pixel-mark shrink-0" aria-hidden="true" style="width:34px; height:34px; background:#12150F; border:1px solid var(--gz-border); border-radius:10px; display:grid; grid-template-columns:repeat(8,1fr); grid-template-rows:repeat(8,1fr); padding:6px;" id="nav-seal"></div>
                 @endif
                 <div class="flex flex-col">
-                    <span class="gz-font-display font-bold text-base tracking-tight leading-none" style="color: var(--gz-ink);">{{ $siteSettings->system_name ?? 'KYMNET' }}</span>
+                    <span class="gz-font-display font-bold text-base tracking-tight leading-none" style="color: var(--gz-ink);">{{ $siteSettings->system_name ?? 'Gaoshou Pickleball' }}</span>
                     <span class="text-[9px] uppercase tracking-wider font-semibold opacity-70 mt-0.5 leading-none hidden sm:block" style="color: var(--gz-muted);">Pickleball Arena</span>
                 </div>
             </a>
@@ -265,11 +267,14 @@
             document.body.classList.toggle('night-mode', isNight);
             document.body.classList.toggle('dark', isNight);
         }
-        try { localStorage.setItem('kymnet_theme', isNight ? 'night' : 'day'); } catch (e) {}
+        try {
+            localStorage.setItem('gaoshou_theme', isNight ? 'night' : 'day');
+            localStorage.setItem('kymnet_theme', isNight ? 'night' : 'day');
+        } catch (e) {}
     };
 
     try {
-        if (localStorage.getItem('kymnet_theme') === 'night') {
+        if (localStorage.getItem('gaoshou_theme') === 'night' || localStorage.getItem('kymnet_theme') === 'night') {
             document.documentElement.classList.add('night-mode', 'dark');
             document.body?.classList.add('night-mode', 'dark');
         }

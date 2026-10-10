@@ -27,7 +27,7 @@ class RegistrationOtpMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Your KYMNET Verification Code: {$this->otp}",
+            subject: "Your Gaoshou Pickleball Verification Code: {$this->otp}",
         );
     }
 

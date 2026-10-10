@@ -294,7 +294,7 @@ class OpenPlayHostController extends Controller
                 return "{$c->court_name} (₱" . number_format($c->price_per_hour, 2) . "/hr x {$durationHours}h = ₱" . number_format($c->price_per_hour * $durationHours, 2) . ")";
             })->join(', ');
 
-            $checkoutDescription = "KYMNET Court Appointment: {$session->title} [{$courtCount} court" . ($courtCount > 1 ? 's' : '') . ": {$courtSummaryList}]";
+            $checkoutDescription = "Gaoshou Pickleball Court Appointment: {$session->title} [{$courtCount} court" . ($courtCount > 1 ? 's' : '') . ": {$courtSummaryList}]";
 
             $successUrl = route('open-play.host.paymongo.success') . '?open_play_id=' . $session->id;
             $cancelUrl = route('open-play.host.paymongo.cancel') . '?open_play_id=' . $session->id;

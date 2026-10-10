@@ -63,7 +63,7 @@ class BookingReceiptMail extends Mailable
      */
     public function envelope(): Envelope
     {
-        $systemName = $this->siteSettings?->system_name ?: 'KYMNET';
+        $systemName = $this->siteSettings?->system_name ?: 'Gaoshou Pickleball';
 
         return new Envelope(
             subject: "[{$systemName}] Booking Confirmation & Official Receipt: {$this->refNum}",

@@ -170,7 +170,7 @@ class StaffWalkInController extends Controller
         if (! $user) {
             if (! $email) {
                 $slug = Str::slug($fullName) ?: 'walkin';
-                $email = "walkin_{$slug}_" . time() . '_' . random_int(100, 999) . '@kymnet.local';
+                $email = "walkin_{$slug}_" . time() . '_' . random_int(100, 999) . '@gaoshou.local';
             }
 
             $user = User::create([
@@ -217,13 +217,13 @@ class StaffWalkInController extends Controller
 
             try {
                 $checkout = $payMongoService->createCheckoutSession($lineItems, [
-                    'description' => "KYMNET Walk-In ({$paymentRef})",
+                    'description' => "Gaoshou Pickleball Walk-In ({$paymentRef})",
                     'reference_number' => $paymentRef,
                     'success_url' => $successUrl,
                     'cancel_url' => $cancelUrl,
                     'customer' => [
                         'name' => $fullName,
-                        'email' => ($user && ! str_ends_with($user->email, '@kymnet.local')) ? $user->email : null,
+                        'email' => ($user && ! str_ends_with($user->email, '@gaoshou.local') && ! str_ends_with($user->email, '@kymnet.local')) ? $user->email : null,
                         'phone' => $validated['phone'] ?? null,
                     ],
                     'payment_method_types' => [
@@ -324,7 +324,7 @@ class StaffWalkInController extends Controller
         });
 
         // Dispatch receipt email if user has a valid real email
-        if ($user && $user->email && ! str_ends_with($user->email, '@kymnet.local')) {
+        if ($user && $user->email && ! str_ends_with($user->email, '@gaoshou.local') && ! str_ends_with($user->email, '@kymnet.local')) {
             try {
                 $createdBooking->setRelation('court', $court);
                 Mail::to($user->email)->send(new BookingReceiptMail(
@@ -419,7 +419,7 @@ class StaffWalkInController extends Controller
             });
 
             // Dispatch receipt email if user has a valid real email
-            if ($booking && $booking->user && $booking->user->email && ! str_ends_with($booking->user->email, '@kymnet.local')) {
+            if ($booking && $booking->user && $booking->user->email && ! str_ends_with($booking->user->email, '@gaoshou.local') && ! str_ends_with($booking->user->email, '@kymnet.local')) {
                 try {
                     $booking->load('court');
                     $methodLabel = 'PayMongo (' . strtoupper(str_replace('_', ' ', $sourceType)) . ')';

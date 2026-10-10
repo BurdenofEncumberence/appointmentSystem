@@ -8,6 +8,8 @@
     $logoPath = null;
     if ($siteSettings && $siteSettings->logo && file_exists(public_path('storage/' . $siteSettings->logo))) {
         $logoPath = asset('storage/' . $siteSettings->logo);
+    } elseif (file_exists(public_path('images/logo.png'))) {
+        $logoPath = asset('images/logo.png');
     } elseif (file_exists(public_path('images/kymnet-logo.png'))) {
         $logoPath = asset('images/kymnet-logo.png');
     }
@@ -19,11 +21,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'Staff Desk · ' . ($siteSettings->system_name ?? 'KYMNET') }}</title>
+    <title>{{ $title ?? 'Staff Desk · ' . ($siteSettings->system_name ?? 'Gaoshou Pickleball') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="{{ asset('images/kymnet-logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="antialiased gz-app-shell">
@@ -52,11 +54,11 @@
                         <img src="{{ $logoPath }}" alt="{{ $siteSettings->system_name ?? 'Logo' }}" class="h-7 w-auto max-h-7 max-w-[100px] object-contain rounded-lg">
                     @else
                         <div class="w-6 h-6 rounded flex items-center justify-center font-bold text-xs" style="background: var(--gz-pop); color: var(--gz-ink);">
-                            K
+                            G
                         </div>
                     @endif
                     <span class="gz-font-display font-bold text-sm tracking-tight" style="color: var(--gz-ink);">
-                        {{ $siteSettings->system_name ?? 'KYMNET' }}
+                        {{ $siteSettings->system_name ?? 'Gaoshou Pickleball' }}
                     </span>
                 </div>
             </div>
@@ -96,12 +98,12 @@
                             <img src="{{ $logoPath }}" alt="{{ $siteSettings->system_name ?? 'Logo' }}" class="h-8 w-auto max-h-8 max-w-[110px] object-contain rounded-lg shrink-0">
                         @else
                             <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm" style="background: var(--gz-pop); color: var(--gz-ink);">
-                                K
+                                G
                             </div>
                         @endif
                         <div>
                             <span class="gz-font-display font-extrabold text-base tracking-tight block leading-tight" style="color: var(--gz-ink);">
-                                {{ $siteSettings->system_name ?? 'KYMNET' }}
+                                {{ $siteSettings->system_name ?? 'Gaoshou Pickleball' }}
                             </span>
                             <span class="text-[10px] uppercase font-bold tracking-widest block" style="color: var(--gz-muted);">
                                 Staff Desk
@@ -224,7 +226,7 @@
             {{-- Staff Footer --}}
             <footer class="border-t px-4 sm:px-6 lg:px-8 py-4 shrink-0 text-xs" style="border-color: var(--gz-border); color: var(--gz-muted);">
                 <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-                    <span>{{ $siteSettings->system_name ?? 'KYMNET' }} &copy; {{ date('Y') }} &middot; All Rights Reserved</span>
+                    <span>{{ $siteSettings->system_name ?? 'Gaoshou Pickleball' }} &copy; {{ date('Y') }} &middot; All Rights Reserved</span>
                     <span class="inline-flex items-center gap-1.5 font-mono text-[11px]">
                         <span class="w-2 h-2 rounded-full inline-block" style="background: var(--gz-pop);"></span>
                         Staff Desk Online

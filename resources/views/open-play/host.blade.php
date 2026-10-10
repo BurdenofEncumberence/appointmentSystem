@@ -1,4 +1,4 @@
-<x-app-layout title="Host an Open Play Session — KYMNET">
+<x-app-layout title="Host an Open Play Session — Gaoshou Pickleball">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6">
         {{-- Breadcrumb & Title --}}
         <div class="mb-6">

@@ -243,7 +243,7 @@
 
                     <!-- Footer Note -->
                     <div class="pt-4 border-t border-dashed border-[#12150F]/20 text-center text-[11px] text-[#7A7E73]">
-                        <p class="font-medium text-[#565A4E]">Thank you for playing at KYMNET!</p>
+                        <p class="font-medium text-[#565A4E]" x-text="'Thank you for playing at ' + (receipt?.business_name || 'Gaoshou Pickleball') + '!'">Thank you for playing at Gaoshou Pickleball!</p>
                         <p class="mt-0.5">Please present this receipt reference or digital copy at the front desk if requested.</p>
                     </div>
                 </div>

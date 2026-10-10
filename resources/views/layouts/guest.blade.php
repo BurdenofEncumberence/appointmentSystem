@@ -1,5 +1,5 @@
 @props([
-    'title' => 'KYMNET',
+    'title' => 'Gaoshou Pickleball',
     'label' => 'Account',
     'cardClass' => '',
 ])
@@ -13,11 +13,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="{{ asset('images/kymnet-logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script>
         try {
-            if (localStorage.getItem('kymnet_theme') === 'night') {
+            if (localStorage.getItem('gaoshou_theme') === 'night' || localStorage.getItem('kymnet_theme') === 'night') {
                 document.documentElement.classList.add('night-mode', 'dark');
             }
         } catch (e) {}

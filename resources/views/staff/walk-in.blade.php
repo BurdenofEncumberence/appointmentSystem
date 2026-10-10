@@ -1,4 +1,4 @@
-<x-staff-layout title="Front Desk · Walk-In Booking · KYMNET" heading="New Walk-In Booking">
+<x-staff-layout title="Front Desk · Walk-In Booking · Gaoshou Pickleball" heading="New Walk-In Booking">
     {{-- Header Banner --}}
     <div class="gz-panel gz-panel-body mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>

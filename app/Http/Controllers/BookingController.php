@@ -172,7 +172,7 @@ class BookingController extends Controller
 
             try {
                 $checkout = $payMongoService->createCheckoutSession($lineItems, [
-                    'description' => "KYMNET Court Reservation ({$refNum})",
+                    'description' => "Gaoshou Pickleball Court Reservation ({$refNum})",
                     'reference_number' => $refNum,
                     'success_url' => $successUrl,
                     'cancel_url' => $cancelUrl,

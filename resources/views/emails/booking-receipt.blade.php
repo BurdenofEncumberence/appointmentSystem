@@ -191,7 +191,7 @@
     <div class="container">
         <!-- Brand Header -->
         <div class="header">
-            <span class="brand-badge">{{ $siteSettings?->system_name ?? 'KYMNET' }}</span>
+            <span class="brand-badge">{{ $siteSettings?->system_name ?? 'Gaoshou Pickleball' }}</span>
             <h1 class="receipt-title">Booking Confirmation & Receipt</h1>
             <p class="subtitle">Thank you for your reservation! Your court booking has been confirmed.</p>
         </div>
@@ -294,9 +294,9 @@
 
         <!-- Footer -->
         <div class="footer">
-            <p style="margin: 0 0 6px 0;"><strong>{{ $siteSettings?->business_name ?? 'KYMNET Pickleball Center' }}</strong></p>
+            <p style="margin: 0 0 6px 0;"><strong>{{ $siteSettings?->business_name ?? 'Gaoshou Pickleball Complex' }}</strong></p>
             <p style="margin: 0 0 6px 0;">{{ $siteSettings?->business_address ?? 'Davao City, Philippines' }}</p>
-            <p style="margin: 0;">Need to reschedule or have questions? Contact support at {{ $siteSettings?->email_address ?? 'support@kymnet.ph' }}</p>
+            <p style="margin: 0;">Need to reschedule or have questions? Contact support at {{ $siteSettings?->email_address ?? 'support@gaoshou.ph' }}</p>
         </div>
     </div>
 </body>

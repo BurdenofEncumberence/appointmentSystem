@@ -1,4 +1,4 @@
-<x-app-layout title="Reserve Courts — KYMNET">
+<x-app-layout title="Reserve Courts — Gaoshou Pickleball">
     <div x-data="courtBookingComponent()">
         <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
             <div>
@@ -380,7 +380,7 @@
                         <div x-show="paymentMethod === 'cash'" x-cloak class="mb-6 p-4 rounded-xl text-xs" style="background: var(--gz-surface); border: 1px solid var(--gz-border);">
                             <strong class="block font-bold text-sm mb-1">Over-the-Counter Payment</strong>
                             <p style="color: var(--gz-muted); line-height: 1.4;">
-                                Your slots are reserved immediately. Please present your booking reference to the cashier at the KYMNET front desk before stepping onto the court.
+                                Your slots are reserved immediately. Please present your booking reference to the cashier at the Gaoshou Pickleball front desk before stepping onto the court.
                             </p>
                         </div>
 

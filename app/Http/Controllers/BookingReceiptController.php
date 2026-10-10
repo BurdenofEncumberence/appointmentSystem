@@ -118,13 +118,13 @@ class BookingReceiptController extends Controller
             'discount_amount' => $discountAmount,
             'total_amount' => $totalPaid,
             'event_title' => $booking->event?->event_title,
-            'system_name' => $siteSettings?->system_name ?? 'KYMNET',
-            'business_name' => $siteSettings?->business_name ?? 'KYMNET Pickleball Complex',
-            'tagline' => $siteSettings?->tagline ?? 'Your court era starts now.',
+            'system_name' => $siteSettings?->system_name ?? 'Gaoshou Pickleball',
+            'business_name' => $siteSettings?->business_name ?? 'Gaoshou Pickleball Complex',
+            'tagline' => $siteSettings?->tagline ?? 'Book Your Court, Rally with Ease',
             'business_address' => $siteSettings?->business_address ?? 'Davao City, Philippines',
             'contact_number' => $siteSettings?->contact_number ?? '+63 (082) 000-0000',
-            'email_address' => $siteSettings?->email_address ?? 'support@kymnet.ph',
-            'logo_url' => $siteSettings?->logo ? asset('storage/' . $siteSettings->logo) : asset('images/kymnet-logo.png'),
+            'email_address' => $siteSettings?->email_address ?? 'support@gaoshou.ph',
+            'logo_url' => $siteSettings?->logo ? asset('storage/' . $siteSettings->logo) : asset('images/logo.png'),
         ];
 
         if ($request->wantsJson() || $request->ajax()) {

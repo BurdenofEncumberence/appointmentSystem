@@ -18,6 +18,17 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(CourtSeeder::class);
 
+        // Seed / Update Site Settings to Gaoshou Pickleball
+        \App\Models\SiteSettings::updateOrCreate(
+            ['id' => 1],
+            [
+                'business_name' => 'Gaoshou Pickleball',
+                'system_name' => 'Gaoshou Pickleball',
+                'tagline' => 'Book Your Court, Rally with Ease',
+                'email_address' => 'support@gaoshou.ph',
+            ]
+        );
+
         // Seed Admin account
         User::firstOrCreate(
             ['email' => 'admin@kymnet.com'],
@@ -47,6 +58,41 @@ class DatabaseSeeder extends Seeder
         // Seed Staff account
         User::firstOrCreate(
             ['email' => 'staff@kymnet.com'],
+            [
+                'first_name' => 'Staff',
+                'last_name' => 'Member',
+                'name' => 'Staff Member',
+                'password' => Hash::make('staff123'),
+                'role' => 'staff',
+                'email_verified_at' => now(),
+            ]
+        );
+
+        // Seed Gaoshou accounts
+        User::firstOrCreate(
+            ['email' => 'admin@gaoshou.ph'],
+            [
+                'first_name' => 'Admin',
+                'last_name' => 'User',
+                'name' => 'Admin User',
+                'password' => Hash::make('admin123'),
+                'role' => 'admin',
+                'email_verified_at' => now(),
+            ]
+        );
+        User::firstOrCreate(
+            ['email' => 'manager@gaoshou.ph'],
+            [
+                'first_name' => 'Manager',
+                'last_name' => 'User',
+                'name' => 'Manager User',
+                'password' => Hash::make('manager123'),
+                'role' => 'manager',
+                'email_verified_at' => now(),
+            ]
+        );
+        User::firstOrCreate(
+            ['email' => 'staff@gaoshou.ph'],
             [
                 'first_name' => 'Staff',
                 'last_name' => 'Member',

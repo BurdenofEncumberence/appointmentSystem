@@ -1,4 +1,4 @@
-<x-app-layout title="Secure Court Appointment — KYMNET">
+<x-app-layout title="Secure Court Appointment — Gaoshou Pickleball">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 py-6" x-data="{ paymentMethod: 'paymongo' }">
         {{-- Breadcrumbs & Header --}}
         <div class="mb-6">

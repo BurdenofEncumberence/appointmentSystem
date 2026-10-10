@@ -1,4 +1,4 @@
-<x-guest-layout title="Register — KYMNET" label="Register" card-class="max-w-[620px]">
+<x-guest-layout title="Register — Gaoshou Pickleball" label="Register" card-class="max-w-[620px]">
     <h1 class="gz-font-display font-bold text-2xl mb-1">Create your account.</h1>
     <p class="gz-hint mb-6">Takes about a minute. No cap.</p>
 
@@ -162,7 +162,7 @@
                         <div class="overflow-y-auto space-y-4 text-sm leading-relaxed pr-2 flex-1" style="color: #374151 !important; max-height: 52vh;">
                             <div>
                                 <h4 class="font-bold text-sm mb-1" style="color: #12150F !important;">1. Acceptance of Terms</h4>
-                                <p style="color: #4B5563 !important; margin: 0;">By creating an account and booking courts with KYMNET, you agree to comply with and be bound by all terms, conditions, and court policies.</p>
+                                <p style="color: #4B5563 !important; margin: 0;">By creating an account and booking courts with Gaoshou Pickleball, you agree to comply with and be bound by all terms, conditions, and court policies.</p>
                             </div>
                             <div>
                                 <h4 class="font-bold text-sm mb-1" style="color: #12150F !important;">2. Reservations & Payments</h4>
@@ -178,7 +178,7 @@
                             </div>
                             <div>
                                 <h4 class="font-bold text-sm mb-1" style="color: #12150F !important;">5. Liability Waiver</h4>
-                                <p style="color: #4B5563 !important; margin: 0;">Participation in racquet sports is voluntary. KYMNET is not liable for personal property lost or accidental injuries during normal gameplay.</p>
+                                <p style="color: #4B5563 !important; margin: 0;">Participation in racquet sports is voluntary. Gaoshou Pickleball is not liable for personal property lost or accidental injuries during normal gameplay.</p>
                             </div>
                         </div>
 

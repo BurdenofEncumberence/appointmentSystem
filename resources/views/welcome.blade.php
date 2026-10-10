@@ -3,15 +3,15 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $siteSettings->system_name ?? 'KYMNET' }} - Book Your Court, Rally with Ease</title>
+    <title>{{ $siteSettings->system_name ?? 'Gaoshou Pickleball' }} - Book Your Court, Rally with Ease</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="{{ asset('images/kymnet-logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script>
         try {
-            if (localStorage.getItem('kymnet_theme') === 'night') {
+            if (localStorage.getItem('gaoshou_theme') === 'night' || localStorage.getItem('kymnet_theme') === 'night') {
                 document.documentElement.classList.add('night-mode');
             }
         } catch (e) {}
@@ -754,11 +754,11 @@
         </div>
     </section>
 
-    <!-- Why Play at KYMNET / Amenities -->
+    <!-- Why Play at Gaoshou Pickleball / Amenities -->
     <section id="perks" class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pb-20 sm:pb-24" aria-labelledby="perks-heading">
         <div class="text-center max-w-2xl mx-auto mb-14">
             <span class="text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--pop-dark)]">
-                The KYMNET Experience
+                The Gaoshou Pickleball Experience
             </span>
             <h2 id="perks-heading" class="font-display text-3xl md:text-4xl font-bold mt-3">
                 Why Davao Picklers Choose Our Courts
@@ -907,7 +907,7 @@
                 Loved by Passionate Davao Picklers
             </h2>
             <p class="text-base mt-2" style="color: var(--muted);">
-                Read why local players, tournament contenders, and weekend squads make KYMNET their home court.
+                Read why local players, tournament contenders, and weekend squads make Gaoshou Pickleball their home court.
             </p>
         </div>
 
@@ -938,7 +938,7 @@
                         ★★★★★
                     </div>
                     <p class="text-sm leading-relaxed mb-6" style="color: var(--ink);">
-                        "We used to waste 40 minutes in Messenger groups trying to coordinate court slots. KYMNET's live schedule makes booking effortless. The stadium lights at night are super crisp and anti-glare!"
+                        "We used to waste 40 minutes in Messenger groups trying to coordinate court slots. Gaoshou Pickleball's live schedule makes booking effortless. The stadium lights at night are super crisp and anti-glare!"
                     </p>
                 </div>
                 <div class="flex items-center gap-3 pt-4 border-t border-[color:var(--border)]">
@@ -1035,7 +1035,7 @@
                     <span class="text-xl transition-transform" :class="{'rotate-45': activeFaq === 5}">+</span>
                 </button>
                 <div x-show="activeFaq === 5" x-cloak x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="px-5 pb-5 text-sm leading-relaxed" style="color: var(--muted);">
-                    KYMNET is open 7 days a week from 8:00 AM to 10:00 PM, including holidays. Night play is fully lit by our 1,000-Lux stadium lighting system.
+                    Gaoshou Pickleball is open 7 days a week from 8:00 AM to 10:00 PM, including holidays. Night play is fully lit by our 1,000-Lux stadium lighting system.
                 </div>
             </div>
         </div>
@@ -1077,7 +1077,7 @@
     <footer class="relative z-10 dark-panel" style="color: rgba(255,255,255,0.7);">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-14 grid md:grid-cols-4 gap-8 sm:gap-10">
             <div>
-                <span class="font-display font-bold text-lg" style="color: var(--dark-fg);">KYMNET</span>
+                <span class="font-display font-bold text-lg" style="color: var(--dark-fg);">{{ $siteSettings->business_name ?? 'Gaoshou Pickleball' }}</span>
                 <p class="mt-4 text-sm max-w-xs leading-relaxed">
                     Court booking for the Davao pickleball community. Built by players, for players.
                 </p>
@@ -1097,7 +1097,7 @@
                     <li><a href="#faq" class="footer-link">Frequently Asked Questions</a></li>
                     <li><a href="{{ route('terms') }}" class="footer-link">Terms & Conditions</a></li>
                     <li><a href="{{ route('privacy') }}" class="footer-link">Privacy Policy</a></li>
-                    <li><a href="mailto:support@kymnet.ph" class="footer-link">Contact Desk</a></li>
+                    <li><a href="mailto:{{ $siteSettings->email_address ?? 'support@gaoshou.ph' }}" class="footer-link">Contact Desk</a></li>
                 </ul>
             </div>
             <div>
@@ -1110,13 +1110,13 @@
             </div>
         </div>
         <div class="max-w-6xl mx-auto px-4 sm:px-6 pb-8 text-sm" style="color: rgba(255,255,255,0.4);">
-            © {{ date('Y') }} KYMNET. All rights reserved.
+            © {{ date('Y') }} {{ $siteSettings->business_name ?? 'Gaoshou Pickleball' }}. All rights reserved.
         </div>
     </footer>
 
     <script>
         try {
-            if (localStorage.getItem('kymnet_theme') === 'night') {
+            if (localStorage.getItem('gaoshou_theme') === 'night' || localStorage.getItem('kymnet_theme') === 'night') {
                 document.body.classList.add('night-mode');
             }
         } catch (e) {}

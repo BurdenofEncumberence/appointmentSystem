@@ -20,7 +20,7 @@
                                 name="business_name"
                                 class="gz-input"
                                 value="{{ old('business_name', $settings->business_name ?? '') }}"
-                                placeholder="e.g., KYMNET Pickleball"
+                                placeholder="e.g., Gaoshou Pickleball Complex"
                             >
                         </div>
                         <div>
@@ -30,7 +30,7 @@
                                 name="system_name"
                                 class="gz-input"
                                 value="{{ old('system_name', $settings->system_name ?? '') }}"
-                                placeholder="e.g., KYMNET"
+                                placeholder="e.g., Gaoshou Pickleball"
                             >
                         </div>
                     </div>
@@ -81,7 +81,7 @@
                                 name="email_address"
                                 class="gz-input"
                                 value="{{ old('email_address', $settings->email_address ?? '') }}"
-                                placeholder="e.g., info@kymnet.com"
+                                placeholder="e.g., support@gaoshou.ph"
                             >
                         </div>
                         <div>

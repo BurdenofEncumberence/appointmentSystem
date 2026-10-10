@@ -1,4 +1,4 @@
-<x-app-layout title="Open Play & Tournaments — KYMNET">
+<x-app-layout title="Open Play & Tournaments — Gaoshou Pickleball">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6">
         {{-- Hero Header --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">

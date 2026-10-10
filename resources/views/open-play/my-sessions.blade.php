@@ -1,4 +1,4 @@
-<x-app-layout title="My Hosted Open Play Sessions — KYMNET">
+<x-app-layout title="My Hosted Open Play Sessions — Gaoshou Pickleball">
     <div
         x-data="{
             showSubmittedModal: {{ session('host_request_submitted') ? 'true' : 'false' }},

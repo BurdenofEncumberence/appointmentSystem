@@ -1,4 +1,4 @@
-<x-guest-layout title="Privacy Policy — KYMNET" label="Privacy Policy" card-class="max-w-[760px]">
+<x-guest-layout title="Privacy Policy — Gaoshou Pickleball" label="Privacy Policy" card-class="max-w-[760px]">
     <div class="mb-6">
         @auth
             <a href="{{ url('/') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 hover:text-emerald-700 mb-3">
@@ -17,7 +17,7 @@
         <section>
             <h2 class="font-bold text-base text-stone-900 mb-2">1. Overview</h2>
             <p>
-                KYMNET ("we", "us", "our") respects your personal data and is committed to protecting your privacy in compliance with Republic Act No. 10173, otherwise known as the Data Privacy Act of 2012 of the Philippines.
+                Gaoshou Pickleball ("we", "us", "our") respects your personal data and is committed to protecting your privacy in compliance with Republic Act No. 10173, otherwise known as the Data Privacy Act of 2012 of the Philippines.
             </p>
         </section>
 
@@ -51,7 +51,7 @@
         <section>
             <h2 class="font-bold text-base text-stone-900 mb-2">5. Third-Party Disclosures</h2>
             <p>
-                KYMNET does not sell, rent, or trade your personal data to third parties. Information may only be shared with payment processors (e.g., GCash, Maya) or official law enforcement authorities when strictly required by Philippine legal processes.
+                Gaoshou Pickleball does not sell, rent, or trade your personal data to third parties. Information may only be shared with payment processors (e.g., GCash, Maya) or official law enforcement authorities when strictly required by Philippine legal processes.
             </p>
         </section>
 
@@ -65,7 +65,7 @@
         <section>
             <h2 class="font-bold text-base text-stone-900 mb-2">7. Contact Desk</h2>
             <p>
-                For questions regarding this Privacy Policy or your personal information, please reach out to our team at Davao City, Philippines or email <span class="font-semibold text-emerald-600">support@kymnet.ph</span>.
+                For questions regarding this Privacy Policy or your personal information, please reach out to our team at Davao City, Philippines or email <span class="font-semibold text-amber-600">support@gaoshou.ph</span>.
             </p>
         </section>
     </div>

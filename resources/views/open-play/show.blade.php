@@ -1,4 +1,4 @@
-<x-app-layout title="{{ $session->title }} — KYMNET">
+<x-app-layout title="{{ $session->title }} — Gaoshou Pickleball">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6" x-data="openPlayReservationComponent({{ (float) $session->price_per_slot }}, {{ (int) $session->remaining_slots }})">
         {{-- Breadcrumbs --}}
         <div class="flex items-center gap-2 text-xs mb-4" style="color: var(--gz-muted);">

@@ -1,4 +1,4 @@
-<x-guest-layout title="Verify Email — KYMNET" label="Verify Email">
+<x-guest-layout title="Verify Email — Gaoshou Pickleball" label="Verify Email">
     <div class="mb-6">
         <div class="flex items-center gap-2 mb-2">
             <span class="gz-badge-primary text-[10px] uppercase font-bold tracking-wider">Step 2 of 2</span>

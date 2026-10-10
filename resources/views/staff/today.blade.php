@@ -309,7 +309,7 @@
 
         {{-- Footer Run-sheet summary --}}
         <div class="p-4 border-t flex flex-col sm:flex-row items-center justify-between text-xs" style="border-color: var(--gz-border); color: var(--gz-muted);">
-            <span>KYMNET Arena Front Desk</span>
+            <span>{{ $siteSettings->system_name ?? 'Gaoshou Pickleball' }} Front Desk</span>
             <span>Date: {{ $today->format('Y-m-d') }} · Attendance engine</span>
         </div>
     </div>

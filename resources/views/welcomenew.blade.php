@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>KYMNET - Book Your Court, Rally with Ease</title>
+    <title>{{ \App\Models\SiteSettings::first()?->system_name ?? 'Gaoshou Pickleball' }} - Book Your Court, Rally with Ease</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -215,7 +215,7 @@
         <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="pixel-mark" id="brand-mark" aria-hidden="true"></div>
-                <span class="font-display font-bold text-lg">KYMNET</span>
+                <span class="font-display font-bold text-lg">{{ \App\Models\SiteSettings::first()?->system_name ?? 'Gaoshou Pickleball' }}</span>
             </div>
 
             <nav class="hidden sm:flex items-center gap-8 text-sm font-semibold" style="color: var(--muted);" aria-label="Primary">
@@ -327,7 +327,7 @@
     <footer class="relative z-10" style="background: var(--ink); color: rgba(255,255,255,0.7);">
         <div class="max-w-6xl mx-auto px-6 py-14 grid md:grid-cols-4 gap-10">
             <div>
-                <span class="font-display font-bold text-lg" style="color: var(--surface);">KYMNET</span>
+                <span class="font-display font-bold text-lg" style="color: var(--surface);">{{ \App\Models\SiteSettings::first()?->business_name ?? 'Gaoshou Pickleball' }}</span>
                 <p class="mt-4 text-sm max-w-xs leading-relaxed">
                     Court booking for the Davao pickleball community. Built by players, for players.
                 </p>
@@ -356,7 +356,7 @@
             </div>
         </div>
         <div class="max-w-6xl mx-auto px-6 pb-8 text-sm" style="color: rgba(255,255,255,0.4);">
-            © {{ date('Y') }} KYMNET. All rights reserved.
+            © {{ date('Y') }} {{ \App\Models\SiteSettings::first()?->business_name ?? 'Gaoshou Pickleball' }}. All rights reserved.
         </div>
     </footer>
 

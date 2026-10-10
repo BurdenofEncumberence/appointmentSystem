@@ -91,7 +91,7 @@ class ReportExportService
             // Write UTF-8 BOM for Excel compatibility
             fwrite($handle, "\xEF\xBB\xBF");
 
-            $siteName = SiteSettings::first()->system_name ?? 'KYMNET';
+            $siteName = SiteSettings::first()->system_name ?? 'Gaoshou Pickleball';
 
             fputcsv($handle, [$siteName . ' - OVERALL OPERATIONS REPORT']);
             fputcsv($handle, ['Reporting Period', $range['label']]);
@@ -205,7 +205,7 @@ class ReportExportService
             $handle = fopen('php://output', 'w');
             fwrite($handle, "\xEF\xBB\xBF");
 
-            $siteName = SiteSettings::first()->system_name ?? 'KYMNET';
+            $siteName = SiteSettings::first()->system_name ?? 'Gaoshou Pickleball';
 
             fputcsv($handle, [$siteName . ' - FINANCIAL & REVENUE AUDIT REPORT']);
             fputcsv($handle, ['Reporting Period', $range['label']]);
@@ -333,7 +333,7 @@ class ReportExportService
             $handle = fopen('php://output', 'w');
             fwrite($handle, "\xEF\xBB\xBF");
 
-            $siteName = SiteSettings::first()->system_name ?? 'KYMNET';
+            $siteName = SiteSettings::first()->system_name ?? 'Gaoshou Pickleball';
 
             fputcsv($handle, [$siteName . ' - COURT UTILIZATION & CAPACITY REPORT']);
             fputcsv($handle, ['Reporting Period', $range['label']]);
@@ -510,7 +510,7 @@ class ReportExportService
         $capacityHours = $availableCourtsCount * self::DAILY_OPERATING_HOURS * $range['days'];
         $utilizationRate = $capacityHours > 0 ? min(round(($bookedHours / $capacityHours) * 100, 1), 100.0) : 0.0;
 
-        $siteName = SiteSettings::first()->system_name ?? 'KYMNET';
+        $siteName = SiteSettings::first()->system_name ?? 'Gaoshou Pickleball';
         $filename = 'overall-report-' . $range['period_key'] . '-' . date('Y-m-d') . '.pdf';
 
         $pdf = Pdf::loadView('reports.pdf.overall', [
@@ -562,7 +562,7 @@ class ReportExportService
             ];
         });
 
-        $siteName = SiteSettings::first()->system_name ?? 'KYMNET';
+        $siteName = SiteSettings::first()->system_name ?? 'Gaoshou Pickleball';
         $filename = 'financial-report-' . $range['period_key'] . '-' . date('Y-m-d') . '.pdf';
 
         $pdf = Pdf::loadView('reports.pdf.financial', [
@@ -628,7 +628,7 @@ class ReportExportService
             : 0.0;
         $totalFacilityRevenue = (float) $courtStats->sum('revenue');
 
-        $siteName = SiteSettings::first()->system_name ?? 'KYMNET';
+        $siteName = SiteSettings::first()->system_name ?? 'Gaoshou Pickleball';
         $filename = 'utilization-report-' . $range['period_key'] . '-' . date('Y-m-d') . '.pdf';
 
         $pdf = Pdf::loadView('reports.pdf.utilization', [

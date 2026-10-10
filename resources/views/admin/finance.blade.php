@@ -217,7 +217,7 @@
             </div>
 
             <div class="p-4 text-center border-t" style="border-color: var(--gz-border);">
-                <p class="text-xs" style="color: var(--gz-muted);">KYMNET financial verification system</p>
+                <p class="text-xs" style="color: var(--gz-muted);">Gaoshou Pickleball financial verification system</p>
             </div>
         </div>
     </div>

@@ -3,7 +3,7 @@
         <div class="kymnet-loader-icon">
             <div class="kymnet-loader-ball"></div>
         </div>
-        <div class="kymnet-loader-title">KYMNET</div>
+        <div class="kymnet-loader-title">{{ \App\Models\SiteSettings::first()?->system_name ?? 'GAOSHOU PICKLEBALL' }}</div>
         <div id="kymnet-loader-msg" class="kymnet-loader-subtitle">Loading arena...</div>
         <div class="kymnet-loader-bar" role="progressbar" aria-label="Loading">
             <div class="kymnet-loader-bar-fill"></div>

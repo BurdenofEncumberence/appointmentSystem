@@ -1,4 +1,4 @@
-<x-guest-layout title="Confirm Password — KYMNET" label="Confirm password">
+<x-guest-layout title="Confirm Password — Gaoshou Pickleball" label="Confirm password">
     <h1 class="gz-font-display font-bold text-2xl mb-1">Confirm it's you.</h1>
     <p class="gz-hint mb-6">This is a secure area — please confirm your password before continuing.</p>
 
