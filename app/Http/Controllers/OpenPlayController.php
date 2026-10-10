@@ -173,8 +173,8 @@ class OpenPlayController extends Controller
                 ]
             ];
 
-            $successUrl = route('open-play.paymongo.success') . '?session_id={CHECKOUT_SESSION_ID}&ref=' . $registration->ref_num;
-            $cancelUrl = route('open-play.paymongo.cancel') . '?session_id={CHECKOUT_SESSION_ID}&ref=' . $registration->ref_num;
+            $successUrl = route('open-play.paymongo.success') . '?ref=' . urlencode($registration->ref_num);
+            $cancelUrl = route('open-play.paymongo.cancel') . '?ref=' . urlencode($registration->ref_num);
 
             try {
                 $checkout = $payMongoService->createCheckoutSession($lineItems, [
@@ -232,8 +232,11 @@ class OpenPlayController extends Controller
      */
     public function paymongoSuccess(Request $request, PayMongoService $payMongoService): RedirectResponse
     {
-        $sessionId = $request->query('session_id');
-        $refNum = $request->query('ref');
+        $sessionId = trim((string) $request->query('session_id', ''));
+        if (str_contains($sessionId, '{')) {
+            $sessionId = '';
+        }
+        $refNum = trim((string) $request->query('ref', ''));
 
         if (! $sessionId && ! $refNum) {
             return redirect()->route('bookings.index')
@@ -259,16 +262,19 @@ class OpenPlayController extends Controller
             abort(403, 'Unauthorized access to this registration.');
         }
 
+        $actualSessionId = $sessionId ?: $registration->paymongo_checkout_session_id;
+
         // Verify status with PayMongo
-        if ($sessionId && $payMongoService->isConfigured()) {
+        if ($actualSessionId && $payMongoService->isConfigured()) {
             try {
-                $sessionData = $payMongoService->getCheckoutSession($sessionId);
+                $sessionData = $payMongoService->getCheckoutSession($actualSessionId);
                 $isPaid = $payMongoService->isSessionPaid($sessionData);
 
                 if ($isPaid) {
                     $details = $payMongoService->extractPaymentDetails($sessionData);
                     $registration->update([
                         'payment_status' => 'paid',
+                        'paymongo_checkout_session_id' => $actualSessionId,
                         'paymongo_payment_id' => $details['payment_id'] ?? null,
                         'payment_method' => 'paymongo_' . ($details['source_type'] ?? 'online'),
                     ]);
@@ -290,8 +296,11 @@ class OpenPlayController extends Controller
      */
     public function paymongoCancel(Request $request): RedirectResponse
     {
-        $sessionId = $request->query('session_id');
-        $refNum = $request->query('ref');
+        $sessionId = trim((string) $request->query('session_id', ''));
+        if (str_contains($sessionId, '{')) {
+            $sessionId = '';
+        }
+        $refNum = trim((string) $request->query('ref', ''));
 
         $registration = OpenPlayRegistration::where(function ($q) use ($sessionId, $refNum) {
             if ($sessionId) {

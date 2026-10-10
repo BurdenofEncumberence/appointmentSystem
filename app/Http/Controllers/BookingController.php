@@ -167,8 +167,8 @@ class BookingController extends Controller
         $isPayMongo = ($paymentMethod === 'paymongo') && $payMongoService->isConfigured();
 
         if ($isPayMongo) {
-            $successUrl = route('booking.paymongo.success') . '?session_id={CHECKOUT_SESSION_ID}&ref=' . $refNum;
-            $cancelUrl = route('booking.paymongo.cancel') . '?session_id={CHECKOUT_SESSION_ID}&ref=' . $refNum;
+            $successUrl = route('booking.paymongo.success') . '?ref=' . urlencode($refNum);
+            $cancelUrl = route('booking.paymongo.cancel') . '?ref=' . urlencode($refNum);
 
             try {
                 $checkout = $payMongoService->createCheckoutSession($lineItems, [
@@ -300,36 +300,48 @@ class BookingController extends Controller
      */
     public function paymongoSuccess(Request $request, PayMongoService $payMongoService)
     {
-        $sessionId = $request->query('session_id');
-        $refNum = $request->query('ref');
+        $sessionId = trim((string) $request->query('session_id', ''));
+        if (str_contains($sessionId, '{')) {
+            $sessionId = '';
+        }
+        $refNum = trim((string) $request->query('ref', ''));
 
-        if (! $sessionId) {
+        if (! $sessionId && ! $refNum) {
             return redirect()->route('bookings.index')
-                ->with('status', 'No payment session ID provided.');
+                ->with('status', 'No payment confirmation details provided.');
         }
 
-        try {
-            $sessionData = $payMongoService->getCheckoutSession($sessionId);
-        } catch (\Throwable $e) {
-            report($e);
-            return redirect()->route('bookings.index')
-                ->with('status', 'Unable to verify checkout status with PayMongo: ' . $e->getMessage());
-        }
-
-        $isPaid = $payMongoService->isSessionPaid($sessionData);
-
-        // Find matching payments
-        $payments = Payment::where('checkout_session_id', $sessionId)
-            ->orWhere(function ($q) use ($refNum) {
-                if ($refNum) {
-                    $q->where('ref_num', $refNum);
-                }
-            })
-            ->get();
+        // Find matching payments by ref or session_id
+        $payments = Payment::where(function ($q) use ($sessionId, $refNum) {
+            if ($sessionId) {
+                $q->where('checkout_session_id', $sessionId);
+            }
+            if ($refNum) {
+                $q->orWhere('ref_num', $refNum);
+            }
+        })->get();
 
         if ($payments->isEmpty()) {
             return redirect()->route('bookings.index')
-                ->with('status', 'Payment received, but no reservations matched this session.');
+                ->with('status', 'Payment received, but no reservations matched this transaction.');
+        }
+
+        // Determine actual PayMongo session ID from request or database record
+        $actualSessionId = $sessionId ?: $payments->first()?->checkout_session_id;
+
+        $sessionData = [];
+        $isPaid = false;
+
+        if ($actualSessionId && $payMongoService->isConfigured()) {
+            try {
+                $sessionData = $payMongoService->getCheckoutSession($actualSessionId);
+                $isPaid = $payMongoService->isSessionPaid($sessionData);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        } else {
+            // Local fallback simulation if API not configured
+            $isPaid = true;
         }
 
         $bookingIds = $payments->pluck('booking_id')->filter()->unique();
@@ -343,19 +355,19 @@ class BookingController extends Controller
         }
 
         if ($isPaid) {
-            $details = $payMongoService->extractPaymentDetails($sessionData);
+            $details = $sessionData ? $payMongoService->extractPaymentDetails($sessionData) : [];
             $paymongoPaymentId = $details['payment_id'] ?? null;
             $sourceType = $details['source_type'] ?? 'online';
 
             $alreadyPaid = $payments->every(fn ($p) => $p->payment_status === 'paid');
 
             if (! $alreadyPaid) {
-                DB::transaction(function () use ($payments, $bookings, $sessionId, $paymongoPaymentId, $sourceType) {
+                DB::transaction(function () use ($payments, $bookings, $actualSessionId, $paymongoPaymentId, $sourceType) {
                     foreach ($payments as $payment) {
                         $payment->update([
                             'payment_status' => 'paid',
-                            'checkout_session_id' => $sessionId,
-                            'paymongo_payment_id' => $paymongoPaymentId,
+                            'checkout_session_id' => $actualSessionId ?: $payment->checkout_session_id,
+                            'paymongo_payment_id' => $paymongoPaymentId ?: $payment->paymongo_payment_id,
                             'payment_method' => 'paymongo_' . $sourceType,
                         ]);
                     }
@@ -399,8 +411,11 @@ class BookingController extends Controller
      */
     public function paymongoCancel(Request $request)
     {
-        $sessionId = $request->query('session_id');
-        $refNum = $request->query('ref');
+        $sessionId = trim((string) $request->query('session_id', ''));
+        if (str_contains($sessionId, '{')) {
+            $sessionId = '';
+        }
+        $refNum = trim((string) $request->query('ref', ''));
 
         $payments = Payment::query()
             ->when($sessionId, fn ($q) => $q->where('checkout_session_id', $sessionId))

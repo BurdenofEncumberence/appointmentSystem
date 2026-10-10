@@ -255,8 +255,8 @@ class OpenPlayHostController extends Controller
 
             $checkoutDescription = "KYMNET Court Appointment: {$session->title} [{$courtCount} court" . ($courtCount > 1 ? 's' : '') . ": {$courtSummaryList}]";
 
-            $successUrl = route('open-play.host.paymongo.success') . '?session_id={CHECKOUT_SESSION_ID}&open_play_id=' . $session->id;
-            $cancelUrl = route('open-play.host.paymongo.cancel') . '?session_id={CHECKOUT_SESSION_ID}&open_play_id=' . $session->id;
+            $successUrl = route('open-play.host.paymongo.success') . '?open_play_id=' . $session->id;
+            $cancelUrl = route('open-play.host.paymongo.cancel') . '?open_play_id=' . $session->id;
 
             try {
                 $checkout = $payMongoService->createCheckoutSession($lineItems, [

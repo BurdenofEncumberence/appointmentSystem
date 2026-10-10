@@ -163,6 +163,87 @@ test('paymongo success return verifies payment and marks booking confirmed and s
     });
 });
 
+test('paymongo success return works when paymongo redirects with literal placeholder or ref only', function () {
+    Mail::fake();
+
+    $player = User::factory()->create([
+        'role' => 'player',
+        'email' => 'player.paymongo.placeholder@example.com',
+        'name' => 'Placeholder Player',
+    ]);
+
+    $court = Court::create([
+        'court_name' => 'Court PayMongo 2',
+        'price_per_hour' => 450.00,
+        'court_status' => 'available',
+    ]);
+
+    $booking = Booking::create([
+        'user_id' => $player->id,
+        'court_id' => $court->id,
+        'date' => today()->addDays(3)->toDateString(),
+        'start_time' => '10:00:00',
+        'end_time' => '11:00:00',
+        'booking_status' => 'pending',
+        'booking_type' => 'online',
+    ]);
+
+    $refNum = 'PAY-PLACEHOLDER1';
+    $realSessionId = 'cs_test_session_real_from_db';
+
+    $payment = Payment::create([
+        'booking_id' => $booking->id,
+        'payment_method' => 'paymongo',
+        'payment_status' => 'pending',
+        'amount' => 450.00,
+        'ref_num' => $refNum,
+        'checkout_session_id' => $realSessionId,
+        'date' => today()->toDateString(),
+        'time' => '10:00:00',
+    ]);
+
+    Http::fake([
+        "https://api.paymongo.com/v1/checkout_sessions/{$realSessionId}" => Http::response([
+            'data' => [
+                'id' => $realSessionId,
+                'type' => 'checkout_session',
+                'attributes' => [
+                    'status' => 'paid',
+                    'payments' => [
+                        [
+                            'id' => 'pay_test_pm_real123',
+                            'type' => 'payment',
+                            'attributes' => [
+                                'status' => 'paid',
+                                'amount' => 45000,
+                                'source' => [
+                                    'type' => 'gcash',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], 200),
+    ]);
+
+    $response = $this->actingAs($player)->get(route('booking.paymongo.success', [
+        'session_id' => '{CHECKOUT_SESSION_ID}',
+        'ref' => $refNum,
+    ]));
+
+    $response->assertRedirect(route('bookings.index'));
+
+    $booking->refresh();
+    $payment->refresh();
+
+    expect($booking->booking_status)->toBe('confirmed');
+    expect($payment->payment_status)->toBe('paid');
+    expect($payment->checkout_session_id)->toBe($realSessionId);
+    expect($payment->paymongo_payment_id)->toBe('pay_test_pm_real123');
+    expect($payment->payment_method)->toBe('paymongo_gcash');
+});
+
 test('paymongo cancel releases pending reservation slots', function () {
     $player = User::factory()->create(['role' => 'player']);
     $court = Court::create([

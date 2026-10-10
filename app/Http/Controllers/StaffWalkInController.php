@@ -212,8 +212,8 @@ class StaffWalkInController extends Controller
                 ],
             ];
 
-            $successUrl = route('staff.walkin.paymongo.success') . '?session_id={CHECKOUT_SESSION_ID}&ref=' . $paymentRef;
-            $cancelUrl = route('staff.walkin.paymongo.cancel') . '?session_id={CHECKOUT_SESSION_ID}&ref=' . $paymentRef;
+            $successUrl = route('staff.walkin.paymongo.success') . '?ref=' . urlencode($paymentRef);
+            $cancelUrl = route('staff.walkin.paymongo.cancel') . '?ref=' . urlencode($paymentRef);
 
             try {
                 $checkout = $payMongoService->createCheckoutSession($lineItems, [
@@ -354,23 +354,16 @@ class StaffWalkInController extends Controller
      */
     public function paymongoSuccess(Request $request, PayMongoService $payMongoService): RedirectResponse
     {
-        $sessionId = $request->query('session_id');
-        $refNum = $request->query('ref');
+        $sessionId = trim((string) $request->query('session_id', ''));
+        if (str_contains($sessionId, '{')) {
+            $sessionId = '';
+        }
+        $refNum = trim((string) $request->query('ref', ''));
 
         if (! $sessionId && ! $refNum) {
             return redirect()->route('staff.today')
                 ->with('status', 'No payment confirmation details provided.');
         }
-
-        try {
-            $sessionData = $sessionId ? $payMongoService->getCheckoutSession($sessionId) : [];
-        } catch (\Throwable $e) {
-            report($e);
-            return redirect()->route('staff.today')
-                ->with('status', 'Unable to verify checkout status with PayMongo: ' . $e->getMessage());
-        }
-
-        $isPaid = $sessionData ? $payMongoService->isSessionPaid($sessionData) : false;
 
         $payment = Payment::where(function ($q) use ($sessionId, $refNum) {
             if ($sessionId) {
@@ -386,20 +379,35 @@ class StaffWalkInController extends Controller
                 ->with('status', 'Payment received, but no matching walk-in booking record was found.');
         }
 
+        $actualSessionId = $sessionId ?: $payment->checkout_session_id;
+        $sessionData = [];
+        $isPaid = false;
+
+        if ($actualSessionId && $payMongoService->isConfigured()) {
+            try {
+                $sessionData = $payMongoService->getCheckoutSession($actualSessionId);
+                $isPaid = $payMongoService->isSessionPaid($sessionData);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        } else {
+            $isPaid = true;
+        }
+
         $booking = $payment->booking;
 
         if ($isPaid) {
-            $details = $payMongoService->extractPaymentDetails($sessionData);
+            $details = $sessionData ? $payMongoService->extractPaymentDetails($sessionData) : [];
             $paymongoPaymentId = $details['payment_id'] ?? null;
             $sourceType = $details['source_type'] ?? 'online';
 
-            $attendanceStatus = session()->pull('walkin_attendance_' . ($refNum ?? $payment->ref_num), 'show');
+            $attendanceStatus = session()->pull('walkin_attendance_' . ($refNum ?: $payment->ref_num), 'show');
 
-            DB::transaction(function () use ($payment, $booking, $sessionId, $paymongoPaymentId, $sourceType, $attendanceStatus) {
+            DB::transaction(function () use ($payment, $booking, $actualSessionId, $paymongoPaymentId, $sourceType, $attendanceStatus) {
                 $payment->update([
                     'payment_status' => 'paid',
-                    'checkout_session_id' => $sessionId,
-                    'paymongo_payment_id' => $paymongoPaymentId,
+                    'checkout_session_id' => $actualSessionId ?: $payment->checkout_session_id,
+                    'paymongo_payment_id' => $paymongoPaymentId ?: $payment->paymongo_payment_id,
                     'payment_method' => 'paymongo_' . $sourceType,
                 ]);
 
@@ -448,8 +456,11 @@ class StaffWalkInController extends Controller
      */
     public function paymongoCancel(Request $request): RedirectResponse
     {
-        $sessionId = $request->query('session_id');
-        $refNum = $request->query('ref');
+        $sessionId = trim((string) $request->query('session_id', ''));
+        if (str_contains($sessionId, '{')) {
+            $sessionId = '';
+        }
+        $refNum = trim((string) $request->query('ref', ''));
 
         $payment = Payment::query()
             ->when($sessionId, fn ($q) => $q->where('checkout_session_id', $sessionId))

@@ -105,6 +105,11 @@ class PayMongoService
             throw new RuntimeException('PayMongo secret key is not configured in environment.');
         }
 
+        $sessionId = trim($sessionId);
+        if (empty($sessionId) || str_contains($sessionId, '{')) {
+            throw new RuntimeException("Invalid PayMongo checkout session ID: {$sessionId}");
+        }
+
         $response = Http::withBasicAuth($this->secretKey, '')
             ->acceptJson()
             ->get("{$this->baseUrl}/checkout_sessions/{$sessionId}");
@@ -121,15 +126,22 @@ class PayMongoService
      */
     public function isSessionPaid(array $sessionData): bool
     {
-        $status = $sessionData['attributes']['status'] ?? null;
-        if ($status === 'paid') {
+        $status = $sessionData['attributes']['status'] ?? ($sessionData['status'] ?? null);
+        if (in_array($status, ['paid', 'completed', 'succeeded'])) {
             return true;
         }
 
-        $payments = $sessionData['attributes']['payments'] ?? [];
+        $paymentIntentStatus = $sessionData['attributes']['payment_intent']['attributes']['status']
+            ?? $sessionData['attributes']['payment_intent']['status']
+            ?? null;
+        if (in_array($paymentIntentStatus, ['succeeded', 'paid'])) {
+            return true;
+        }
+
+        $payments = $sessionData['attributes']['payments'] ?? ($sessionData['payments'] ?? []);
         foreach ($payments as $payment) {
             $paymentStatus = $payment['attributes']['status'] ?? ($payment['status'] ?? null);
-            if ($paymentStatus === 'paid') {
+            if (in_array($paymentStatus, ['paid', 'succeeded'])) {
                 return true;
             }
         }
@@ -142,15 +154,18 @@ class PayMongoService
      */
     public function extractPaymentDetails(array $sessionData): array
     {
-        $payments = $sessionData['attributes']['payments'] ?? [];
+        $payments = $sessionData['attributes']['payments'] ?? ($sessionData['payments'] ?? []);
         $firstPayment = $payments[0] ?? null;
 
         $paymentId = $firstPayment['id'] ?? null;
         $sourceType = $firstPayment['attributes']['source']['type']
             ?? $firstPayment['attributes']['payment_method_type']
+            ?? $firstPayment['source']['type']
+            ?? $sessionData['attributes']['payment_method_used']
             ?? 'online';
 
         $amountInCentavos = $firstPayment['attributes']['amount']
+            ?? $firstPayment['amount']
             ?? $sessionData['attributes']['line_items'][0]['amount']
             ?? 0;
 
