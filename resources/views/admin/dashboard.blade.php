@@ -44,7 +44,7 @@
         {{-- Metric 1: Month Revenue --}}
         <div class="gz-kpi-card">
             <div class="flex items-center justify-between mb-3">
-                <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: rgba(62, 207, 126, 0.15); color: var(--gz-pop-dark);">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: rgba(229, 168, 35, 0.15); color: var(--gz-pop-dark);">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 12v-2m0 0c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -106,7 +106,7 @@
         {{-- Metric 4: Fleet Court Utilization --}}
         <div class="gz-kpi-card">
             <div class="flex items-center justify-between mb-3">
-                <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: rgba(62, 207, 126, 0.15); color: var(--gz-pop-dark);">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: rgba(229, 168, 35, 0.15); color: var(--gz-pop-dark);">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
@@ -197,7 +197,7 @@
         <div class="mb-8">
             <div class="gz-kpi-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-base" style="background: rgba(62, 207, 126, 0.15); color: var(--gz-pop-dark);">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-base" style="background: rgba(229, 168, 35, 0.15); color: var(--gz-pop-dark);">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     </div>
                     <div>

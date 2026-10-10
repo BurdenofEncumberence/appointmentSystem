@@ -29,7 +29,7 @@
         }
         .brand-badge {
             background: #12150F;
-            color: #3ECF7E;
+            color: #E5A823;
             font-weight: 800;
             padding: 6px 12px;
             border-radius: 6px;

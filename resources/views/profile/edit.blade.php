@@ -113,7 +113,7 @@
                         @enderror
 
                         @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
-                            <div class="mt-3 p-3 rounded-lg" style="background: rgba(62, 207, 126, 0.1); border: 1px solid var(--pop);">
+                            <div class="mt-3 p-3 rounded-lg" style="background: rgba(229, 168, 35, 0.1); border: 1px solid var(--pop);">
                                 <p class="text-sm" style="color: var(--gz-ink);">
                                     {{ __('Your email address is unverified.') }}
 

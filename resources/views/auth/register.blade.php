@@ -147,7 +147,7 @@
                     >
                         <div class="flex items-center justify-between border-b pb-4 mb-4" style="border-color: #E4E0D4 !important;">
                             <div class="flex items-center gap-2.5">
-                                <span class="text-xs font-bold px-2.5 py-1 rounded" style="background-color: #12150F !important; color: #3ECF7E !important; letter-spacing: 0.5px;">Policy</span>
+                                <span class="text-xs font-bold px-2.5 py-1 rounded" style="background-color: #12150F !important; color: #E5A823 !important; letter-spacing: 0.5px;">Policy</span>
                                 <h3 class="gz-font-display font-bold text-xl" style="color: #12150F !important; margin: 0;">Terms and Conditions</h3>
                             </div>
                             <button
@@ -183,7 +183,7 @@
                         </div>
 
                         <div class="mt-5 pt-4 border-t flex items-center justify-between gap-3" style="border-color: #E4E0D4 !important;">
-                            <a href="{{ route('terms') }}" target="_blank" class="text-xs font-semibold hover:underline" style="color: #2BA863 !important;">Open full page ↗</a>
+                            <a href="{{ route('terms') }}" target="_blank" class="text-xs font-semibold hover:underline" style="color: #A67512 !important;">Open full page ↗</a>
                             <div class="flex gap-2">
                                 <button type="button" @click="modal = null" class="gz-btn-outline gz-btn-sm text-xs">Close</button>
                                 <button type="button" @click="agreed = true; modal = null" class="gz-btn-primary gz-btn-sm text-xs">I Agree & Accept</button>
@@ -214,7 +214,7 @@
                     >
                         <div class="flex items-center justify-between border-b pb-4 mb-4" style="border-color: #E4E0D4 !important;">
                             <div class="flex items-center gap-2.5">
-                                <span class="text-xs font-bold px-2.5 py-1 rounded" style="background-color: #12150F !important; color: #3ECF7E !important; letter-spacing: 0.5px;">Privacy</span>
+                                <span class="text-xs font-bold px-2.5 py-1 rounded" style="background-color: #12150F !important; color: #E5A823 !important; letter-spacing: 0.5px;">Privacy</span>
                                 <h3 class="gz-font-display font-bold text-xl" style="color: #12150F !important; margin: 0;">Privacy Policy</h3>
                             </div>
                             <button
@@ -250,7 +250,7 @@
                         </div>
 
                         <div class="mt-5 pt-4 border-t flex items-center justify-between gap-3" style="border-color: #E4E0D4 !important;">
-                            <a href="{{ route('privacy') }}" target="_blank" class="text-xs font-semibold hover:underline" style="color: #2BA863 !important;">Open full page ↗</a>
+                            <a href="{{ route('privacy') }}" target="_blank" class="text-xs font-semibold hover:underline" style="color: #A67512 !important;">Open full page ↗</a>
                             <div class="flex gap-2">
                                 <button type="button" @click="modal = null" class="gz-btn-outline gz-btn-sm text-xs">Close</button>
                                 <button type="button" @click="agreed = true; modal = null" class="gz-btn-primary gz-btn-sm text-xs">I Agree & Accept</button>

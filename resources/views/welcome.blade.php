@@ -23,10 +23,10 @@
             --ink: #12150F;
             --muted: #565A4E;
             --border: #E4E0D4;
-            --pop: #3ECF7E;
-            --pop-dark: #2BA863;
+            --pop: #E5A823;
+            --pop-dark: #A67512;
 
-            /* Text color on green buttons: never flips */
+            /* Text color on gold buttons: never flips */
             --on-pop: #12150F;
             /* Panels that stay dark in both themes */
             --dark-bg: #12150F;
@@ -46,8 +46,8 @@
             --ink: #F4F1E9 !important;
             --muted: #8F9685 !important;
             --border: #283324 !important;
-            --pop: #3ECF7E !important;
-            --pop-dark: #2BA863 !important;
+            --pop: #E5A823 !important;
+            --pop-dark: #A67512 !important;
         }
 
         body {
@@ -68,7 +68,7 @@
         }
 
         body.night-mode #hero-arena {
-            box-shadow: 0 0 35px -5px rgba(62, 207, 126, 0.2), 0 20px 40px -15px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 35px -5px rgba(229, 168, 35, 0.2), 0 20px 40px -15px rgba(0, 0, 0, 0.8);
         }
 
         /* Dark panels (banner, CTA, footer) stay dark in both themes */
@@ -87,11 +87,11 @@
         .gz-dropdown-item:hover { background: var(--bg); }
         .gz-badge-outline { border-color: var(--border); color: var(--ink); }
 
-        /* Hardcoded Tailwind tints become the same jade palette at night */
+        /* Hardcoded Tailwind tints become the gold palette at night */
         html.night-mode .bg-emerald-100,
         html.night-mode .bg-green-100,
         html.night-mode .bg-purple-100,
-        html.night-mode .bg-amber-100 { background: rgba(62, 207, 126, 0.15) !important; }
+        html.night-mode .bg-amber-100 { background: rgba(229, 168, 35, 0.15) !important; }
         html.night-mode .text-emerald-800,
         html.night-mode .text-green-800,
         html.night-mode .text-purple-800,
@@ -115,7 +115,7 @@
         .huiwen-bl { bottom: 8px; left: 8px; transform: scaleY(-1); }
         .huiwen-br { bottom: 8px; right: 8px; transform: scale(-1); }
 
-        /* Jade Seal Stamp */
+        /* Gold Seal Stamp */
         .seal-jade {
             display: inline-flex;
             align-items: center;
@@ -127,7 +127,7 @@
             font-size: 10px;
             font-weight: 800;
             line-height: 1;
-            background: rgba(62, 207, 126, 0.12);
+            background: rgba(229, 168, 35, 0.12);
             transform: rotate(-2deg);
             user-select: none;
         }
@@ -368,19 +368,19 @@
 
             <!-- Tournament Arena & Regulation Court Showcase -->
             <div class="relative w-full">
-                <div class="relative bg-gradient-to-b from-[#131710] via-[#171D14] to-[#0E120B] text-white rounded-3xl p-5 sm:p-7 border border-[#3ECF7E]/30 shadow-2xl overflow-hidden">
+                <div class="relative bg-gradient-to-b from-[#131710] via-[#171D14] to-[#0E120B] text-white rounded-3xl p-5 sm:p-7 border border-[#E5A823]/30 shadow-2xl overflow-hidden">
                     <!-- Subtle Court Glow & Ambient Lighting -->
-                    <div class="absolute -top-24 -right-24 w-64 h-64 bg-[#3ECF7E]/10 rounded-full blur-3xl pointer-events-none"></div>
-                    <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-[#3ECF7E]/10 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="absolute -top-24 -right-24 w-64 h-64 bg-[#E5A823]/10 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-[#E5A823]/10 rounded-full blur-3xl pointer-events-none"></div>
 
                     <!-- Card Header -->
                     <div class="relative z-10 flex items-center justify-between pb-4 border-b border-white/10 gap-2">
                         <div class="flex items-center gap-2">
                             <span class="relative flex h-2.5 w-2.5">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#E5A823] opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#E5A823]"></span>
                             </span>
-                            <span class="text-[11px] sm:text-xs font-mono font-bold tracking-wider uppercase text-emerald-400">Live Court Hub</span>
+                            <span class="text-[11px] sm:text-xs font-mono font-bold tracking-wider uppercase text-[#E5A823]">Live Court Hub</span>
                         </div>
                         <span class="text-[10px] sm:text-xs text-white/60 font-mono">Open Daily: 8 AM – 10 PM</span>
                     </div>
@@ -389,7 +389,7 @@
                     <div class="relative z-10 my-5">
                         <div class="relative bg-[#0A0D08] rounded-2xl p-3 sm:p-4 border border-white/10 shadow-inner">
                             <!-- Court Blueprint SVG -->
-                            <div class="relative w-full aspect-[2/1] rounded-lg overflow-hidden bg-gradient-to-br from-[#1B3624] via-[#162E1F] to-[#0E2015] border border-emerald-500/40 shadow-lg">
+                            <div class="relative w-full aspect-[2/1] rounded-lg overflow-hidden bg-gradient-to-br from-[#241E13] via-[#1C170E] to-[#120F09] border border-[#E5A823]/40 shadow-lg">
                                 <!-- Outer Boundary Line -->
                                 <div class="absolute inset-2 sm:inset-3 border-2 border-white/90 rounded-sm"></div>
 
@@ -399,8 +399,8 @@
                                 <div class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-white z-20"></div>
 
                                 <!-- Non-Volley Zone ("The Kitchen" - 7ft / 2.13m from net each side) -->
-                                <div class="absolute inset-y-2 sm:inset-y-3 left-[34%] right-[34%] bg-emerald-500/20 border-x-2 border-white/90 flex items-center justify-center pointer-events-none">
-                                    <span class="text-[9px] sm:text-[11px] font-mono font-black uppercase tracking-widest text-emerald-300 drop-shadow select-none">Kitchen / NVZ</span>
+                                <div class="absolute inset-y-2 sm:inset-y-3 left-[34%] right-[34%] bg-[#E5A823]/20 border-x-2 border-white/90 flex items-center justify-center pointer-events-none">
+                                    <span class="text-[9px] sm:text-[11px] font-mono font-black uppercase tracking-widest text-[#F5C75D] drop-shadow select-none">Kitchen / NVZ</span>
                                 </div>
 
                                 <!-- Service Court Centerlines -->
@@ -416,7 +416,7 @@
                                 <div class="absolute bottom-3 right-4 sm:right-6 text-[8px] sm:text-[10px] font-mono text-white/70 select-none uppercase font-semibold">Left Service</div>
 
                                 <!-- Official Dimensions Overlays -->
-                                <div class="absolute bottom-1.5 left-1/2 -translate-x-1/2 text-[8px] sm:text-[9px] font-mono text-emerald-300/80 bg-black/60 px-2 py-0.5 rounded-full pointer-events-none">
+                                <div class="absolute bottom-1.5 left-1/2 -translate-x-1/2 text-[8px] sm:text-[9px] font-mono text-[#F5C75D]/90 bg-black/60 px-2 py-0.5 rounded-full pointer-events-none">
                                     USA Pickleball Official Spec · 13.41m × 6.10m (44' × 20')
                                 </div>
                             </div>
@@ -426,12 +426,12 @@
                     <!-- Court Specs & Features Grid -->
                     <div class="relative z-10 grid grid-cols-2 gap-2.5 sm:gap-3 text-xs">
                         <div class="bg-white/5 hover:bg-white/[0.08] transition rounded-xl p-3 border border-white/10">
-                            <div class="text-[10px] uppercase font-bold tracking-wider text-emerald-400">Regular Courts</div>
+                            <div class="text-[10px] uppercase font-bold tracking-wider text-[#E5A823]">Regular Courts</div>
                             <div class="font-display font-bold text-sm sm:text-base text-white mt-0.5">13.41m × 6.10m</div>
                             <div class="text-[11px] text-white/60 mt-0.5">Official regulation format</div>
                         </div>
                         <div class="bg-white/5 hover:bg-white/[0.08] transition rounded-xl p-3 border border-white/10">
-                            <div class="text-[10px] uppercase font-bold tracking-wider text-emerald-400">Junior Courts</div>
+                            <div class="text-[10px] uppercase font-bold tracking-wider text-[#E5A823]">Junior Courts</div>
                             <div class="font-display font-bold text-sm sm:text-base text-white mt-0.5">10.00m × 4.50m</div>
                             <div class="text-[11px] text-white/60 mt-0.5">Youth & training format</div>
                         </div>
@@ -450,12 +450,12 @@
                     <!-- Live Fleet Bar & Direct Booking Action -->
                     <div class="relative z-10 mt-4 pt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div class="flex items-center gap-2">
-                            <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+                            <div class="w-2 h-2 rounded-full bg-[#E5A823]"></div>
                             <span class="text-xs text-white/80 font-medium">
                                 {{ $courts->count() > 0 ? $courts->count() . ' Courts Ready for Booking' : 'Courts Open for Booking' }}
                             </span>
                         </div>
-                        <a href="{{ $reserveUrl }}" class="inline-flex items-center justify-center gap-2 bg-[#3ECF7E] text-[#12150F] text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-[#34B86F] transition shadow-md">
+                        <a href="{{ $reserveUrl }}" class="inline-flex items-center justify-center gap-2 bg-[#E5A823] text-[#12150F] text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-[#D49B1F] transition shadow-md">
                             <span>Check Live Availability</span>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </a>
@@ -473,7 +473,7 @@
             <svg class="huiwen-corner huiwen-bl" viewBox="0 0 20 20"><path d="M1 19V1H19M5 19V5H19"/></svg>
             <svg class="huiwen-corner huiwen-br" viewBox="0 0 20 20"><path d="M1 19V1H19M5 19V5H19"/></svg>
             <div class="flex items-center gap-2.5 sm:gap-3">
-                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(229, 168, 35, 0.15); color: var(--pop-dark);">
                     <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
                 </div>
                 <div>
@@ -482,7 +482,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-2.5 sm:gap-3">
-                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(229, 168, 35, 0.15); color: var(--pop-dark);">
                     <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                 </div>
                 <div>
@@ -491,7 +491,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-2.5 sm:gap-3">
-                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(229, 168, 35, 0.15); color: var(--pop-dark);">
                     <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                 </div>
                 <div>
@@ -500,7 +500,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-2.5 sm:gap-3">
-                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(229, 168, 35, 0.15); color: var(--pop-dark);">
                     <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </div>
                 <div>
@@ -669,18 +669,18 @@
                     <svg class="huiwen-corner huiwen-tr" viewBox="0 0 20 20"><path d="M1 19V1H19M5 19V5H19"/></svg>
                     <div>
                         <div class="flex items-center justify-between mb-4">
-                            <span class="text-xs font-bold uppercase px-2 py-0.5 rounded-full" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                            <span class="text-xs font-bold uppercase px-2 py-0.5 rounded-full" style="background: rgba(229, 168, 35, 0.15); color: var(--pop-dark);">
                                 {{ $court->size ?: 'Regular (13.41m x 6.10m)' }}
                             </span>
                             <span class="text-xs font-semibold flex items-center gap-1.5" style="color: var(--pop-dark);">
-                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span class="w-2 h-2 rounded-full bg-[#E5A823] animate-pulse"></span>
                                 Available Daily
                             </span>
                         </div>
 
                         <div class="h-28 rounded-2xl relative overflow-hidden mb-5 flex items-center justify-center" style="background: #12150F;">
                             <div class="absolute inset-2 border border-dashed border-stone-600 rounded-lg flex items-center justify-center">
-                                <div class="w-full h-[2px] bg-emerald-400/80"></div>
+                                <div class="w-full h-[2px] bg-[#E5A823]/80"></div>
                                 <div class="absolute w-[2px] h-full bg-stone-500"></div>
                             </div>
                             <span class="relative z-10 font-display font-extrabold text-white text-lg tracking-wide uppercase">
@@ -699,19 +699,19 @@
 
                         <ul class="space-y-2 text-xs mb-6" style="color: var(--ink);">
                             <li class="flex items-center gap-2">
-                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                <svg class="w-4 h-4 text-[#E5A823] shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                                 <span>Anti-slip acrylic cushion surface</span>
                             </li>
                             <li class="flex items-center gap-2">
-                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                <svg class="w-4 h-4 text-[#E5A823] shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                                 <span>1,000-Lux stadium night lighting</span>
                             </li>
                             <li class="flex items-center gap-2">
-                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                <svg class="w-4 h-4 text-[#E5A823] shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                                 <span>Heavy-duty tournament mesh net</span>
                             </li>
                             <li class="flex items-center gap-2">
-                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                <svg class="w-4 h-4 text-[#E5A823] shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                                 <span>Covered roof & shaded player zone</span>
                             </li>
                         </ul>
@@ -740,8 +740,8 @@
 
         <div class="mt-8 p-5 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-lg shrink-0">
-                    <svg class="w-5 h-5 text-emerald-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg shrink-0" style="background: rgba(229, 168, 35, 0.15); color: var(--pop-dark);">
+                    <svg class="w-5 h-5 text-[#A67512]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                 </div>
                 <div>
                     <h4 class="font-bold text-sm">Organizing a mini tournament or squad friendly?</h4>
@@ -770,7 +770,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div class="surface-card p-7">
-                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(229, 168, 35, 0.15); color: var(--pop-dark);">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                 </div>
                 <h3 class="font-display font-bold text-lg mb-2">Joint-Cushion Surface</h3>
@@ -780,7 +780,7 @@
             </div>
 
             <div class="surface-card p-7">
-                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(229, 168, 35, 0.15); color: var(--pop-dark);">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                 </div>
                 <h3 class="font-display font-bold text-lg mb-2">Anti-Glare Night Lighting</h3>
@@ -790,7 +790,7 @@
             </div>
 
             <div class="surface-card p-7">
-                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(229, 168, 35, 0.15); color: var(--pop-dark);">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z" /></svg>
                 </div>
                 <h3 class="font-display font-bold text-lg mb-2">Covered & Weather-Resistant</h3>
@@ -800,7 +800,7 @@
             </div>
 
             <div class="surface-card p-7">
-                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(229, 168, 35, 0.15); color: var(--pop-dark);">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
                 </div>
                 <h3 class="font-display font-bold text-lg mb-2">Pro Shop & Gear Rentals</h3>
@@ -810,7 +810,7 @@
             </div>
 
             <div class="surface-card p-7">
-                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(229, 168, 35, 0.15); color: var(--pop-dark);">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                 </div>
                 <h3 class="font-display font-bold text-lg mb-2">Showers & Locker Rooms</h3>
@@ -820,7 +820,7 @@
             </div>
 
             <div class="surface-card p-7">
-                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(62, 207, 126, 0.15); color: var(--pop-dark);">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(229, 168, 35, 0.15); color: var(--pop-dark);">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                 </div>
                 <h3 class="font-display font-bold text-lg mb-2">Lounge & Refreshment Bar</h3>
@@ -1048,7 +1048,7 @@
             <div class="absolute -left-20 -bottom-20 w-80 h-80 rounded-full blur-3xl opacity-20 pointer-events-none" style="background: var(--pop);"></div>
 
             <div class="relative z-10 max-w-2xl mx-auto">
-                <span class="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full" style="background: rgba(62, 207, 126, 0.2); color: var(--pop);">
+                <span class="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full" style="background: rgba(229, 168, 35, 0.2); color: var(--pop);">
                     ● Live Availability Ready
                 </span>
                 <h2 class="font-display text-4xl md:text-5xl font-extrabold mt-5 leading-tight">

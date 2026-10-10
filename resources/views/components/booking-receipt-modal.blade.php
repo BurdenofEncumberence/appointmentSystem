@@ -106,7 +106,7 @@
                 <!-- Modal Top Controls -->
                 <div class="sticky top-0 z-10 bg-[#FCFBF7]/95 backdrop-blur-xs border-b border-[#12150F]/15 px-6 py-3.5 flex items-center justify-between gap-3">
                     <div class="flex items-center gap-2">
-                        <span class="inline-block px-2.5 py-1 bg-[#12150F] text-[#3ECF7E] text-[10px] font-mono font-black uppercase tracking-wider rounded">
+                        <span class="inline-block px-2.5 py-1 bg-[#12150F] text-[#E5A823] text-[10px] font-mono font-black uppercase tracking-wider rounded">
                             OFFICIAL RECEIPT
                         </span>
                         <span class="font-mono font-bold text-xs text-[#12150F]" x-text="receipt ? ('#' + receipt.ref_num) : ''"></span>
@@ -116,7 +116,7 @@
                         <a
                             :href="receipt ? `/bookings/${receipt.booking_id}/receipt` : '#'"
                             target="_blank"
-                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#3ECF7E] text-[#12150F] border border-[#12150F] shadow-[2px_2px_0_#12150F] hover:bg-[#34B86F] transition"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#E5A823] text-[#12150F] border border-[#12150F] shadow-[2px_2px_0_#12150F] hover:bg-[#D49B1F] transition"
                             title="Open standalone printable receipt"
                         >
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -192,7 +192,7 @@
                                                 <span class="font-bold text-sm text-[#12150F]" x-text="item.court_name"></span>
                                                 <span class="px-1.5 py-0.5 bg-[#12150F]/5 border border-black/10 rounded text-[10px] font-medium text-[#565A4E]" x-text="item.court_size"></span>
                                                 <template x-if="item.event_title">
-                                                    <span class="px-1.5 py-0.5 bg-[#3ECF7E]/20 text-[#12150F] rounded text-[10px] font-bold" x-text="item.event_title + (item.event_discount > 0 ? (' · ' + item.event_discount + '% OFF') : '')"></span>
+                                                    <span class="px-1.5 py-0.5 bg-[#E5A823]/20 text-[#12150F] rounded text-[10px] font-bold" x-text="item.event_title + (item.event_discount > 0 ? (' · ' + item.event_discount + '% OFF') : '')"></span>
                                                 </template>
                                             </div>
                                             <div class="text-xs text-[#565A4E] mt-0.5">

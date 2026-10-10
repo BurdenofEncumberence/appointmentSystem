@@ -33,7 +33,7 @@
 
     {{-- Status Flash Alert --}}
     @if (session('status'))
-        <div class="mb-4 p-4 rounded-xl text-sm border" style="background: rgba(62, 207, 126, 0.08); border-color: rgba(62, 207, 126, 0.3); color: var(--gz-ink);">
+        <div class="mb-4 p-4 rounded-xl text-sm border" style="background: rgba(229, 168, 35, 0.08); border-color: rgba(229, 168, 35, 0.3); color: var(--gz-ink);">
             <div class="flex items-center gap-2">
                 <svg class="w-5 h-5 shrink-0" style="color: var(--gz-pop-dark);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>

@@ -28,7 +28,7 @@
         transition: border-color 0.15s ease, transform 0.15s ease;
         flex-shrink: 0;
     }
-    .theme-toggle-btn:hover { border-color: var(--pop, #3ECF7E); transform: rotate(-12deg); }
+    .theme-toggle-btn:hover { border-color: var(--pop, #E5A823); transform: rotate(-12deg); }
 </style>
 
 <nav x-data="{ mobileOpen: false, profileOpen: false }" class="border-b relative" style="border-color: var(--gz-border);">

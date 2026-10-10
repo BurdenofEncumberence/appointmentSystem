@@ -49,7 +49,7 @@
             <button
                 type="button"
                 onclick="window.print()"
-                class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg font-bold text-xs bg-[#3ECF7E] text-[#12150F] shadow-sm hover:bg-[#34B86F] transition"
+                class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg font-bold text-xs bg-[#E5A823] text-[#12150F] shadow-sm hover:bg-[#D49B1F] transition"
             >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
@@ -85,7 +85,7 @@
                 </div>
 
                 <div class="text-left sm:text-right">
-                    <span class="inline-block px-3 py-1 bg-[#12150F] text-[#3ECF7E] text-xs font-mono font-black uppercase tracking-wider rounded-md">
+                    <span class="inline-block px-3 py-1 bg-[#12150F] text-[#E5A823] text-xs font-mono font-black uppercase tracking-wider rounded-md">
                         OFFICIAL RECEIPT
                     </span>
                     <div class="font-mono font-bold text-sm text-[#12150F] mt-2">
@@ -116,7 +116,7 @@
                 </div>
                 <div class="flex items-center sm:justify-end gap-2 pt-1">
                     <span class="text-[11px] text-[#565A4E]">Payment Status:</span>
-                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider {{ $receipt['payment_status'] === 'paid' ? 'bg-[#3ECF7E] text-[#12150F]' : 'bg-amber-200 text-amber-900' }}">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider {{ $receipt['payment_status'] === 'paid' ? 'bg-[#E5A823] text-[#12150F]' : 'bg-amber-200 text-amber-900' }}">
                         {{ strtoupper($receipt['payment_status']) }}
                     </span>
                 </div>
@@ -183,7 +183,7 @@
                 </div>
 
                 @if($receipt['discount_amount'] > 0)
-                    <div class="flex items-center justify-between text-emerald-800 font-semibold">
+                    <div class="flex items-center justify-between text-[#A67512] font-semibold">
                         <span>Event Promotion Discount ({{ $receipt['discount_percent'] }}%)</span>
                         <span class="font-mono">-₱{{ number_format($receipt['discount_amount'], 2) }}</span>
                     </div>
@@ -191,7 +191,7 @@
 
                 <div class="border-t-2 border-[#12150F] pt-2 flex items-center justify-between text-base font-extrabold text-[#12150F]">
                     <span>Total Amount Paid</span>
-                    <span class="font-mono text-lg text-emerald-800">₱{{ number_format($receipt['total_amount'], 2) }}</span>
+                    <span class="font-mono text-lg text-[#12150F]">₱{{ number_format($receipt['total_amount'], 2) }}</span>
                 </div>
             </div>
         </section>
@@ -205,8 +205,8 @@
             </div>
 
             <div class="text-center sm:text-right shrink-0">
-                <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-full font-bold text-[10px]">
-                    <svg class="w-3.5 h-3.5 text-emerald-700" fill="currentColor" viewBox="0 0 20 20">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#E5A823]/15 text-[#12150F] border border-[#E5A823]/40 rounded-full font-bold text-[10px]">
+                    <svg class="w-3.5 h-3.5 text-[#A67512]" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                     </svg>
                     <span>VERIFIED DIGITAL RECEIPT</span>

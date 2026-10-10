@@ -29,7 +29,7 @@
         }
         .brand-badge {
             background: #12150F;
-            color: #3ECF7E;
+            color: #E5A823;
             font-weight: 800;
             padding: 6px 14px;
             border-radius: 8px;
@@ -80,7 +80,7 @@
         }
         .badge-status {
             display: inline-block;
-            background: #3ECF7E;
+            background: #E5A823;
             color: #12150F;
             font-weight: 800;
             font-size: 11px;
@@ -166,8 +166,8 @@
         }
         .btn-view {
             display: inline-block;
-            background: #3ECF7E;
-            color: #ffffff !important;
+            background: #E5A823;
+            color: #12150F !important;
             text-decoration: none !important;
             font-weight: 700;
             font-size: 14px;
@@ -182,7 +182,7 @@
         .btn-view:visited,
         .btn-view:hover,
         .btn-view:active {
-            color: #ffffff !important;
+            color: #12150F !important;
             text-decoration: none !important;
         }
     </style>
@@ -266,7 +266,7 @@
                 <span>₱{{ number_format($subtotal, 2) }}</span>
             </div>
             @if($discountPercent > 0)
-                <div class="total-row" style="color: #2BA863; font-weight: 600;">
+                <div class="total-row" style="color: #A67512; font-weight: 600;">
                     <span>Promotion Discount ({{ $discountPercent }}% OFF{{ $event ? ' - ' . $event->event_title : '' }})</span>
                     <span>- ₱{{ number_format($discountAmount, 2) }}</span>
                 </div>
@@ -289,7 +289,7 @@
         </div>
 
         <div style="text-align: center;">
-            <a href="{{ route('bookings.index') }}" class="btn-view" style="display: inline-block; background-color: #3ECF7E; color: #ffffff !important; text-decoration: none !important; font-weight: 700; font-size: 14px; padding: 12px 24px; border-radius: 999px; border: 2px solid #12150F; box-shadow: 2px 3px 0px #12150F; margin: 10px 0 20px 0;"><span style="color: #ffffff !important; text-decoration: none !important;">View My Bookings Online &rarr;</span></a>
+            <a href="{{ route('bookings.index') }}" class="btn-view" style="display: inline-block; background-color: #E5A823; color: #12150F !important; text-decoration: none !important; font-weight: 700; font-size: 14px; padding: 12px 24px; border-radius: 999px; border: 2px solid #12150F; box-shadow: 2px 3px 0px #12150F; margin: 10px 0 20px 0;"><span style="color: #12150F !important; text-decoration: none !important;">View My Bookings Online &rarr;</span></a>
         </div>
 
         <!-- Footer -->

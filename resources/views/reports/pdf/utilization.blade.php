@@ -51,8 +51,8 @@
         }
         .period-badge {
             display: inline-block;
-            background: #3ecf7e;
-            color: #0b2214;
+            background: #E5A823;
+            color: #12150F;
             font-weight: 700;
             font-size: 9px;
             padding: 3px 8px;
@@ -68,7 +68,7 @@
             color: #12150f;
             margin-top: 18px;
             margin-bottom: 8px;
-            border-left: 3px solid #3ecf7e;
+            border-left: 3px solid #E5A823;
             padding-left: 8px;
         }
         .kpi-grid {

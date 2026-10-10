@@ -15,8 +15,8 @@
             --ink: #12150F;
             --muted: #565A4E;
             --border: #E4E0D4;
-            --pop: #3ECF7E;
-            --pop-dark: #2BA863;
+            --pop: #E5A823;
+            --pop-dark: #A67512;
         }
 
         body {
@@ -143,7 +143,7 @@
             width: 52px;
             height: 52px;
             border-radius: 16px;
-            background: rgba(62, 207, 126, 0.12);
+            background: rgba(229, 168, 35, 0.12);
             display: grid;
             grid-template-columns: repeat(8, 1fr);
             grid-template-rows: repeat(8, 1fr);
@@ -393,9 +393,9 @@
             ]
         };
         renderPixelGrid('brand-mark', glyphs['brand-mark'], { '.': 'transparent', 'W': '#FCFBF7' });
-        renderPixelGrid('icon-availability', glyphs['icon-availability'], { '.': 'transparent', 'G': '#3ECF7E' });
-        renderPixelGrid('icon-booking', glyphs['icon-booking'], { '.': 'transparent', 'G': '#3ECF7E' });
-        renderPixelGrid('icon-preferences', glyphs['icon-preferences'], { '.': 'transparent', 'G': '#3ECF7E' });
+        renderPixelGrid('icon-availability', glyphs['icon-availability'], { '.': 'transparent', 'G': '#E5A823' });
+        renderPixelGrid('icon-booking', glyphs['icon-booking'], { '.': 'transparent', 'G': '#E5A823' });
+        renderPixelGrid('icon-preferences', glyphs['icon-preferences'], { '.': 'transparent', 'G': '#E5A823' });
     </script>
 
 </body>

@@ -30,7 +30,7 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div class="gz-kpi-card">
             <div class="flex items-center justify-between mb-3">
-                <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: rgba(62, 207, 126, 0.15); color: var(--gz-pop-dark);">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: rgba(229, 168, 35, 0.15); color: var(--gz-pop-dark);">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 12v-2m0 0c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -82,7 +82,7 @@
         <div class="gz-kpi-card" style="border-left: 4px solid var(--gz-pop-dark);">
             <div class="flex items-center justify-between mb-3">
                 <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-base" style="background: rgba(62, 207, 126, 0.15); color: var(--gz-pop-dark);">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-base" style="background: rgba(229, 168, 35, 0.15); color: var(--gz-pop-dark);">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                     </div>
                     <div>

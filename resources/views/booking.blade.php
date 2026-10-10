@@ -154,15 +154,15 @@
                                         <span style="color: var(--gz-muted);">Booked</span>
                                     </span>
                                     <span class="inline-flex items-center gap-1.5">
-                                        <span class="w-2.5 h-2.5 rounded border" style="background: rgba(62, 207, 126, 0.2); border-color: rgba(62, 207, 126, 0.6);"></span>
-                                        <span class="font-semibold" style="color: #166534;">Open Play</span>
+                                        <span class="w-2.5 h-2.5 rounded border" style="background: rgba(229, 168, 35, 0.2); border-color: rgba(229, 168, 35, 0.6);"></span>
+                                        <span class="font-semibold" style="color: #A67512;">Open Play</span>
                                     </span>
                                     <span class="inline-flex items-center gap-1.5">
                                         <span class="w-2.5 h-2.5 rounded border" style="background: rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.6);"></span>
                                         <span class="font-semibold" style="color: #B45309;">Tournament</span>
                                     </span>
                                 </div>
-                                <a href="{{ route('open-play.index') }}" class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 hover:underline">
+                                <a href="{{ route('open-play.index') }}" class="inline-flex items-center gap-1 text-[11px] font-semibold text-[#A67512] hover:underline">
                                     Join Open Play & Tournaments →
                                 </a>
                             </div>
@@ -299,10 +299,10 @@
                             <button type="button" @click="paymentMethod = 'paymongo'"
                                     role="radio" :aria-checked="paymentMethod === 'paymongo' ? 'true' : 'false'"
                                     class="gz-kpi-card text-left p-3.5 cursor-pointer transition relative"
-                                    :style="paymentMethod === 'paymongo' ? 'border-color: var(--gz-pop); background: rgba(62,207,126,0.08);' : ''">
+                                    :style="paymentMethod === 'paymongo' ? 'border-color: var(--gz-pop); background: rgba(229,168,35,0.08);' : ''">
                                 <div class="flex items-center justify-between mb-2">
                                     <div class="flex items-center gap-2">
-                                        <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0" style="background: rgba(62,207,126,0.2); color: var(--gz-pop-dark);">
+                                        <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0" style="background: rgba(229,168,35,0.2); color: var(--gz-pop-dark);">
                                             PAY
                                         </div>
                                         <div>
@@ -325,7 +325,7 @@
                             <button type="button" @click="paymentMethod = 'cash'"
                                     role="radio" :aria-checked="paymentMethod === 'cash' ? 'true' : 'false'"
                                     class="gz-kpi-card text-left p-3.5 cursor-pointer transition relative"
-                                    :style="paymentMethod === 'cash' ? 'border-color: var(--gz-pop); background: rgba(62,207,126,0.08);' : ''">
+                                    :style="paymentMethod === 'cash' ? 'border-color: var(--gz-pop); background: rgba(229,168,35,0.08);' : ''">
                                 <div class="flex items-center justify-between mb-2">
                                     <div class="flex items-center gap-2">
                                         <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0" style="background: rgba(18,21,15,0.08); color: var(--gz-ink);">
@@ -345,7 +345,7 @@
                         </div>
 
                         {{-- Online Payment Sandbox Info Panel --}}
-                        <div x-show="paymentMethod === 'paymongo'" x-cloak class="mb-6 p-4 rounded-xl text-xs space-y-2.5" style="background: rgba(62,207,126,0.06); border: 1px solid rgba(62,207,126,0.25);">
+                        <div x-show="paymentMethod === 'paymongo'" x-cloak class="mb-6 p-4 rounded-xl text-xs space-y-2.5" style="background: rgba(229,168,35,0.06); border: 1px solid rgba(229,168,35,0.25);">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-1.5">
                                     <span class="w-2.5 h-2.5 rounded-full inline-block" style="background: var(--gz-pop-dark);"></span>
@@ -500,7 +500,7 @@
                         return 'height: 28px; background: rgba(245, 158, 11, 0.16); color: #B45309; border: 1.5px solid rgba(245, 158, 11, 0.55); font-weight: 700; cursor: not-allowed;';
                     }
                     if (status === 'open_play') {
-                        return 'height: 28px; background: rgba(62, 207, 126, 0.16); color: #166534; border: 1.5px solid rgba(62, 207, 126, 0.55); font-weight: 700; cursor: not-allowed;';
+                        return 'height: 28px; background: rgba(229, 168, 35, 0.16); color: #A67512; border: 1.5px solid rgba(229, 168, 35, 0.55); font-weight: 700; cursor: not-allowed;';
                     }
                     if (status === 'booked') {
                         return 'height: 28px; background: var(--gz-bg); color: var(--gz-muted); cursor: not-allowed; border: 1px solid var(--gz-border); opacity: 0.65;';

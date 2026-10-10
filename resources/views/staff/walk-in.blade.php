@@ -325,7 +325,7 @@
                         <div class="space-y-2 mt-1">
                             {{-- Option 1: PayMongo Online Gateway --}}
                             <label class="flex items-start gap-2.5 p-2.5 border cursor-pointer text-xs rounded transition"
-                                   :style="selectedPaymentMethod === 'paymongo' ? 'border-color: var(--gz-pop-dark); background: rgba(62,207,126,0.08);' : 'border-color: var(--gz-border);'">
+                                   :style="selectedPaymentMethod === 'paymongo' ? 'border-color: var(--gz-pop-dark); background: rgba(229,168,35,0.08);' : 'border-color: var(--gz-border);'">
                                 <input type="radio" name="payment_method" value="paymongo" x-model="selectedPaymentMethod" class="mt-0.5">
                                 <div class="flex-1">
                                     <div class="flex items-center justify-between">
@@ -338,7 +338,7 @@
 
                             {{-- Option 2: Cash --}}
                             <label class="flex items-start gap-2.5 p-2.5 border cursor-pointer text-xs rounded transition"
-                                   :style="selectedPaymentMethod === 'cash' ? 'border-color: var(--gz-pop-dark); background: rgba(62,207,126,0.08);' : 'border-color: var(--gz-border);'">
+                                   :style="selectedPaymentMethod === 'cash' ? 'border-color: var(--gz-pop-dark); background: rgba(229,168,35,0.08);' : 'border-color: var(--gz-border);'">
                                 <input type="radio" name="payment_method" value="cash" x-model="selectedPaymentMethod" class="mt-0.5">
                                 <div class="flex-1">
                                     <div class="flex items-center justify-between">
