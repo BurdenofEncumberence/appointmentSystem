@@ -132,6 +132,10 @@ Route::middleware(['auth', 'verified', 'role:staff'])
             ->whereNumber('booking')
             ->middleware('throttle:60,1')
             ->name('bookings.status');
+        Route::patch('/open-play/registrations/{registration}/attendance', [StaffTodayController::class, 'updateOpenPlayAttendance'])
+            ->whereNumber('registration')
+            ->middleware('throttle:60,1')
+            ->name('open-play.attendance');
         Route::get('/walk-in', [StaffWalkInController::class, 'create'])->name('walkin.create');
         Route::post('/walk-in', [StaffWalkInController::class, 'store'])
             ->middleware('throttle:30,1')

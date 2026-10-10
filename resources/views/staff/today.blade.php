@@ -313,4 +313,142 @@
             <span>Date: {{ $today->format('Y-m-d') }} · Attendance engine</span>
         </div>
     </div>
+
+    {{-- Open Play & Tournament Sessions Section --}}
+    @if(isset($openPlaySessions) && $openPlaySessions->isNotEmpty())
+        <div class="gz-panel mt-6">
+            <div class="gz-panel-header">
+                <div>
+                    <h2 class="gz-font-display font-bold text-base">
+                        Open Play &amp; Tournament Attendees for {{ $selectedDate->format('M j, Y') }}
+                    </h2>
+                    <p class="text-xs" style="color: var(--gz-muted);">
+                        Community sessions and player rosters scheduled on facility courts.
+                    </p>
+                </div>
+                <span class="gz-badge gz-badge-warning">
+                    {{ $openPlaySessions->count() }} Session{{ $openPlaySessions->count() === 1 ? '' : 's' }}
+                </span>
+            </div>
+
+            <div class="gz-panel-body space-y-6">
+                @foreach($openPlaySessions as $session)
+                    @php
+                        $sessionStart = \Carbon\Carbon::parse($session->date->format('Y-m-d') . ' ' . $session->start_time);
+                        $sessionEnd = \Carbon\Carbon::parse($session->date->format('Y-m-d') . ' ' . $session->end_time);
+                        $isSessionLive = now()->between($sessionStart, $sessionEnd);
+                        $registeredPlayers = $session->registrations->whereIn('payment_status', ['paid', 'pending']);
+                        $totalSlotsFilled = $registeredPlayers->sum('slots_count');
+                    @endphp
+                    <div class="p-4 rounded-xl border" style="border-color: var(--gz-border); background: var(--gz-surface);">
+                        {{-- Session Header --}}
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b" style="border-color: var(--gz-border);">
+                            <div>
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="gz-font-display font-bold text-base" style="color: var(--gz-ink);">
+                                        {{ $session->title }}
+                                    </span>
+                                    <span class="gz-badge {{ $session->session_type === 'tournament' ? 'gz-badge-warning' : 'gz-badge-neutral' }}">
+                                        {{ ucfirst(str_replace('_', ' ', $session->session_type)) }}
+                                    </span>
+                                    @if($isSessionLive)
+                                        <span class="gz-badge gz-badge-success">Live on Court</span>
+                                    @endif
+                                </div>
+                                <div class="text-xs mt-1 flex items-center gap-3 flex-wrap" style="color: var(--gz-muted);">
+                                    <span><strong>Time:</strong> {{ $sessionStart->format('g:i A') }} – {{ $sessionEnd->format('g:i A') }}</span>
+                                    <span><strong>Courts:</strong> {{ $session->courts->pluck('court_name')->join(', ') ?: 'No courts assigned' }}</span>
+                                    <span><strong>Capacity:</strong> {{ $totalSlotsFilled }} / {{ $session->max_capacity }} slots</span>
+                                    <span><strong>Fee:</strong> ₱{{ number_format($session->price_per_slot, 2) }}/slot</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Roster Table --}}
+                        <div class="mt-3 overflow-x-auto">
+                            @if($registeredPlayers->isEmpty())
+                                <p class="text-xs italic py-2" style="color: var(--gz-muted);">
+                                    No players registered yet for this session.
+                                </p>
+                            @else
+                                <table class="gz-table text-xs">
+                                    <thead>
+                                        <tr>
+                                            <th>Player Name</th>
+                                            <th>Contact / Email</th>
+                                            <th>Slots</th>
+                                            <th>Payment</th>
+                                            <th>Attendance</th>
+                                            <th class="text-right print:hidden">Staff Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($registeredPlayers as $reg)
+                                            @php
+                                                $regShow = $reg->attendance_status === 'show';
+                                                $regNoShow = $reg->attendance_status === 'no_show';
+                                                $isDateToday = \Carbon\Carbon::parse($session->date)->isSameDay(now());
+                                            @endphp
+                                            <tr>
+                                                <td class="font-semibold">{{ $reg->player_name }}</td>
+                                                <td style="color: var(--gz-muted);">
+                                                    {{ $reg->player_email }}
+                                                    @if($reg->player_phone)
+                                                        · {{ $reg->player_phone }}
+                                                    @endif
+                                                </td>
+                                                <td>{{ $reg->slots_count }} slot{{ $reg->slots_count === 1 ? '' : 's' }}</td>
+                                                <td>
+                                                    <span class="gz-badge {{ $reg->payment_status === 'paid' ? 'gz-badge-success' : 'gz-badge-warning' }}">
+                                                        {{ strtoupper($reg->payment_status) }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    @if($regShow)
+                                                        <span class="gz-badge gz-badge-success">Show (Present)</span>
+                                                    @elseif($regNoShow)
+                                                        <span class="gz-badge gz-badge-danger">No-Show</span>
+                                                    @else
+                                                        <span class="gz-badge gz-badge-warning">Registered</span>
+                                                    @endif
+                                                </td>
+                                                <td class="text-right print:hidden">
+                                                    @if($isDateToday)
+                                                        <div class="flex items-center justify-end gap-1.5">
+                                                            @if(!$regShow)
+                                                                <form method="POST" action="{{ route('staff.open-play.attendance', $reg) }}" class="inline">
+                                                                    @csrf
+                                                                    @method('PATCH')
+                                                                    <input type="hidden" name="attendance_status" value="show">
+                                                                    <button type="submit" class="gz-btn-success gz-btn-sm py-0.5 px-2 text-[10px]" title="Mark Present">
+                                                                        Show
+                                                                    </button>
+                                                                </form>
+                                                            @endif
+                                                            @if(!$regNoShow)
+                                                                <form method="POST" action="{{ route('staff.open-play.attendance', $reg) }}" class="inline">
+                                                                    @csrf
+                                                                    @method('PATCH')
+                                                                    <input type="hidden" name="attendance_status" value="no_show">
+                                                                    <button type="submit" class="gz-btn-danger gz-btn-sm py-0.5 px-2 text-[10px]" title="Mark Absent">
+                                                                        No-show
+                                                                    </button>
+                                                                </form>
+                                                            @endif
+                                                        </div>
+                                                    @else
+                                                        <span class="text-[11px] italic" style="color: var(--gz-muted);">Match day check-in</span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
 </x-staff-layout>

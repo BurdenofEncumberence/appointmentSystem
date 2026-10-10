@@ -83,10 +83,51 @@ class AdminOpenPlayController extends Controller
             'session_type' => 'open_play',
         ]);
 
+        $bookings = Booking::query()
+            ->where('date', '>=', now()->toDateString())
+            ->where('booking_status', '!=', 'cancelled')
+            ->get();
+
+        $bookedSlots = [];
+        foreach ($bookings as $booking) {
+            $formattedSlot = Carbon::parse($booking->start_time)->format('g:i A') . ' - ' . Carbon::parse($booking->end_time)->format('g:i A');
+            $dateStr = Carbon::parse($booking->date)->toDateString();
+            $bookedSlots[$dateStr][$booking->court_id][] = $formattedSlot;
+        }
+
+        $openPlaySessions = OpenPlaySession::with('courts')
+            ->where('date', '>=', now()->toDateString())
+            ->whereIn('session_status', ['scheduled', 'approved_pending_payment', 'ongoing'])
+            ->get();
+
+        $specialSlots = [];
+        foreach ($openPlaySessions as $existingSession) {
+            $dateStr = Carbon::parse($existingSession->date)->toDateString();
+            $sessionStart = Carbon::parse($existingSession->start_time);
+            $sessionEnd = Carbon::parse($existingSession->end_time);
+
+            $cur = $sessionStart->copy();
+            while ($cur->lt($sessionEnd)) {
+                $next = $cur->copy()->addHour();
+                $formattedSlot = $cur->format('g:i A') . ' - ' . $next->format('g:i A');
+                foreach ($existingSession->courts as $allocatedCourt) {
+                    $bookedSlots[$dateStr][$allocatedCourt->id][] = $formattedSlot;
+                    $specialSlots[$dateStr][$allocatedCourt->id][$formattedSlot] = [
+                        'type' => $existingSession->session_type,
+                        'title' => $existingSession->title,
+                        'id' => $existingSession->id,
+                    ];
+                }
+                $cur = $next;
+            }
+        }
+
         return view('admin.open-play.form', [
             'session' => $session,
             'courts' => $courts,
             'allocatedCourtIds' => [],
+            'bookedSlots' => $bookedSlots,
+            'specialSlots' => $specialSlots,
         ]);
     }
 
@@ -141,10 +182,52 @@ class AdminOpenPlayController extends Controller
         $courts = Court::orderBy('court_name')->get();
         $allocatedCourtIds = $open_play->courts->pluck('id')->all();
 
+        $bookings = Booking::query()
+            ->where('date', '>=', now()->toDateString())
+            ->where('booking_status', '!=', 'cancelled')
+            ->get();
+
+        $bookedSlots = [];
+        foreach ($bookings as $booking) {
+            $formattedSlot = Carbon::parse($booking->start_time)->format('g:i A') . ' - ' . Carbon::parse($booking->end_time)->format('g:i A');
+            $dateStr = Carbon::parse($booking->date)->toDateString();
+            $bookedSlots[$dateStr][$booking->court_id][] = $formattedSlot;
+        }
+
+        $openPlaySessions = OpenPlaySession::with('courts')
+            ->where('id', '!=', $open_play->id)
+            ->where('date', '>=', now()->toDateString())
+            ->whereIn('session_status', ['scheduled', 'approved_pending_payment', 'ongoing'])
+            ->get();
+
+        $specialSlots = [];
+        foreach ($openPlaySessions as $existingSession) {
+            $dateStr = Carbon::parse($existingSession->date)->toDateString();
+            $sessionStart = Carbon::parse($existingSession->start_time);
+            $sessionEnd = Carbon::parse($existingSession->end_time);
+
+            $cur = $sessionStart->copy();
+            while ($cur->lt($sessionEnd)) {
+                $next = $cur->copy()->addHour();
+                $formattedSlot = $cur->format('g:i A') . ' - ' . $next->format('g:i A');
+                foreach ($existingSession->courts as $allocatedCourt) {
+                    $bookedSlots[$dateStr][$allocatedCourt->id][] = $formattedSlot;
+                    $specialSlots[$dateStr][$allocatedCourt->id][$formattedSlot] = [
+                        'type' => $existingSession->session_type,
+                        'title' => $existingSession->title,
+                        'id' => $existingSession->id,
+                    ];
+                }
+                $cur = $next;
+            }
+        }
+
         return view('admin.open-play.form', [
             'session' => $open_play,
             'courts' => $courts,
             'allocatedCourtIds' => $allocatedCourtIds,
+            'bookedSlots' => $bookedSlots,
+            'specialSlots' => $specialSlots,
         ]);
     }
 

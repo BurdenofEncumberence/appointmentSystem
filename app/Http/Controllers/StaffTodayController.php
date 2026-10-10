@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Court;
+use App\Models\OpenPlayRegistration;
+use App\Models\OpenPlaySession;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -56,6 +58,13 @@ class StaffTodayController extends Controller
 
         $bookings = $query->get();
 
+        // Query Open Play / Tournament sessions and registrations for selected date
+        $openPlaySessions = OpenPlaySession::with(['courts', 'registrations.user'])
+            ->whereDate('date', $selectedDate)
+            ->whereIn('session_status', ['scheduled', 'ongoing', 'completed', 'approved_pending_payment'])
+            ->orderBy('start_time')
+            ->get();
+
         // Baseline attendance statistics for the selected date
         $selectedDateAll = Booking::whereDate('date', $selectedDate)->where('booking_status', '!=', 'cancelled')->get();
         $totalBookingsToday = $selectedDateAll->count();
@@ -64,17 +73,25 @@ class StaffTodayController extends Controller
         $awaitingCount = max(0, $totalBookingsToday - $showCount - $noShowCount);
         $uniqueCustomersCount = $selectedDateAll->pluck('user_id')->unique()->count();
 
+        // Open Play attendee counts
+        $openPlayAttendeesCount = 0;
+        foreach ($openPlaySessions as $session) {
+            $openPlayAttendeesCount += $session->registrations->whereIn('payment_status', ['paid', 'pending'])->sum('slots_count');
+        }
+
         $courts = Court::orderBy('court_name')->get();
 
         return view('staff.today', [
             'today' => $today,
             'selectedDate' => $selectedDate,
             'bookings' => $bookings,
+            'openPlaySessions' => $openPlaySessions,
             'totalBookingsToday' => $totalBookingsToday,
             'showCount' => $showCount,
             'noShowCount' => $noShowCount,
             'awaitingCount' => $awaitingCount,
             'uniqueCustomersCount' => $uniqueCustomersCount,
+            'openPlayAttendeesCount' => $openPlayAttendeesCount,
             'courts' => $courts,
             'selectedCourt' => $request->input('court_id'),
             'selectedStatus' => $request->input('status'),
@@ -114,5 +131,22 @@ class StaffTodayController extends Controller
         };
 
         return back()->with('status', "Attendance for {$customerName} marked as {$statusLabel}.");
+    }
+
+    public function updateOpenPlayAttendance(Request $request, OpenPlayRegistration $registration): RedirectResponse
+    {
+        $validated = $request->validate([
+            'attendance_status' => ['required', 'in:registered,show,no_show'],
+        ]);
+
+        $registration->update($validated);
+
+        $statusLabel = match ($validated['attendance_status']) {
+            'show' => 'SHOW (Present)',
+            'no_show' => 'NO-SHOW',
+            'registered' => 'REGISTERED (Awaiting)',
+        };
+
+        return back()->with('status', "Open Play attendance for {$registration->player_name} marked as {$statusLabel}.");
     }
 }
